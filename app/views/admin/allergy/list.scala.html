@@ -1,0 +1,225 @@
+@(title: String, action: String, feature:RoleFeature)
+
+@import helper._
+@import views.html.admin.helper._
+@views.html.admin.main(title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Customer")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div class="header pull-left">
+                            <h3 class="box-title title-module">@action @title</h3>
+                        </div>
+
+                        <div class="add pull-right">
+                            @if(feature.isAdd()){
+                            <a class="btn btn-info btn-sm" href="@controllers.admin.routes.AllergyController.add()">
+                                <i class="fa fa-plus"></i> New
+                            </a>
+                            }
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-xs-4 col-md-2">
+                                    <select class="form-control" id="searchFilter" name="filter" >
+                                        <option value="-1">All</option>
+                                        <option value="1">Active</option>
+                                        <option value="2">Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="col-xs-4 col-md-2">
+                                    <select class="form-control col-md-3"id="action" name="action" >
+                                        <option value="">Select Action</option>
+                                        @if(feature.isEdit()){
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                        }
+                                        @if(feature.isDelete()){
+                                        <option value="delete">Delete</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                        <table id="listTables" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th><input name="select_all" value="1" id="select-all" type="checkbox"></th>
+                                    <th>No</th>
+                                    <th>Name</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+</div>
+
+@mymodaldelete("allergy")
+}
+<script src='@routes.Assets.at("javascripts/additional-methods.min.js")' type='text/javascript'></script>
+<script type="text/javascript">
+    var table;
+    $(document).ready(function(){
+       $('#action').hide();
+
+       table = $("#listTables").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "@controllers.admin.routes.AllergyController.lists()",
+                "data": function(data) {
+                    data.filter = $("#searchFilter").val();
+                }
+            },
+            columnDefs : [
+                {
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'sortable': false,
+                    'className': 'dt-body-center',
+                    'width': "20px",
+                    'render': function (data, type, full, meta){
+                        return '<input type="checkbox" class="cb-action" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                },
+                { targets: 1, sortable: false, width: "20px"},
+                { targets: 2, sortable: false}
+            ],
+            order: [[ 2, "asc" ]],
+            "fnDrawCallback": function() {
+                $('.cb-status').bootstrapToggle();
+                $('.cb-status').change(function() {
+                    var val = [parseInt($(this).val())];
+                    updateStatus(val, $(this).prop('checked') ? "active" : "inactive", false);
+                })
+            },
+            language: {
+                searchPlaceholder: "Search by allergy..."
+            }
+        });
+
+       $('#searchFilter').on('change', function(){
+            table.ajax.reload();
+       });
+
+        oTable = $('#listTables').DataTable();
+
+        $('#listTables_length').hide();
+
+        // Handle click on "Select all" control
+       $('#select-all').on('click', function(){
+          // Get all rows with search applied
+          var rows = table.rows({ 'search': 'applied' }).nodes();
+          // Check/uncheck checkboxes for all rows in the table
+          $('input[type="checkbox"]', rows).prop('checked', this.checked);
+          if(this.checked){
+            $('#action').show();
+          }else{
+            $('#action').hide();
+          }
+          //
+       });
+
+       // Handle click on checkbox to set state of "Select all" control
+       $('#listTables tbody').on('change', 'input[type="checkbox"]', function(){
+          // If checkbox is not checked
+          if(!this.checked){
+             var el = $('#example-select-all').get(0);
+             // If "Select all" control is checked and has 'indeterminate' property
+             if(el && el.checked && ('indeterminate' in el)){
+                // Set visual state of "Select all" control
+                // as 'indeterminate'
+                el.indeterminate = true;
+             }
+          }
+
+          if(getSelectedIds() != ''){
+            $('#action').show();
+          }else{
+            $('#action').hide();
+          }
+       });
+
+       $('.submit-delete').on('click', function() {
+        var id = $("#allergy_id").val();
+        $.ajax({
+            url: "/admin/customer/masterallergy/"+id+"/delete",
+            type: 'DELETE',
+            beforeSend: function() {
+                $('#modal-delete-allergy').modal('hide');
+                MyApp.loadingOverlay.show();
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                toastr["error"](resp.message, "Error")
+            },
+            success: function(resp) {
+                toastr["success"](resp.message, "Succes")
+                table.ajax.reload();
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    toastr["error"]("Something went wrong.", "Error")
+                }
+            }
+        });
+       });
+
+        // Handle action change
+       // Handle action change
+       $('#action').on('change', function(){
+            if($('#action').val() == "delete"){
+                $('#modal-delete-allergy').modal('show');
+                $("#allergy_id").val(getSelectedIds());
+                $('.modal-title').html('Delete allergy');
+                $('.modal-body').html('Are you sure you want to delete these item?');
+            }else if($('#action').val() == "active" || $('#action').val() == "inactive"){
+                updateStatusAll($('#action').val());
+            }
+       });
+
+    });
+
+    function deleteData(id) {
+        $('#modal-delete-allergy').modal('show');
+        $("#allergy_id").val(id);
+    };
+
+    function getSelectedIds(){
+        var dataId = "";
+        var i = 0;
+        table.$('.cb-action').each(function(){
+            if(this.checked){
+               if(i > 0)
+                    dataId += ","+this.value;
+               else dataId = this.value;
+               i++;
+            }
+        });
+        return dataId;
+    }
+</script>

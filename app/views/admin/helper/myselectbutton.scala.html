@@ -1,0 +1,17 @@
+@(field: Field, label: String = "", lists: Map[Integer, String], idBtn: String="idBtn", labelBtn: String="Add Group")
+
+<div class="form-group @if(field.hasErrors) {has-error}">
+    <label for="@field.id">@label</label>
+    <div class="row">
+        <div class="col-md-5 col-sm-9 col-xs-12">
+            <select id="@field.id" name="@field.name" class="form-control select2" style="width: 100%;">
+                <option value="0" selected="selected"></option>
+                @for((k,v) <- lists){<option value="@k" @if(k==Integer.valueOf(field.value.getOrElse("0"))) {selected}>@v</option>}
+            </select>
+        </div>
+        <div class="col-md-7 col-sm-3 col-xs-12">
+            <button type="button" class="btn btn-primary" id="@idBtn">@labelBtn</button>
+        </div>
+    </div>
+    <span class="help-block">@{field.error.map { error => error.message }}</span>
+</div>

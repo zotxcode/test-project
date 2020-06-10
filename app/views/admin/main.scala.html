@@ -1,0 +1,169 @@
+@(title: String)(content: Html)
+
+@import com.enwie.util.Constant
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@title | @Constant.getInstance().getAppName Admin Page</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.6 -->
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/bootstrap.min.css")'>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- jqueryui -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/ui-lightness/jquery-ui.css">
+
+    <link rel='stylesheet' href='@routes.Assets.at("plugins/datatables/dataTables.bootstrap.css")'>
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/bootstrap-toggle.css")'>
+
+    <link rel='stylesheet' href='@routes.Assets.at("plugins/select2/select2.min.css")'>
+    <!-- Theme style -->
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/AdminLTE.min.css")'>
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/_all-skins.min.css")'>
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/_new-skins.css")'>
+    <!-- iCheck -->
+    <link rel='stylesheet' href='@routes.Assets.at("plugins/iCheck/flat/blue.css")'>
+    <!-- Date Picker -->
+    <link rel='stylesheet' href='@routes.Assets.at("plugins/datepicker/datepicker3.css")'>
+    <!-- Daterange picker -->
+    <link rel='stylesheet' href='@routes.Assets.at("plugins/daterangepicker/daterangepicker.css")'>
+    <!-- Bootstrap time Picker -->
+    <link rel='stylesheet' href='@routes.Assets.at("plugins/timepicker/bootstrap-timepicker.min.css")'>
+    <link rel='stylesheet' href='@routes.Assets.at("plugins/toastr/toastr.min.css")'>
+    <!-- bootstrap wysihtml5 - text editor -->
+    <link rel='stylesheet' href='@routes.Assets.at("plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css")'>
+    <link rel='stylesheet' href='@routes.Assets.at("plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css")'>
+    <!-- additional css -->
+    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/main.css")'>
+
+    <link rel='stylesheet' href='@routes.Assets.at("plugins/jcrop/css/Jcrop.css")'>
+
+    <link rel='stylesheet' href='@routes.Assets.at("plugins/sojitra-cropper/css/cropper.css")'>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="hold-transition @Constant.getInstance().getSkinColor sidebar-mini">
+<div class="wrapper">
+
+    @header()
+
+    @leftmenu()
+
+    @content
+
+    @footer()
+
+    @rightmenu()
+
+    <!-- /.control-sidebar -->
+    <!-- Add the sidebar's background. This div must be placed
+         immediately after the control sidebar -->
+    <div class="control-sidebar-bg"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src='@routes.Assets.at("javascripts/jquery-2.2.3.min.js")' type='text/javascript'></script>
+<!-- jQuery Validate -->
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script src='@routes.Assets.at("javascripts/jquery.validate.min.js")' type='text/javascript'></script>
+<!-- jQuery UI 1.11.4 -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button);
+</script>
+<!-- Bootstrap 3.3.6 -->
+<script src='@routes.Assets.at("javascripts/bootstrap.min.js")' type='text/javascript'></script>
+<script src='@routes.Assets.at("javascripts/bootstrap-toggle.js")' type='text/javascript'></script>
+
+<script src='@routes.Assets.at("plugins/datatables/jquery.dataTables.min.js")' type='text/javascript'></script>
+<script src='@routes.Assets.at("plugins/datatables/dataTables.bootstrap.min.js")' type='text/javascript'></script>
+
+<!-- daterangepicker -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+<script src='@routes.Assets.at("plugins/daterangepicker/daterangepicker.js")' type='text/javascript'></script>
+<!-- datepicker -->
+<script src='@routes.Assets.at("plugins/datepicker/bootstrap-datepicker.js")' type='text/javascript'></script>
+<!-- bootstrap time picker -->
+<script src='@routes.Assets.at("plugins/timepicker/bootstrap-timepicker.min.js")' type='text/javascript'></script>
+<!-- Bootstrap WYSIHTML5 -->
+<script src='@routes.Assets.at("plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js")' type='text/javascript'></script>
+<!-- Slimscroll -->
+<script src='@routes.Assets.at("plugins/slimScroll/jquery.slimscroll.min.js")' type='text/javascript'></script>
+
+<!--<script src="https://cdn.ckeditor.com/4.5.7/standard/ckeditor.js"></script>-->
+<script type="text/javascript" src="@routes.Assets.at("plugins/ckeditor/ckeditor.js")"></script>
+
+<script src='@routes.Assets.at("plugins/select2/select2.full.min.js")' type='text/javascript'></script>
+<!-- FastClick -->
+<script src='@routes.Assets.at("plugins/chartjs/Chart.min.js")' type='text/javascript'></script>
+<script src='@routes.Assets.at("plugins/fastclick/fastclick.js")' type='text/javascript'></script>
+<script src='@routes.Assets.at("plugins/toastr/toastr.min.js")' type='text/javascript'></script>
+<!-- AdminLTE App -->
+<script src='@routes.Assets.at("javascripts/app.min.js")' type='text/javascript'></script>
+<script src='@routes.Assets.at("javascripts/jquery.form.js")' type='text/javascript'></script>
+<script src='@routes.Assets.at("javascripts/myapp.js")' type='text/javascript'></script>
+<!-- AdminLTE for demo purposes -->
+<script src='@routes.Assets.at("javascripts/demo.js")' type='text/javascript'></script>
+<script src='@routes.Assets.at("javascripts/autonumeric.js")' type='text/javascript'></script>
+
+<script src='@routes.Assets.at("plugins/jcrop/js/Jcrop.js")' type='text/javascript'></script>
+@*<script src="http://jcrop-dev.tapmodo.com/Jcrop/js/jquery.color.js"></script>*@
+
+<script src='@routes.Assets.at("plugins/sojitra-cropper/js/cropper.js")' type='text/javascript'></script>
+
+
+<script>
+    $(function () {
+        @if(flash.containsKey("success")) {
+            toastr["success"]("@flash.get("success")", "Success")
+        }
+        @if(flash.containsKey("error")) {
+            toastr["error"]("@flash.get("error")", "Error")
+        }
+
+//        $.ajax({
+//            url: "/admin/dashboard/pending-notif",
+//            type: 'GET',
+//            beforeSend: function() {
+//            },
+//            error: function(data ) {
+//                //resp = JSON.parse(data.responseText);
+//                //alert(resp.message);
+//            },
+//            success: function(resp) {
+//                if(resp.data.sum_pending_stock + resp.data.sum_pending_product > 0) $("#notif_pending").text(resp.data.sum_pending_stock + resp.data.sum_pending_product);
+//                if(resp.data.sum_pending_product > 0) $("#notif_pending_auth_product").text(resp.data.sum_pending_product);
+//                if(resp.data.sum_pending_stock > 0) $("#notif_pending_auth_stock").text(resp.data.sum_pending_stock);
+//                if(resp.data.sum_pending_article_comment + resp.data.sum_pending_promo_request > 0) $("#notif_pending_information").text(resp.data.sum_pending_article_comment + resp.data.sum_pending_promo_request);
+//                if(resp.data.sum_pending_article_comment > 0) $("#notif_pending_article_comment").text(resp.data.sum_pending_article_comment);
+//                if(resp.data.sum_pending_promo_request > 0) $("#notif_pending_promo_request").text(resp.data.sum_pending_promo_request);
+//                if(resp.data.sum_pending_product_review + resp.data.sum_pending_product_marketplace > 0) $("#notif_pending_product").text(resp.data.sum_pending_product_review + resp.data.sum_pending_product_marketplace);
+//                if(resp.data.sum_pending_product_review > 0) $("#notif_pending_product_review").text(resp.data.sum_pending_product_review);
+//                if(resp.data.sum_pending_product_marketplace > 0) $("#notif_pending_product_marketplace").text(resp.data.sum_pending_product_marketplace);
+//
+//                if(resp.data.sum_pending_payment_confirmation + resp.data.sum_pending_order > 0) $("#notif_pending_shop").text(resp.data.sum_pending_payment_confirmation + resp.data.sum_pending_order);
+//                if(resp.data.sum_pending_payment_confirmation > 0) $("#notif_pending_payment_confirmation").text(resp.data.sum_pending_payment_confirmation);
+//                if(resp.data.sum_pending_order > 0) $("#notif_pending_order").text(resp.data.sum_pending_order);
+//
+//            },
+//            complete: function(xhr) {
+//
+//            }
+//        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+@(title: String, action: String)
+
+@import views.html.admin.helper._
+@views.html.admin.main(title+" | Hokeba Admin Page"){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Voucher")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div class="header pull-left">
+                            <h3 class="box-title title-module">@action @title</h3>
+                        </div>
+
+                        <div class="add pull-right">
+                            <a class="btn btn-info btn-sm" href="@controllers.admin.routes.VoucherController.add()">
+                                <i class="fa fa-plus"></i> Add New Generate Voucher
+                            </a>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-4 col-md-2">
+                                <a class="btn btn-danger btn-sm" id="action">
+                                    <i class="fa fa-trash"></i> Delete All
+                                </a>
+                            </div>
+                        </div>
+                        <table id="listVoucher" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th><input name="select_all" value="1" id="select-all" type="checkbox"></th>
+                                    <th>Voucher Name</th>
+                                    <th>Voucher Description</th>
+                                    <th>Masking Name</th>
+                                    <th>Count</th>
+                                    <th>Used</th>
+                                    <th>Value</th>
+                                    <th>Valid Date</th>
+                                    <th>Type Voucher</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+</div>
+
+@mymodaldelete("voucher")
+
+}
+
+<script type="text/javascript">
+    var table;
+    $(document).ready(function(){
+       $('#action').hide();
+
+       table = $("#listVoucher").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": "@controllers.admin.routes.VoucherController.lists()",
+            columnDefs : [
+                {
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'sortable': false,
+                    'className': 'dt-body-center',
+                    'width': "20px",
+                    'render': function (data, type, full, meta){
+                        return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                },
+                { targets: 1, sortable: false, width: "20px"},
+                { targets: 10, sortable: false, width: "20px"}
+            ],
+            order: [[ 1, "asc" ]],
+            "fnDrawCallback": function() {
+                $('.cb-status').bootstrapToggle();
+                $('.cb-status').change(function() {
+                    var val = [parseInt($(this).val())];
+                    updateStatus(val, $(this).prop('checked') ? "active" : "inactive", true);
+                })
+            },
+            language: {
+                searchPlaceholder: "Search by name..."
+            }
+        });
+
+        oTable = $('#listVoucher').DataTable();
+
+        $('#listVoucher_length').hide();
+
+        // Handle click on "Select all" control
+       $('#select-all').on('click', function(){
+          var rows = table.rows({ 'search': 'applied' }).nodes();
+          $('input[type="checkbox"]', rows).prop('checked', this.checked);
+          if(this.checked){
+            $('#action').show();
+          }else{
+            $('#action').hide();
+          }
+       });
+
+       // Handle click on checkbox to set state of "Select all" control
+       $('#listVoucher tbody').on('change', 'input[type="checkbox"]', function(){
+          if(!this.checked){
+             var el = $('#example-select-all').get(0);
+             if(el && el.checked && ('indeterminate' in el)){
+                el.indeterminate = true;
+             }
+          }
+
+          if(getSelectedIds() != ''){
+            $('#action').show();
+          }else{
+            $('#action').hide();
+          }
+       });
+
+       // Handle action change
+       $('#action').on('click', function(){
+            $('#modal-delete-voucher').modal('show');
+            $("#voucher_id").val(getSelectedIds());
+            $('.modal-title').html('Delete Voucher');
+            $('.modal-body').html('Are you sure you want to delete these item?');
+       });
+
+        $('.submit-delete').on('click', function() {
+            var id = $("#voucher_id").val();
+            $.ajax({
+                url: "/admin/voucher/"+id+"/delete",
+                type: 'DELETE',
+                beforeSend: function() {
+                    $('#modal-delete-voucher').modal('hide');
+                    MyApp.loadingOverlay.show();
+                },
+                error: function(data ) {
+                    resp = JSON.parse(data.responseText);
+                    toastr["error"](resp.message, "Error")
+                },
+                success: function(resp) {
+                    toastr["success"](resp.message, "Succes")
+                    table.ajax.reload();
+                },
+                complete: function(xhr) {
+                    MyApp.loadingOverlay.hide();
+                    try {
+                        resp = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        toastr["error"]("Something went wrong.", "Error")
+                    }
+                }
+            });
+        });
+
+    });
+
+    function deleteData(id) {
+        $('#modal-delete-voucher').modal('show');
+        $("#voucher_id").val(id);
+    };
+
+    function getSelectedIds(){
+        var dataId = "";
+        var i = 0;
+        table.$('input[type="checkbox"]').each(function(){
+            if(this.checked){
+               if(i > 0)
+                dataId += ","+this.value;
+               else dataId = this.value;
+               i++;
+            }
+        });
+        return dataId;
+    }
+
+    // Handle update status action
+    function updateStatus(id, status, reload){
+        $.ajax({
+            url: "/admin/voucher/"+id+"/updateStatus/"+status,
+            type: 'POST',
+            beforeSend: function() {
+                $('#modal-delete-banner').modal('hide');
+                MyApp.loadingOverlay.show();
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                $('#action option[value=""]').prop('selected', true);
+
+                if(resp.meta.total != 0){
+                    toastr["success"](resp.message, "Succes")
+                    $('#action').hide();
+                }else{
+                    toastr["error"](resp.message, "Error")
+                    table.ajax.reload();
+                }
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('Something went wrong.');
+                }
+            }
+        });
+    }
+
+</script>

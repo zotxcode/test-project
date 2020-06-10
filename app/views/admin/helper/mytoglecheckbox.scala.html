@@ -1,0 +1,18 @@
+@(field: Field, label: String = "", style: String = "", activeText: String="Active", inActiveText: String="Inactive")
+<div class="form-group @style ">
+    <label for="@field.id">@label</label>
+    <div class="row col-xs-12">
+        <input id="@field.id"
+               name="@field.id"
+               data-toggle="toggle"
+               data-on="@activeText"
+               data-off="@inActiveText"
+               data-style="ios"
+               data-size="small"
+               data-offstyle="danger"
+               @if(field.value.getOrElse("").equalsIgnoreCase("active")){checked="checked"}
+               type="checkbox">
+        <span class="help-block">@{field.error.map { error => error.message }}</span>
+    </div>
+
+</div>

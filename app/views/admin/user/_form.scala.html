@@ -1,0 +1,140 @@
+@(title: String, action: String, formData: Form[UserCms], url: play.api.mvc.Call, listRole: Map[Integer, String], listBrand: Map[Integer, String], listProvince: Map[Integer, String], listCity: Map[Integer, String])
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "User Management")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id->"form-save") {
+                    <div class="box-body">
+                        @mytext(formData("id"), "", "", "hidden")
+                        @mytext(formData("firstName"), "First Name *")
+                        @mytext(formData("lastName"), "Last Name")
+                        @mytext(formData("email"), "Email *")
+                        <div class="row">
+                        @myselect(formData("roleId"), "Role *", listRole, "col-xs-4", true)
+                        </div>
+                        <div class="row">
+                        @myselect(formData("brandId"), "Brand *", listBrand, "col-xs-4", true)
+                        </div>
+                        @if(action == "Add"){
+                            @mytoglecheckbox(formData("isDistributor"), "Is Distributor?", "", "Yes", "No")
+                            <div class="row">
+                            @myselect(formData("provinceId"), "Province", listProvince, "col-xs-4", true)
+                            </div>
+                            <div class="row">
+                            @myselect(formData("cityId"), "City", listCity, "col-xs-4", true)
+                            </div>
+                        }
+                        @mytoglecheckbox(formData("isActive"), "Status")
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.UserController.index(), action.equalsIgnoreCase("add"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+
+}
+<script type="text/javascript">
+$(document).ready(function() {
+    $(".select2").select2();
+
+    @if(action.equalsIgnoreCase("edit")){
+        $('#email').prop("disabled", true);
+    }
+
+    $.validator.addMethod("valueNotEquals", function(value, element, arg){
+          return arg != value;
+         }, "Value must not equal arg.");
+
+    $('#provinceId').on("select2:select", function(e) {
+        $.ajax({
+            url: "/admin/usermanagement/users/cities/"+$('#provinceId').val(),
+            type: 'GET',
+            beforeSend: function() {
+
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                $("#cityId").empty();
+                var items = [];
+                items.push({"id":0,"text":""});
+                $.each (resp.items, function (k) {
+                    items.push(resp.items[k])
+                });
+                $("#cityId").select2({data: items});
+            },
+            complete: function(xhr) {
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('Something went wrong.');
+                }
+            }
+        });
+    });
+    $("#form-save").validate({
+        ignore: [],
+        rules: {
+          firstName: "required",
+          email: "required",
+          roleId : {
+                valueNotEquals : "0"
+            }
+        },
+        messages: {
+          firstName: "First name is required",
+          email: "Email is required",
+          roleId : {
+                valueNotEquals : "Please select role"
+            }
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            $('#email').prop("disabled", false);
+            form.submit();
+        }
+    });
+});
+</script>

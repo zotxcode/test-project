@@ -1,0 +1,7 @@
+@(field: Field, label: String = "", placeholder: String = "", style : String = "", rows : Integer = 10, cols : Integer = 80)
+
+<div class="form-group @if(field.hasErrors) {has-error}" id="div-@field.id">
+    <label>@label</label>
+    <textarea id="@field.id" name="@field.name" rows="@rows" cols="@cols" class="form-control">@field.value.getOrElse("")</textarea>
+    <span class="help-block">@{field.error.map { error => error.message }}</span>
+</div>

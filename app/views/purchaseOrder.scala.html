@@ -1,0 +1,346 @@
+@(name: String, url: String, path: String, so: SalesOrder, appName: String)
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Account Confirm - email template</title>
+    <!-- <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:700' rel='stylesheet' type='text/css'>
+      <link href='https://fonts.googleapis.com/css?family=Nunito:400,700,300' rel='stylesheet' type='text/css'> -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <style>
+      /*font face*/
+     
+      .sos-med>ul {
+      padding-left: 0;
+      margin-bottom: 0;
+      list-style: none;
+      margin: 0px auto 15px;
+      }
+      .sos-med>ul>li {
+      display: inline-block;
+      }
+      .sos-med>ul>li>a>img {
+      transition: all 0.3s;
+      -webkit-transition: all 0.3s;
+      -moz-transition: all 0.3s;
+      }
+      .sos-med>ul>li>a:hover>img {
+      transform: scale(1.12);
+      -webkit-transform: scale(1.12);
+      -moz-transform: scale(1.12);
+      }
+      .item-desc {
+      width: 80px;
+      height: 80px;
+      float: left;
+      }
+    </style>
+  </head>
+  <body style="background:#000">
+    <table border="0" cellspacing="0" cellpadding="0" style="max-width: 600px;width: 100%;margin: auto;">
+      <tbody>
+        <tr>
+          <td>
+            <table cellspacing="0" cellpadding="0" align="center" style="margin-top: 10px;">
+              <tr>
+                <td align="center" style="padding:20px 30px;">
+                  <a href=""><img src="images/LOGO @appName
+                    .png" style="display:block;" border="0" alt="" /></a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <table bgcolor="#fff" cellspacing="0" cellpadding="0" align="center" style="margin-top: 10px;">
+              <tbody>
+                <tr bgcolor="#252525">
+                  <td align="left" style="padding:0 30px; height: 105px" colspan="2">
+                    <h3 style="color:#fff;font-family: 'MontserratBold', sans-serif; font-size: 18px; ">Hi, @name</h3>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <table border="0" cellspacing="0" cellpadding="0">
+                      <tbody>
+                        <tr>
+                          <td align="left" style="padding:0 30px; " colspan="2">
+                            <h3 style="color:#000;font-family: 'MontserratBold', sans-serif; font-size: 18px; ">Thank You For Order !</h3>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td width="30px">&nbsp;</td>
+                          <td align="left" valign="top">
+                            <table style="margin: 0 auto;">
+                              <tbody>
+                                <tr>
+                                  <td style="padding:10px 0 10px" colspan="4">
+                                    <font style="font-family: 'MontserratLight', sans-serif;color:#333; font-size:16px; font-weight:500;line-height: 36px;">We Your order is on-hold until we confirm payment has been received. 
+                                    Your order details are shown below for your reference:
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    <table>
+                                      <tr>
+                                        <td>
+                                          <font style="font-family: 'MontserratBold', sans-serif;color:#000; font-size:14px; font-weight:700">
+                                            Order Number :  @so.orderNumber
+                                          </font>
+                                        </td>
+                                        <td style="text-align: right;">
+                                          <font style="font-family: 'MontserratBold', sans-serif;color:#000; font-size:14px; font-weight:700">
+                                            Placed On:  @so.orderDate
+                                          </font>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td style="padding: 30px 0 15px 0;" colspan="4">
+                                    <h2 style="font-weight: bold; font-size: 16px; text-transform: uppercase; margin: 0; text-align: center; padding: 20px; background: #000; color: #fff;">ORDER SUMMARY</h2>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td width="100%">
+                                    <table style="margin: 15px 0;">
+                                      <thead>
+                                        <tr>
+                                          <th width="40%" style="text-align: left;">
+                                            <font style="font-family: 'MontserratBold', sans-serif;color:#000; font-size:14px; font-weight:700; text-align: left;">Item Description 
+                                            </font>
+                                          </th>
+                                          <th width="20%" style="text-align: left;">
+                                            <font style="font-family: 'MontserratBold', sans-serif;color:#000; font-size:14px; font-weight:700; text-align: left;">Quantity
+                                            </font>
+                                          </th>
+                                          <th width="20%" style="text-align: left;">
+                                            <font style="font-family: 'MontserratBold', sans-serif;color:#000; font-size:14px; font-weight:700; text-align: left;">Price 
+                                            </font>
+                                          </th>
+                                          <th width="20%" style="text-align: left;">
+                                            <font style="font-family: 'MontserratBold', sans-serif;color:#000; font-size:14px; font-weight:700; text-align: left;">Total
+                                            </font>
+                                          </th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+									  @for(sod <- so.salesOrderDetail){
+                                        <tr style="text-align: left;">
+                                          <td width="45%">
+                                            <div class="item-desc">
+                                              <img src="images/bag1.png" width="45px;">
+                                            </div>
+                                            <font style="font-family: 'MontserratLight', sans-serif;color:#333; font-size:13px; font-weight:500;">
+                                              <p>@sod.productName</p>
+                                            </font>
+                                          </td>
+                                          <td width="20%">
+                                            <p class="qty" style="text-align: left;">
+                                              <font style="font-family: 'MontserratLight', sans-serif;color:#333; font-size:15px; font-weight:500;">@sod.quantity
+                                              </font>
+                                          </td>
+                                          <td width="20%" style="text-align: left;">
+                                            <font style="font-family: 'MontserratLight', sans-serif;color:#333; font-size:13px; font-weight:500;">
+                                            @sod.getPriceString()
+                                            </font>
+                                          </td>
+                                          <td width="20%" style="text-align: left;">
+                                            <font style="font-family: 'MontserratLight', sans-serif;color:#333; font-size:13px; font-weight:500;">
+                                              sod.getSubTotalString()
+                                            </font>
+                                          </td>
+                                        </tr>
+										}
+                                      </tbody>
+                                      <tfoot>
+                                        <tr style="background-color: #f7f7f7;">
+                                          <td colspan="4">
+                                            <p style="font-family: 'MontserratBold', sans-serif;color:#000; font-size:14px; font-weight:700; text-align: left; padding:5px 10px;">Subtotal <span style="float: right;">@so.getSubTotalFormat()</span></p>
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td colspan="4">
+                                            <p style="font-family: 'MontserratBold', sans-serif;color:#000; font-size:14px; font-weight:700; text-align: left; padding:5px 10px;">Discount <span style="float: right;">@so.getDiscountFormat()</span></p>
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td colspan="4">
+                                            <p style="font-family: 'MontserratBold', sans-serif;color:#000; font-size:14px; font-weight:700; text-align: left; padding:5px 10px;">Discount <span style="float: right;">@so.getVoucherFormat()</span></p>
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td colspan="4">
+                                            <p style="font-family: 'MontserratBold', sans-serif;color:#000; font-size:14px; font-weight:700; text-align: left; padding:5px 10px;">Shipping Cost <span style="float: right;">@so.getShippingFormat()</span></p>
+                                          </td>
+                                        </tr>
+                                        <tr style="background-color: #f7f7f7;">
+                                          <td colspan="4">
+                                            <p style="font-family: 'MontserratBold', sans-serif;color:#000; font-size:14px; font-weight:700; text-align: left; padding:20px;">Total Payment <span style="float: right;">@so.getTotalFormat()</span></p>
+                                          </td>
+                                        </tr>
+                                      </tfoot>
+									  
+                                    </table>
+									
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td style="padding:10px 0 10px" colspan="4">
+                                    <font style="font-family: 'MontserratLight', sans-serif;color:#000; font-size:14px; font-weight:500;line-height: 36px;">After you make a payment, please confirm the payment via the link below
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td align="center" style="padding: 20px 0 30px;">
+                                    <a href="#" style="font-size: 18px; padding: 20px 30px; color: #fff; background-color: #c81e32; text-decoration: none; font-family: 'MontserratBold', sans-serif; border-radius: 5px; border: 1px solid #0a2745; background:#0a2745;">Confirm Payment</a>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <table style="margin: 15px 0;">
+                                      <tbody>
+                                        <tr>
+                                          <h3 style="color:#000;font-family: 'MontserratBold', sans-serif; font-size: 18px; text-transform: uppercase;">Delivery Courier</h3>
+                                        </tr>
+                                        <tr style="text-align: center;">
+                                          <td width="30%">
+                                            <div style="border-right: dotted 1px #000; padding: 10px 20px 10px 0px; ;">
+                                              <img src="@so.courier.imageUrl" width="80px;">
+                                            </div>
+                                          </td>
+                                          <td width="30%">
+                                            <p class="qty" style="text-align: center;">
+                                              <font style="font-family: 'MontserratBold', sans-serif;color:#333; font-size:15px; font-weight:500;  padding: 10px 20px;">@so.serviceCode
+                                              </font>
+                                          </td>
+                                          <td width="30%" style="text-align: center;">
+                                            <font style="font-family: 'MontserratBold', sans-serif;color:#333; font-size:15px; font-weight:500; border-left: dotted 1px #000; padding: 10px 20px;">
+                                              @so.serviceEtd
+                                            </font>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                  </table>
+                                  <table style="margin: 15px 0;width: 100%;">
+                                      <tbody>
+                                        <tr>
+                                          <h3 style="color:#000;font-family: 'MontserratBold', sans-serif; font-size: 18px; text-transform: uppercase;">Payment Method </h3>
+                                        </tr>
+                                        <tr style="text-align: center;">
+                                          <td width="50%">
+                                            <p class="qty" style="text-align: center;">
+                                              <font style="font-family: 'MontserratBold', sans-serif;color:#333; font-size:15px; font-weight:500;  padding: 10px 0px;">Bank Transfer
+                                              </font>
+                                          </td>
+                                          <td width="50%" style="text-align: center;border-left: dotted 1px #000;">
+                                            <font style="font-family: 'MontserratBold', sans-serif;color:#333; font-size:15px; font-weight:500; padding: 10px 10px;">
+                                              @so.bank.bankName - @so.bank.accountNumber <br> 
+                                              An. @so.bank.accountName
+                                            </font>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                  </table>
+                                  
+                                  <table style="margin: 15px 0;">
+                                      <tbody>
+                                        <tr>
+                                          <h3 style="color:#000;font-family: 'MontserratBold', sans-serif; font-size: 18px; text-transform: uppercase;">Customer Detail</h3>
+                                        </tr>
+                                        <tr style="text-align: center;">
+                                          <td width="30%">
+                                            <p class="qty" style="text-align: left;">
+                                              <font style="font-family: 'MontserratBold', sans-serif;color:#333; font-size:15px; font-weight:500;  ">Note <span  style="padding: 0px 20px;">:</span>-
+                                              </font> 
+                                            </p>
+                                            <p class="qty" style="text-align: left;">
+                                              <font style="font-family: 'MontserratBold', sans-serif;color:#333; font-size:15px; font-weight:500;  ">Name <span style="padding: 0px 20px;">:</span>@so.member.fullName
+                                              </font> 
+                                            </p>
+                                            <p class="qty" style="text-align: left;">
+                                              <font style="font-family: 'MontserratBold', sans-serif;color:#333; font-size:15px; font-weight:500;  ">Phone Number <span  style="padding: 0px 20px;">:</span>@so.member.phone
+                                              </font> 
+                                            </p>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                  </table>
+                                  <table>
+                                    <tr>
+                                      <td width="30%">
+                                            <h3 style="color:#000;font-family: 'MontserratBold', sans-serif; font-size: 18px; text-transform: uppercase;">Billing Addres</h3>
+                                            <p class="qty" style="text-align: left;">
+                                              <font style="font-family: 'MontserratBold', sans-serif;color:#333; font-size:18px; font-weight:500;  ">@so.salesOrderAddress.fullName
+                                              </font> 
+                                            </p>
+                                            <p class="qty" style="text-align: left;">
+                                              <font style="font-family: 'MontserratBold', sans-serif;color:#333; font-size:15px; font-weight:500;  ">@so.salesOrderAddress.email
+                                              </font> 
+                                            </p>
+                                            <p class="qty" style="text-align: left;">
+                                              <font style="font-family: 'MontserratBold', sans-serif;color:#333; font-size:15px; font-weight:500;  ">@so.salesOrderAddress.phone
+                                              </font> 
+                                            </p>
+                                            <p class="qty" style="text-align: left;">
+                                              <font style="font-family: 'MontserratBold', sans-serif;color:#333; font-size:15px; font-weight:500;  ">@so.salesOrderAddress.address<br>@so.salesOrderAddress.city.name  @so.salesOrderAddress.province.name<br>@so.salesOrderAddress.getPostalCode()
+                                              </font> 
+                                            </p>
+                                          </td>
+                                      
+                                    </tr>
+                                  </table>
+                                </tr>
+                              </tbody>
+                            </table>
+                          <td width="30px">&nbsp;</td>
+                        </tr>
+                        <tr bgcolor="#252525">
+                          <td align="center" style="padding:0 30px; height: 105px; margin-top: 20px;" colspan="2" >
+                            <h3 style="color:#fff;font-family: 'roboto', sans-serif;">NEED MORE HELP</h3>
+                            <label style="font-family:'MontserratRegular', sans-serif; color: #fff; font-size: 14px;">We're here,ready to talk</label>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <table cellspacing="0" cellpadding="0" align="center" style="margin-top: 10px; margin-bottom: 10px; max-width: 550px;width: 100%;margin: auto;">
+              <tbody>
+                <tr>
+                  <td align="center">
+                    <p style="font-family: 'MontserratLight', sans-serif;color:#fff; font-size:14px; line-height: 20px; text-align: left;">
+                      <font style="font-size:14px; color:#fff; line-height: 30px; letter-spacing: 1px;">You received this email because you just make an order.
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center">
+                    <div class="sos-med" style="margin: 0 auto;width: 160px;">
+                      <ul>
+                        <li style="padding-right: 30px; padding-top: 50px; padding-bottom: 30px;"><a href="#"><img src="images/facebook.png" alt="" /></a></li>
+                        <li  style="padding-right: 30px; padding-top: 30px; padding-bottom: 30px;""><a href="#"><img src="images/instagram.png" alt="" /></a></li>
+                        <li style="padding-top: 30px; padding-bottom: 30px;""><a href="#"><img src="images/twitter.png" alt="" /></a></li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" colspan="2" style="padding:15px;">
+                    <font style="font-family: 'MontserratLight', sans-serif;color:#fff; font-size:14px;">&copy; All right reserved 2018 Copyright @appName</font>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

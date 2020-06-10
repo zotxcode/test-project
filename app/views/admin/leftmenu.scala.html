@@ -1,0 +1,381 @@
+<!-- Left side column. contains the logo and sidebar -->
+@import com.enwie.util.Constant
+
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="header">MAIN NAVIGATION</li>
+            <li class="@if(request.uri.equals("/")) {active} treeview">
+            @if(session().get("listsGroup").contains("Dashboard")) {
+            <a href="@controllers.admin.routes.HomeController.index()">
+                <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+                <span class="pull-right-container"></span>
+            </a>
+            </li>
+            }
+            @if(session().get("listsGroup").contains("Information")) {
+                <li class="treeview @if(request.uri.contains("information")) {active}">
+                    <a href="#">
+                        <i class="fa fa-info-circle"></i> <span>Information</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                            <small class="label pull-right bg-red" id="notif_pending_information"></small>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu @if(request.uri.contains("information")) {menu-open}" @if(request.uri.contains("information")) {style="display: block;"}>
+                        @if(session().get("listsMenu").contains("#banner#")) {
+                            <li @if(request.uri.contains("mainbanner")) {class="active"}>
+                                <a href="@controllers.admin.routes.BannerController.index()"><i class="fa fa-skyatlas"></i> Slider Banner</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#new_arrival_banner#")) {
+                            <li @if(request.uri.contains("newarrivalbanner")) {class="active"}>
+                                <a href="@controllers.admin.routes.NewArrivalBannerController.index()"><i class="fa fa-skyatlas"></i> New Arrival Banner</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#best_seller_banner#")) {
+                            <li @if(request.uri.contains("bestsellerbanner")) {class="active"}>
+                                <a href="@controllers.admin.routes.BestSellerBannerController.index()"><i class="fa fa-skyatlas"></i> Best Seller Banner</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#instagram_banner#")) {
+                            <li @if(request.uri.contains("instagrambanner")) {class="active"}>
+                                <a href="@controllers.admin.routes.InstagramBannerController.index()"><i class="fa fa-skyatlas"></i> Instagram Banner</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#category_banner#")) {
+                            <li @if(request.uri.contains("categorybanner")) {class="active"}>
+                                <a href="@controllers.admin.routes.CategoryBannerController.index()"><i class="fa fa-skyatlas"></i> Category Banner</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#new_arrival#")) {
+                            <li @if(request.uri.contains("newarrivalproduct")) {class="active"}>
+                                <a href="@controllers.admin.routes.NewArrivalController.index()"><i class="fa fa-skyatlas"></i> New Arrival Product</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#best_seller#")) {
+                            <li @if(request.uri.contains("bestsellerproduct")) {class="active"}>
+                                <a href="@controllers.admin.routes.BestSellerController.index()"><i class="fa fa-skyatlas"></i> Best Seller Product</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#on_sale#") && Constant.getInstance().isEversac()) {
+                            <li @if(request.uri.contains("onsaleproduct")) {class="active"}>
+                                <a href="@controllers.admin.routes.OnSaleController.index()"><i class="fa fa-skyatlas"></i> On Sale Product</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#faq#")) {
+                            <li @if(request.uri.contains("faq")) {class="active"}>
+                                <a href="@controllers.admin.routes.FaqController.index()"><i class="fa fa-question-circle"></i> FAQ</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#staticpage#")) {
+                            <li @if(request.uri.contains("static")) {class="active"}>
+                                <a href="@controllers.admin.routes.StaticPageController.index()"><i class="fa fa-book"></i> Static Page</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#footer#")) {
+                            <li @if(request.uri.contains("footer")) {class="active"}>
+                                <a href="@controllers.admin.routes.FooterController.index()"><i class="fa fa-circle-o"></i> Footer</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#article#")) {
+                            <li @if(request.uri.contains("article")) {class="active"}>
+                                <a href="@controllers.admin.routes.ArticleController.index()"><i class="fa fa-newspaper-o"></i> Article</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#article_comment#")) {
+                            <li @if(request.uri.contains("comment")) {class="active"}>
+                                <a href="@controllers.admin.routes.CommentController.index()"><i class="fa fa-comments-o"></i> Article Comment
+                                    <span class="pull-right-container">
+                                        <small class="label pull-right bg-red" id="notif_pending_article_comment"></small>
+                                    </span>
+                                </a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#location_setting#")) {
+                            <li @if(request.uri.contains("location")) {class="active"}>
+                                <a href="@controllers.admin.routes.LocationController.index()"><i class="fa fa-circle-o"></i> Location</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#our_story#")) {
+                            <li @if(request.uri.contains("ourstory")) {class="active"}>
+                                <a href="@controllers.admin.routes.OurStoryController.index()"><i class="fa fa-circle-o"></i> Our Story</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#socmed#")) {
+                            <li @if(request.uri.contains("socmed")) {class="active"}>
+                                <a href="@controllers.admin.routes.SocmedController.index()"><i class="fa fa-circle-o"></i> Socmed</a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            @if(session().get("listsGroup").contains("Master Products")) {
+                <li class="treeview @if(request.uri.contains("masterproducts")) {active}">
+                    <a href="#">
+                        <i class="fa fa-list"></i> <span>Master Products</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu @if(request.uri.contains("masterproducts")) {menu-open}" @if(request.uri.contains("masterproducts")) {style="display: block;"}>
+                        @if(session().get("listsMenu").contains("#category#")) {
+                            <li @if(request.uri.contains("category")) {class="active"}>
+                                <a href="@controllers.admin.routes.CategoryController.index()"><i class="fa fa-tags"></i> Categories</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#attribute#")) {
+                            <li @if(request.uri.contains("attribute")) {class="active"}>
+                                <a href="@controllers.admin.routes.AttributeController.index()"><i class="fa fa-list-alt"></i>Master Attribute</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#size#")) {
+                            <li @if(request.uri.contains("size")) {class="active"}>
+                                <a href="@controllers.admin.routes.SizeController.index()"><i class="fa fa-female"></i>Master Size</a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            @if(session().get("listsGroup").contains("#Products#")) {
+                <li class="treeview @if(request.uri.contains("admin/products")) {active}">
+                    <a href="#">
+                        <i class="fa fa-dropbox"></i> <span>Products</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                            <small class="label pull-right bg-red" id="notif_pending_product"></small>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu @if(request.uri.contains("admin/products")) {menu-open}" @if(request.uri.contains("admin/products")) {style="display: block;"}>
+                        @if(session().get("addproduct").equals("1")) {
+                            <li @if(request.uri.contains("products/new")) {class="active"}>
+                                <a href="@controllers.admin.routes.ProductController.add()"><i class="fa fa-tags"></i> New Product</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#variant#")) {
+                            <li @if(request.uri.contains("products/productvariantgroup")) {class="active"}>
+                                <a href="@controllers.admin.routes.ProductVariantGroupController.index()"><i class="fa fa-object-group"></i> Grouping Product</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#product#")) {
+                            <li @if(request.uri.contains("products/lists")) {class="active"}>
+                                <a href="@controllers.admin.routes.ProductController.index()"><i class="fa  fa-list-alt"></i> Product List</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#productdistributor#")) {
+                            <li @if(request.uri.contains("productdistributor/lists")) {class="active"}>
+                                <a href="@controllers.admin.routes.ProductDistributorController.index()"><i class="fa  fa-list-alt"></i> Product Distributor</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#productreview#")) {
+                            <li @if(request.uri.contains("products/review")) {class="active"}>
+                                <a href="@controllers.admin.routes.ProductReviewController.index()"><i class="fa fa-comments-o"></i> Product Reviews
+                                    <span class="pull-right-container">
+                                        <small class="label pull-right bg-red" id="notif_pending_product_review"></small>
+                                    </span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            @if(session().get("listsGroup").contains("Customers")) {
+                <li class="treeview @if(request.uri.contains("customer")) {active}">
+                    <a href="#">
+                        <i class="fa fa-user"></i> <span>Customers</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu @if(request.uri.contains("customer")) {menu-open}" @if(request.uri.contains("customer")) {style="display: block;"}>
+                        @if(session().get("listsMenu").contains("#customer#")) {
+                            <li @if(request.uri.contains("customer")) {class="active"}>
+                                <a href="@controllers.admin.routes.CustomerController.index()"><i class="fa fa-users"></i> Customer List</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#blacklist#")) {
+                            <li @if(request.uri.contains("blacklist")) {class="active"}>
+                                <a href="@controllers.admin.routes.BlacklistController.index()"><i class="fa fa-user-times"></i> Blacklist Setting</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#contact_us#")) {
+                            <li @if(request.uri.contains("contact_us")) {class="active"}>
+                                <a href="@controllers.admin.routes.ContactUsController.index()"><i class="fa fa-user-times"></i> Contact Us</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#allergy#")) {
+                            <li @if(request.uri.contains("allergy")) {class="active"}>
+                                <a href="@controllers.admin.routes.AllergyController.index()"><i class="fa fa-user-times"></i> Master Allergy</a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            @if(session().get("listsGroup").contains("Shop")) {
+                <li class="treeview @if(request.uri.contains("admin/shop")) {active}">
+                    <a href="#">
+                        <i class="fa fa-cart-arrow-down"></i> <span>Shop</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                            <small class="label pull-right bg-red" id="notif_pending_shop"></small>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu @if(request.uri.contains("admin/shop")) {menu-open}" @if(request.uri.contains("admin/shop")) {style="display: block;"}>
+                    @if(session().get("listsMenu").contains("#order#")) {
+                        <li @if(request.uri.contains("admin/shop/orders")) {class="active"}>
+                            <a href="@controllers.admin.routes.SalesOrderController.index()"><i class="fa fa-reorder"></i> Orders</a>
+                        </li>
+                    }
+                    @if(session().get("listsMenu").contains("#paymentconfirmation#")) {
+                        <li @if(request.uri.contains("admin/shop/payments")) {class="active"}>
+                            <a href="@controllers.admin.routes.SalesOrderPaymentController.index()"><i class="fa fa fa-paypal"></i> Payment Confirmation</a>
+                        </li>
+                    }
+                    @if(session().get("listsMenu").contains("#bank#")) {
+                        <li @if(request.uri.contains("admin/shop/bank")) {class="active"}>
+                            <a href="@controllers.admin.routes.BankController.index()"><i class="fa fa-bank"></i> Bank Account</a>
+                        </li>
+                    }
+                    @if(session().get("listsMenu").contains("#courier#")) {
+                        <li @if(request.uri.contains("admin/shop/mastercourier")) {class="active"}>
+                            <a href="@controllers.admin.routes.CourierController.index()"><i class="fa fa-truck"></i> Master Courier</a>
+                        </li>
+                    }
+                    </ul>
+                </li>
+            }
+            @if(session().get("listsGroup").contains("Distributor")) {
+                <li class="treeview @if(request.uri.contains("admin/distributor")) {active}">
+                    <a href="#">
+                        <i class="fa fa-gears"></i> <span>Distributor</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu @if(request.uri.contains("admin/distributor")) {menu-open}" @if(request.uri.contains("admin/distributor")) {style="display: block;"}>
+                        @if(session().get("listsMenu").contains("#purchase#")) {
+                            <li @if(request.uri.contains("purchase")) {class="active"}>
+                                <a href="@controllers.admin.routes.PurchaseOrderController.index()"><i class="fa fa-book"></i> Purchase Order</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#orderdistributor#")) {
+                            <li @if(request.uri.contains("orderdistributor")) {class="active"}>
+                                <a href="@controllers.admin.routes.OrderDistributorController.index()"><i class="fa fa-book"></i> Order Distributor</a>
+                            </li>
+                        }
+                        @if(session().get("listsMenu").contains("#orderreseller#")) {
+                            <li @if(request.uri.contains("orderreseller")) {class="active"}>
+                                <a href="@controllers.admin.routes.OrderResellerController.index()"><i class="fa fa-book"></i> Order Reseller</a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if(session().get("listsGroup").contains("Presentation")) {
+                <li class="treeview @if(request.uri.contains("admin/presentations/")) {active}">
+                    <a href="@controllers.admin.routes.PresentationController.index()">
+                        <i class="fa fa-gift"></i> <span>Presentation</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+            }
+
+            @if(session().get("listsGroup").contains("User Management")) {
+            <li class="treeview @if(request.uri.contains("admin/usermanagement")) {active}">
+            <a href="#">
+                <i class="fa fa-users"></i> <span>User Management</span>
+                <span class="pull-right-container">
+                                              <i class="fa fa-angle-left pull-right"></i>
+                                            </span>
+            </a>
+            <ul class="treeview-menu @if(request.uri.contains("usermanagement")) {menu-open}" @if(request.uri.contains("usermanagement")) {style="display: block;"}>
+                @if(session().get("listsMenu").contains("#role#")) {
+                <li @if(request.uri.contains("role")) {class="active"}>
+                <a href="@controllers.admin.routes.RoleController.index()"><i class="fa fa-reorder"></i> Role</a>
+                </li>
+                }
+                @if(session().get("listsMenu").contains("#brand#")) {
+                    <li @if(request.uri.contains("brand")) {class="active"}>
+                        <a href="@controllers.admin.routes.BrandController.index()"><i class="fa fa-reorder"></i> Brand</a>
+                    </li>
+                }
+                @if(session().get("listsMenu").contains("#user#")) {
+                <li @if(request.uri.contains("users")) {class="active"}>
+                <a href="@controllers.admin.routes.UserController.index()"><i class="fa fa-user"></i> User</a>
+                </li>
+                }
+            </ul>
+            </li>
+            }
+            @if(session().get("listsGroup").contains("Voucher")) {
+                <li class="treeview @if(request.uri.contains("admin/voucher")) {active}">
+                    <a href="@controllers.admin.routes.VoucherController.index()">
+                        <i class="fa fa-gift"></i> <span>Voucher</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+            }
+            @if(session().get("listsGroup").contains("Promotion")) {
+                <li class="treeview @if(request.uri.contains("admin/promotion")) {active}">
+                    <a href="@controllers.admin.routes.PromotionController.index()">
+                        <i class="fa fa-percent"></i> <span>Promotion</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+            }
+			 @if(session().get("listsGroup").contains("Newsletter")) {
+                <li class="treeview @if(request.uri.contains("admin/newsletter")) {active}">
+                    <a href="@controllers.admin.routes.NewsletterController.index()">
+                        <i class="fa fa-newspaper-o"></i> <span>Newsletter</span>
+                        <span class="pull-right-container"></span>
+                    </a>
+                </li>
+            }
+            @if(session().get("listsGroup").contains("Preference") && false) {
+            <li class="treeview @if(request.uri.contains("admin/preference")) {active}">
+                <a href="#">
+                    <i class="fa fa-gears"></i> <span>Preference</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu @if(request.uri.contains("admin/preference")) {menu-open}" @if(request.uri.contains("admin/preference")) {style="display: block;"}>
+                    @if(session().get("listsMenu").contains("#hashtag#")) {
+                        <li @if(request.uri.contains("hashtag")) {class="active"}>
+                            <a href="@controllers.admin.routes.HashtagController.index()"><i class="fa fa-book"></i> Hashtag</a>
+                        </li>
+                    }
+                    @if(session().get("listsMenu").contains("#seo#")) {
+                        <li @if(request.uri.contains("seo")) {class="active"}>
+                            <a href="@controllers.admin.routes.SeoPageController.index()"><i class="fa fa-book"></i> SEO</a>
+                        </li>
+                    }
+                    @if(session().get("listsMenu").contains("#cartbutton#")) {
+                        <li @if(request.uri.contains("cartbutton")) {class="active"}>
+                            <a href="@controllers.admin.routes.CartButtonController.index()"><i class="fa fa-book"></i> Cart Button</a>
+                        </li>
+                    }
+                    @if(session().get("listsMenu").contains("#theme#")) {
+                        <li @if(request.uri.contains("theme")) {class="active"}>
+                            <a href="@controllers.admin.routes.ThemeController.index()"><i class="fa fa-book"></i> Themes</a>
+                        </li>
+                    }
+                    @if(session().get("listsMenu").contains("#expirepaymentsetting#")) {
+                        <li @if(request.uri.contains("setpaymentexpire")) {class="active"}>
+                            <a href="@controllers.admin.routes.PaymentExpirationController.index()"><i class="fa fa-gear"></i> Setting Expire Payment</a>
+                        </li>
+                    }
+					@if(session().get("listsMenu").contains("#vouchersignupvaluesetting#")) {
+                        <li @if(request.uri.contains("setvouchersignup")) {class="active"}>
+                            <a href="@controllers.admin.routes.VoucherSignupController.index()"><i class="fa fa-gear"></i> Setting Voucher Signup Value</a>
+                        </li>
+                    }
+                </ul>
+            </li>
+            }
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>

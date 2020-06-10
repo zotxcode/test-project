@@ -1,0 +1,114 @@
+@(title: String, action: String, formData: Form[models.VoucherSignUp], url: play.api.mvc.Call)
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title +" | Hladal Admin Page"){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Preference")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id->"form-save") {
+                    <div class="box-body">
+                        <div class="row">
+                            @mytext(formData("id"), "", "", "hidden")
+                            <div class="col-xs-6">
+                                <!--@mytext(formData("userParam"), "Parameter* ") -->
+                                @mytext(formData("prefixKupon"), "Prefix Kupon *")
+                                @mytext(formData("clientId"), "Client ID *")
+                            </div>
+
+                            <div class="col-xs-6">
+                                @mytext(formData("periode"), "Duration (Days) *")
+                                @mytext(formData("besaranVoucher"), "Besaran Voucher *")
+                                @mytext(formData("minimumBelanja"), "Minimum belanja *")
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.VoucherSignupController.index(), action.equalsIgnoreCase("add"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+</div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.input_currency').autoNumeric('init');
+    });
+	
+	$.validator.addMethod("valueNotEquals", function(value, element, arg){
+          return arg != value;
+         }, "Value must not equal arg.");
+		 
+	$("#form-save").validate({
+        ignore: [],
+        rules: {
+            
+            prefixKupon :{
+                required: true
+            },
+			clientId :{
+                required: true
+            },
+			periode :{
+                required: true,
+                number: true
+            },
+			besaranVoucher :{
+                required: true,
+                number: true
+            },
+			minimumBelanja :{
+                required: true,
+                number: true
+            }
+        },
+        messages: {
+            prefixKupon: "Prefix Kupon is required",
+			clientId: "Client ID Param is required",
+			periode: "Period Param is required",
+			besaranVoucher: "Besaran Voucher Param is required",
+			minimumBelanja: "Minimum Belanja Param is required",
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            form.submit();
+        }
+    });
+</script>

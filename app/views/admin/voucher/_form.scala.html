@@ -1,0 +1,652 @@
+@(title: String, action: String, formData: Form[models.Voucher], url: play.api.mvc.Call, listsType: Map[String, String], listsFilter: Map[String, String], listsAssign: Map[String, String], listsPriority: Map[Integer, String], listFurtherRuleProcessing: Map[Integer, String], listCanBeCombined: Map[Integer, String], listSubCategory: Map[Integer, String], listsProduct: Map[Integer, String])
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title +" | Hokeba Admin Page"){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb("Voucher List", "Voucher")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            @myalert()
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id -> "form-save") {
+                    <div class="box-body">
+                        @mytext(formData("name"), "Voucher Name *")
+                        @mytext(formData("masking"), "Masking")
+                        <div class="row">
+                        @myselect2(formData("type"), "Voucher Type *", listsType, "col-xs-4", false)
+                        </div>
+                        <div class="row col-xs-12">
+                            <div class="form-group " id="div_voucher_value">
+                                <label>Voucher Value</label>
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        <input type="text" class="form-control input_currency" id="discount" name="discount"/>
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <select id="discountType" name="discountType" class="form-control select2">
+                                            <option value="1">Nominal</option>
+                                            <option value="2">Percent</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            @myselect2(formData("filterStatus"), "Voucher Filter *", listsFilter, "col-xs-4", false)
+                        </div>
+                        <div class="row" id="div-product">
+                            <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                <label>Product</label>
+                                <div class="row">
+                                    <div class="col-xs-10">
+                                        <select id="productlist" name="product_list[]" class="form-control" data-placeholder="Please select product">
+                                        @for((k,v) <- listsProduct){<option value="@k" >@v</option>}
+                                        </select>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <button type="button" class="btn btn-primary" id="listproductbtn">Show Product Item</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="div-category">
+                            <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                <label>Category</label>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <select id="category" name="category_list[]" class="form-control" data-placeholder="Please select category">
+                                            @*for((k,v) <- listsCategory){<option value="@k" >@v</option>}*@
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            @myselect2(formData("assignedTo"), "Assigned To *", listsAssign, "col-xs-4", false)
+                        </div>
+                        <div class="row" id="div-member">
+                            <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                <label>Customer</label>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <select id="member" name="member_list[]" class="form-control" data-placeholder="Please select customer">
+                                            @*for((k,v) <- listsCategory){<option value="@k" >@v</option>}*@
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">@mytext(formData("count"), "Voucher(s) to be generated *", "", "text", "col-xs-4")</div>
+                        <div class="row">@mytextnumeric(formData("maxValue"), "Max Value *", "", "text", "col-xs-4")</div>
+                        <div class="row">@mytextnumeric(formData("minPurchase"), "Minimum Purchase *", "", "text", "col-xs-4")</div>
+                        <div class="row">
+                            @myselect(formData("canBeCombined"), "Can be Combined *", listCanBeCombined)
+                        </div>
+
+
+                        <div class="row">
+                            <div class="form-group col-md-2 col-sm-6 col-xs-12">
+                                <label>From *</label>
+
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control pull-right" id="fromDate" value="@formData("fromDate").value" name="fromDate">
+                                </div>
+                                <!-- /.input group -->
+                            </div>
+                            <div class="form-group bootstrap-timepicker col-md-2 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-clock-o"></i>
+                                        </div>
+                                        <input type="text" class="form-control timepicker" value="@formData("fromTime").value" id="fromTime" name="fromTime">
+                                    </div>
+                                    <!-- /.input group -->
+                                </div>
+                                <!-- /.form group -->
+                            </div>
+                            <div class="form-group col-md-2 col-sm-6 col-xs-12">
+                                <label>To *</label>
+
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control pull-right" id="toDate" value="@formData("toDate").value" name="toDate">
+                                </div>
+                                <!-- /.input group -->
+                            </div>
+                            <div class="form-group bootstrap-timepicker col-md-2 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-clock-o"></i>
+                                        </div>
+                                        <input type="text" class="form-control timepicker" value="@formData("toTime").value" id="toTime" name="toTime">
+                                    </div>
+                                    <!-- /.input group -->
+                                </div>
+                                <!-- /.form group -->
+                            </div>
+                        </div>
+                        @mytextarea(formData("description"), "Description")
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.VoucherController.index(), action.equalsIgnoreCase("Generate"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+<div id="modal-select-product" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Product Item Name</h4>
+            </div>
+            <div class="modal-body">
+                <table id="listProduct" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th><!--<input name="select_all" value="1" id="select-all" type="checkbox">--></th>
+                            <th>No</th>
+                            <th>Product Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-default">Back</button>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+<script type="text/javascript">
+var dataProducts = [];
+$("#productlist option").each(function()
+{
+    if($(this).val() != 0){
+        dataProducts.push({id:$(this).val(),text:$(this).text()});
+    }
+});
+var table;
+
+$(document).ready(function() {
+//    $("#productlist").select2({
+//        multiple:true
+//    });
+    var arrProduct = [];
+    $("#productlist option").each(function()
+    {
+        arrProduct.push($(this).val());
+    });
+    if(arrProduct.length > 0){
+        $('#productlist').val(arrProduct).trigger("change");
+    }
+
+    $('#listproductbtn').text('Show Product Item');
+    $('#listproductbtn').on('click', function(){
+        table.ajax.reload();
+        $('#modal-select-product').modal('show');
+    });
+
+    table = $("#listProduct").DataTable({
+        "lengthMenu": [[10, 25, 50, 100, 200], [10, 25, 50, 100, 200]],
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "/admin/information/mainbanner/listsProduct",
+            "data": function ( d ) {
+                d.myKey = "myValue";
+                d.category = "";
+            }
+        },
+        columnDefs : [
+            {
+                'targets': 0,
+                'searchable': false,
+                'orderable': false,
+                'sortable': false,
+                'className': 'dt-body-center',
+                'width': "20px"
+            },
+            { targets: 1, sortable: false, width: "20px"},
+        ],
+        order: [[ 2, "asc" ]],
+        fnDrawCallback: function() {
+            for(i=0; i < dataProducts.length ; i++){
+                if($('#cb-action-'+dataProducts[i].id).length > 0){
+                    $('#cb-action-'+dataProducts[i].id).prop('checked', true);
+                }
+            }
+        }
+    });
+
+    function addProducts(item){
+        dataProducts.push(item);
+        $("#productlist").select2({multiple: true, data: dataProducts});
+    }
+
+    function deleteProducts(id){
+        findAndRemove(dataProducts, "id", id);
+        $("#productlist").empty();
+        $("#productlist").select2({multiple: true, data: dataProducts});
+    }
+
+    function findAndRemove(array, property, value) {
+        array.forEach(function(result, index) {
+            if(result[property] == value) {
+                //Remove from array
+                array.splice(index, 1);
+            }
+        });
+    };
+
+    $('#listProduct tbody').on('change', '.cb-action', function(){
+        // If checkbox is not checked
+        if(!this.checked)
+            deleteProducts($(this).val());
+        else {
+            addProducts({id:this.value,text:this.name});
+        }
+        var arrProduct = [];
+        $("#productlist option").each(function()
+        {
+            arrProduct.push($(this).val());
+        });
+        if(arrProduct.length > 0){
+            $('#productlist').val(arrProduct).trigger("change");
+        }
+    });
+});
+</script>
+<script type="text/javascript">
+$(document).ready(function () {
+    $('.select2').select2();
+    $("#productlist").select2({multiple: true});
+    $('.input_currency').autoNumeric('init');
+    $('#div_maxValue').hide();
+    $('#maxValue').val(0);
+    $('#minPurchase').val(0);
+    $('#type').on('change', function(){
+        if($(this).val() == 'DISCOUNT'){
+            $('#div_voucher_value').show();
+            $('#filterStatus').select2('destroy').empty().select2({data: [{id: 'A', text: 'All'},{id: 'P', text: 'Custom Product'},{id: 'C', text: 'Custom Category'}]});
+            $('#div-product').hide();
+            $('#div-category').hide();
+        }else{
+            $('#div_voucher_value').hide();
+            $('#filterStatus').select2('destroy').empty().select2({data: [{id: 'A', text: 'All'}]});
+            $('#div-product').hide();
+            $('#div-category').hide();
+        }
+    });
+
+    $('#filterStatus').on('change', function(){
+        if($(this).val() == 'A'){
+            $('#div-product').hide();
+            $('#div-category').hide();
+        }else if($(this).val() == 'P'){
+            $('#div-product').show();
+            $('#div-category').hide();
+        }else if($(this).val() == 'C'){
+            $('#div-product').hide();
+            $('#div-category').show();
+        }
+    });
+
+    $('#assignedTo').on('change', function(){
+        if($(this).val() == 'C'){
+            $('#div-member').show();
+        }else{
+            $('#div-member').hide();
+        }
+    });
+
+    $('#discountType').on('change', function(){
+        if($(this).val() == '2'){
+            $('#div_maxValue').show();
+        }else{
+            $('#div_maxValue').hide();
+        }
+    });
+
+    $("#category").select2({
+      multiple:true,
+      ajax: {
+//        url: "/admin/information/promo/listsCategory",
+        url: "/admin/information/mainbanner/listsCategory",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term, // search term
+            page: params.page
+          };
+        },
+        processResults: function (data, params) {
+          params.page = params.page || 1;
+
+          return {
+            results: data.items,
+            pagination: {
+              more: (params.page * 30) < data.total_count
+            }
+          };
+        },
+        cache: true
+      },
+      escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+      minimumInputLength: 1,
+        templateResult: function (data) {
+            return data.name;
+        },
+        templateSelection:function (data) {
+            return data.name || data.text;
+        }
+    });
+    var arrCategory = [];
+    $("#category option").each(function()
+    {
+        arrCategory.push($(this).val());
+    });
+    if(arrCategory.length > 0){
+        $('#category').val(arrCategory).trigger("change");
+    }
+
+    $('#category').on("select2:select", function(e) {
+        $.ajax({
+            url: "/admin/information/promo/listsSubCategory?q="+$('#category').val(),
+            type: 'GET',
+            beforeSend: function() {
+
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                $("#subcategoryid").empty();
+                $("#subcategoryid").select2({data: resp.items});
+                var arrSubCategory = [];
+                $("#subcategoryid option").each(function()
+                {
+                    arrSubCategory.push($(this).val());
+                });
+                if(arrSubCategory.length > 0){
+                    $('#subcategoryid').val(arrSubCategory).trigger("change");
+                }
+            },
+            complete: function(xhr) {
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('Something went wrong.');
+                }
+            }
+        });
+    });
+
+    $("#subcategoryid").select2({multiple:true});
+    var arrSubCategory = [];
+    $("#subcategoryid option").each(function()
+    {
+        arrSubCategory.push($(this).val());
+    });
+    if(arrSubCategory.length > 0){
+        $('#subcategoryid').val(arrSubCategory).trigger("change");
+    }
+
+    $("#member").select2({
+      multiple:true,
+      ajax: {
+        url: "/admin/voucher/listsMember",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term, // search term
+            page: params.page
+          };
+        },
+        processResults: function (data, params) {
+          params.page = params.page || 1;
+
+          return {
+            results: data.items,
+            pagination: {
+              more: (params.page * 30) < data.total_count
+            }
+          };
+        },
+        cache: true
+      },
+      escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+      minimumInputLength: 1,
+        templateResult: function (data) {
+            return data.name;
+        },
+        templateSelection:function (data) {
+            return data.name || data.text;
+        }
+    });
+    var arrMember = [];
+    $("#member option").each(function()
+    {
+        arrMember.push($(this).val());
+    });
+    if(arrMember.length > 0){
+        $('#member').val(arrCategory).trigger("change");
+    }
+
+    $('#fromDate').datepicker({
+        autoclose: true,
+        todayHighlight: true,
+        dateFormat:'MM/dd/YYYY',
+        minDate: "dateToday"
+    });
+    $('#toDate').datepicker({
+        autoclose: true,
+        todayHighlight: true,
+        dateFormat:'MM/dd/YYYY',
+        minDate: "dateToday"
+    });
+    $(".timepicker").timepicker({
+        showInputs: false,
+        showMeridian: false,
+        showSeconds: true,
+        minuteStep: 5,
+        secondStep: 5
+    });
+});
+
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $.validator.addMethod("greaterThan",
+        function(value, element, params) {
+
+            if (!/Invalid|NaN/.test(new Date(value))) {
+                return new Date(value) >= new Date($(params).val());
+            }
+
+            return isNaN(value) && isNaN($(params).val())
+                || (Number(value) >= Number($(params).val()));
+    },'Must be greater than {0}.');
+
+    $.validator.addMethod("valueNotEquals", function(value, element, arg){
+        return arg != value;
+    }, "Value must not equal arg.");
+
+    $.validator.addMethod("minimumAmt", function(value, element, arg){
+        var v = $(element).autoNumeric('get');
+        return v > arg;
+    });
+
+    $.validator.addMethod("checkDiscount",function(value, element, params) {
+            var v = $('#discount').autoNumeric('get');
+            if($('#type').val() == 'FREE DELIVERY'){
+                return true;
+            }else if($('#type').val() == 'DISCOUNT' && (v == '')){
+                return false;
+            }else return true;
+    },'Discount is required');
+
+    $.validator.addMethod("checkMinimumDiscount", function(value, element, arg){
+        var v = $(element).autoNumeric('get');
+        if($('#type').val() == 'DISCOUNT'){
+            return v > arg;
+        } else return true;
+
+    });
+
+    $.validator.addMethod("checkMaxValue",function(value, element, arg) {
+            if($('#discountType').val() == '2'){
+                var v = $(element).autoNumeric('get');
+                return v > arg;
+                return false;
+            }else return true;
+    },'Max value must greater than 0');
+
+    $('button[name="save"]').on('click', function() {
+        $("#form-save").validate();
+    });
+
+    var validator = $("#form-save").validate({
+        ignore:[],
+        rules: {
+            name: "required",
+            discount: {
+                checkDiscount : true,
+                number : true,
+                checkMinimumDiscount : 0.01
+            },
+            count : {
+                required : true,
+                number : true,
+                min : 1
+            },
+            maxValue : {
+                checkMaxValue : 0.01
+            },
+            minPurchase : {
+                required : true,
+                number : true,
+                minimumAmt : 0.01
+            },
+            priority : {valueNotEquals : "0"},
+            /*'merchant_list[]': {
+                required : function(){
+                    if($('filterStatus').val() == 'M' && ($('discount').val == '' || $('discount').val == '0')){
+                        return false;
+                    }else return true;
+                }
+            },
+            */
+            fromDate: {
+                required: true,
+                date: true
+            },
+            toDate: {
+                required: true,
+                date: true,
+                greaterThan: "#fromDate"
+            }
+        },
+        messages: {
+            name: "Name is required",
+            discount: {
+                checkDiscount : "Discount is required",
+                checkMinimumDiscount : "Discount must greater than 0"
+            },
+            count : {
+                required : "Count is required"
+            },
+            minPurchase : {
+                required : "Minimum Purchase is required",
+                minimumAmt : "Minimum purchase must greater than 0"
+            },
+            priority : {valueNotEquals : "Please select priority"},
+            /*'merchant_list[]': {required: "Seller is required"},
+            */
+            fromDate: {
+                required: "From date is required"
+            },
+            toDate: {
+                required: "To date is required",
+                greaterThan: "To date must be greater than or equal from date"
+            }
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            $('.input_currency').autoNumeric('get');
+            $('.input_currency').each(function(key, value) {
+                $(value).val($(value).autoNumeric('get'));
+            });
+            form.submit();
+        }
+    });
+
+    $('#fromDate').on('change', function(){
+        $('#fromDate').valid();
+    });
+
+    $('#toDate').on('change', function(){
+        $('#toDate').valid();
+    });
+
+    $('#category').on('change', function(){
+        $('#category').valid();
+    });
+
+    $('#priority').on('change', function(){
+        $('#priority').valid();
+    });
+
+
+    $('#div-product').hide();
+    $('#div-category').hide();
+    $('#div-member').hide();
+});
+</script>

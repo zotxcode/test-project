@@ -1,0 +1,75 @@
+.sortable { list-style-type: none; margin: 0; padding: 0;}
+.sortable ul { min-height: 42px; padding-left:0; }
+.sortable li {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    margin-bottom: -1px;
+    padding: 10px 15px;
+}
+.sortable li span { position: absolute; margin-left: -1.3em; }
+.margin-show{ margin-top:15px; }
+.action2{
+    display: inline-block;
+    margin: 2px;
+}
+.margin-comment{margin-left:25px;}
+/** style for tag to be seperated by comma*/
+ul.taglist {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+ul.taglist li {
+  display: inline-block;
+}
+
+ul.taglist li:not(:last-child):after {
+  content: ", ";
+}
+
+.form-group.has-error .row .col-xs-12 .select2 .select2-selection{
+    border: 1px solid #DD4B3F;
+}
+
+.form-group .no-padding {
+    padding-left : 0;
+    padding-right : 0;
+}
+.error:focus {
+    border: 1px solid #DD4B3F;
+}
+input.error {
+    border: 1px solid #DD4B3F;
+}
+label.error {
+    color : #DD4B3F;
+}
+.form-group.error .row .col-xs-12 .select2 .select2-selection{
+    border: 1px solid #DD4B3F;
+}
+.has-error .select2-selection {
+    border: 1px solid #a94442;
+    border-radius: 4px;
+}
+.label-control{
+    background-color: #fff;
+    background-image: none;
+    border-radius: 4px;
+    color: #555;
+    display: block;
+    font-size: 14px;
+    height: 34px;
+    line-height: 1.42857;
+    padding: 6px 12px;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+    width: 100%;
+}
+.form-information-label {
+    color: #01b511;
+    font-style: italic;
+}
+textarea {
+    resize: none;
+}

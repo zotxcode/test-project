@@ -1,0 +1,595 @@
+@(title: String, action: String, formData: Form[models.Voucher], voucher: models.Voucher, url: play.api.mvc.Call, listsType: Map[String, String], listsFilter: Map[String, String], listsAssign: Map[String, String], listsPriority: Map[Integer, String], listFurtherRuleProcessing: Map[Integer, String], listCanBeCombined: Map[Integer, String], listSubCategory: Map[Integer, String], listsProduct: Map[Integer, String])
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title +" | Hokeba Admin Page"){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb("Voucher List", "Voucher")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            @myalert()
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id -> "form-save") {
+                    <div class="box-body">
+                        @mytext(formData("id"), "", "", "hidden")
+                        @mylabel("Voucher Name", voucher.name)
+                        @mylabel("Masking", voucher.masking)
+                        @mylabel("Voucher Type", voucher.getTypeView())
+                        @if(voucher.getType().equals("DISCOUNT")){
+                        <div class="form-group">
+                            <label>Nominal</label>
+                            <div class="row">
+                                <div class="col-md-8 col-sm-10 col-xs-12">
+                                    @if(voucher.discountType == 1){Rp }@voucher.getDiscountFormat()@if(voucher.discountType == 2){%}
+                                </div>
+                            </div>
+                        </div>
+                        }
+                        @mylabel("Voucher Filter", voucher.getFilterStatusView())
+                        @if(voucher.filterStatus.equals("P")){
+                        <div class="form-group">
+                            <label>Product</label>
+                            <div class="row">
+                                <div class="col-md-8 col-sm-10 col-xs-12">
+                                    <ul class="taglist">
+                                        @for(product <- voucher.products) {
+                                        <li>@product.name</li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                        @if(voucher.filterStatus.equals("C")){
+                        <div class="form-group">
+                            <label>Category</label>
+                            <div class="row">
+                                <div class="col-md-8 col-sm-10 col-xs-12">
+                                    <ul class="taglist">
+                                        @for(category <- voucher.categories) {
+                                        <li>@category.name</li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                        @mylabel("Assigned To", voucher.getAssignedToView())
+                        @if(voucher.assignedTo.equals("C")){
+                            <div class="form-group">
+                                <label>Customer</label>
+                                <div class="row">
+                                    <div class="col-md-8 col-sm-10 col-xs-12">
+                                        <ul class="taglist">
+                                            @for(member <- voucher.members) {
+                                            <li>@member.fullName</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @mylabel("Max Value", voucher.getMaxValueFormat())
+                        @mylabel("Minimum Purchase", voucher.getMinPurchaseFormat())
+                        <div class="row">
+                            @myselect(formData("canBeCombined"), "Can be Combined *", listCanBeCombined)
+                        </div>
+                        @mylabel("Valid Date", "From "+voucher.getValidFrom()+" to "+voucher.getValidTo())
+                        @mylabel("Description", voucher.description)
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.VoucherController.index(), action.equalsIgnoreCase("Generate"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+}
+<script type="text/javascript">
+$(document).ready(function () {
+    $('.select2').select2();
+    $('.input_currency').autoNumeric('init');
+    $('#div_maxValue').hide();
+    $('#maxValue').val(0);
+    $('#minPurchase').val(0);
+    $('#type').on('change', function(){
+        if($(this).val() == 'DISCOUNT'){
+            $('#div_voucher_value').show();
+            $('#filterStatus').select2('destroy').empty().select2({data: [{id: 'A', text: 'All'},{id: 'P', text: 'Custom Product'},{id: 'C', text: 'Custom Category'},{id: 'B', text: 'Custom Brand'},{id: 'M', text: 'Custom Seller'}]});
+            $('#div-product').hide();
+            $('#div-category').hide();
+        }else{
+            $('#div_voucher_value').hide();
+            $('#filterStatus').select2('destroy').empty().select2({data: [{id: 'A', text: 'All'},{id: 'M', text: 'Custom Seller'}]});
+            $('#div-product').hide();
+            $('#div-category').hide();
+        }
+    });
+
+    $('#filterStatus').on('change', function(){
+        if($(this).val() == 'A'){
+            $('#div-product').hide();
+            $('#div-category').hide();
+        }else if($(this).val() == 'P'){
+            $('#div-product').show();
+            $('#div-category').hide();
+        }else if($(this).val() == 'C') {
+            $('#div-product').hide();
+            $('#div-category').show();
+        }
+    });
+
+    $('#assignedTo').on('change', function(){
+        if($(this).val() == 'C'){
+            $('#div-member').show();
+        }else{
+            $('#div-member').hide();
+        }
+    });
+
+    $('#discountType').on('change', function(){
+        if($(this).val() == '2'){
+            $('#div_maxValue').show();
+        }else{
+            $('#div_maxValue').hide();
+        }
+    });
+
+    $("#product").select2({
+      multiple:true,
+      ajax: {
+        url: "/admin/information/promo/listsProduct2",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term, // search term
+            page: params.page
+          };
+        },
+        processResults: function (data, params) {
+          params.page = params.page || 1;
+
+          return {
+            results: data.items,
+            pagination: {
+              more: (params.page * 30) < data.total_count
+            }
+          };
+        },
+        cache: true
+      },
+      escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+      minimumInputLength: 1,
+        templateResult: function (data) {
+            return data.name;
+        },
+        templateSelection:function (data) {
+            return data.name || data.text;
+        }
+    });
+    var arrProduct = [];
+    $("#product option").each(function()
+    {
+        arrProduct.push($(this).val());
+    });
+    if(arrProduct.length > 0){
+        $('#product').val(arrCategory).trigger("change");
+    }
+
+    $("#merchant").select2({
+      multiple:true,
+      ajax: {
+        url: "/admin/information/promo/listsMerchant",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term, // search term
+            page: params.page
+          };
+        },
+        processResults: function (data, params) {
+          params.page = params.page || 1;
+
+          return {
+            results: data.items,
+            pagination: {
+              more: (params.page * 30) < data.total_count
+            }
+          };
+        },
+        cache: true
+      },
+      escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+      minimumInputLength: 1,
+        templateResult: function (data) {
+            return data.name;
+        },
+        templateSelection:function (data) {
+            return data.name || data.text;
+        }
+    });
+    var arrMerchant = [];
+    $("#merchant option").each(function()
+    {
+        arrMerchant.push($(this).val());
+    });
+    if(arrMerchant.length > 0){
+        $('#merchant').val(arrMerchant).trigger("change");
+    }
+
+
+    $("#brand").select2({
+      multiple:true,
+      ajax: {
+        url: "/admin/information/promo/listsBrand",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term, // search term
+            page: params.page
+          };
+        },
+        processResults: function (data, params) {
+          params.page = params.page || 1;
+
+          return {
+            results: data.items,
+            pagination: {
+              more: (params.page * 30) < data.total_count
+            }
+          };
+        },
+        cache: true
+      },
+      escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+      minimumInputLength: 1,
+        templateResult: function (data) {
+            return data.name;
+        },
+        templateSelection:function (data) {
+            return data.name || data.text;
+        }
+    });
+    var arrBrand = [];
+    $("#brand option").each(function()
+    {
+        arrBrand.push($(this).val());
+    });
+    if(arrBrand.length > 0){
+        $('#brand').val(arrBrand).trigger("change");
+    }
+
+    $("#category").select2({
+      multiple:true,
+      ajax: {
+        url: "/admin/information/promo/listsCategory",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term, // search term
+            page: params.page
+          };
+        },
+        processResults: function (data, params) {
+          params.page = params.page || 1;
+
+          return {
+            results: data.items,
+            pagination: {
+              more: (params.page * 30) < data.total_count
+            }
+          };
+        },
+        cache: true
+      },
+      escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+      minimumInputLength: 1,
+        templateResult: function (data) {
+            return data.name;
+        },
+        templateSelection:function (data) {
+            return data.name || data.text;
+        }
+    });
+    var arrCategory = [];
+    $("#category option").each(function()
+    {
+        arrCategory.push($(this).val());
+    });
+    if(arrCategory.length > 0){
+        $('#category').val(arrCategory).trigger("change");
+    }
+
+    $('#category').on("select2:select", function(e) {
+        $.ajax({
+            url: "/admin/information/promo/listsSubCategory?q="+$('#category').val(),
+            type: 'GET',
+            beforeSend: function() {
+
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                $("#subcategoryid").empty();
+                $("#subcategoryid").select2({data: resp.items});
+                var arrSubCategory = [];
+                $("#subcategoryid option").each(function()
+                {
+                    arrSubCategory.push($(this).val());
+                });
+                if(arrSubCategory.length > 0){
+                    $('#subcategoryid').val(arrSubCategory).trigger("change");
+                }
+            },
+            complete: function(xhr) {
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('Something went wrong.');
+                }
+            }
+        });
+    });
+
+    $("#subcategoryid").select2({multiple:true});
+    var arrSubCategory = [];
+    $("#subcategoryid option").each(function()
+    {
+        arrSubCategory.push($(this).val());
+    });
+    if(arrSubCategory.length > 0){
+        $('#subcategoryid').val(arrSubCategory).trigger("change");
+    }
+
+    $("#member").select2({
+      multiple:true,
+      ajax: {
+        url: "/admin/information/promo/listsMember",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term, // search term
+            page: params.page
+          };
+        },
+        processResults: function (data, params) {
+          params.page = params.page || 1;
+
+          return {
+            results: data.items,
+            pagination: {
+              more: (params.page * 30) < data.total_count
+            }
+          };
+        },
+        cache: true
+      },
+      escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+      minimumInputLength: 1,
+        templateResult: function (data) {
+            return data.name;
+        },
+        templateSelection:function (data) {
+            return data.name || data.text;
+        }
+    });
+    var arrMember = [];
+    $("#member option").each(function()
+    {
+        arrMember.push($(this).val());
+    });
+    if(arrMember.length > 0){
+        $('#member').val(arrCategory).trigger("change");
+    }
+
+    $('#fromDate').datepicker({
+        autoclose: true,
+        todayHighlight: true,
+        dateFormat:'MM/dd/YYYY',
+        minDate: "dateToday"
+    });
+    $('#toDate').datepicker({
+        autoclose: true,
+        todayHighlight: true,
+        dateFormat:'MM/dd/YYYY',
+        minDate: "dateToday"
+    });
+    $(".timepicker").timepicker({
+        showInputs: false,
+        showMeridian: false,
+        showSeconds: true,
+        minuteStep: 5,
+        secondStep: 5
+    });
+});
+
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $.validator.addMethod("greaterThan",
+        function(value, element, params) {
+
+            if (!/Invalid|NaN/.test(new Date(value))) {
+                return new Date(value) >= new Date($(params).val());
+            }
+
+            return isNaN(value) && isNaN($(params).val())
+                || (Number(value) >= Number($(params).val()));
+    },'Must be greater than {0}.');
+
+    $.validator.addMethod("valueNotEquals", function(value, element, arg){
+        return arg != value;
+    }, "Value must not equal arg.");
+
+    $.validator.addMethod("minimumAmt", function(value, element, arg){
+        var v = $(element).autoNumeric('get');
+        return v > arg;
+    });
+
+    $.validator.addMethod("checkDiscount",function(value, element, params) {
+            var v = $('#discount').autoNumeric('get');
+            if($('#type').val() == 'FREE DELIVERY'){
+                return true;
+            }else if($('#type').val() == 'DISCOUNT' && (v == '')){
+                return false;
+            }else return true;
+    },'Discount is required');
+
+    $.validator.addMethod("checkMinimumDiscount", function(value, element, arg){
+        var v = $(element).autoNumeric('get');
+        if($('#type').val() == 'DISCOUNT'){
+            return v > arg;
+        } else return true;
+
+    });
+
+    $.validator.addMethod("checkMaxValue",function(value, element, arg) {
+            if($('#discountType').val() == '2'){
+                var v = $(element).autoNumeric('get');
+                return v > arg;
+                return false;
+            }else return true;
+    },'Max value must greater than 0');
+
+    $('button[name="save"]').on('click', function() {
+        $("#form-save").validate();
+    });
+
+    var validator = $("#form-save").validate({
+        ignore:[],
+        rules: {
+            name: "required",
+            discount: {
+                checkDiscount : true,
+                number : true,
+                checkMinimumDiscount : 0.01
+            },
+            count : {
+                required : true,
+                number : true,
+                min : 1
+            },
+            maxValue : {
+                checkMaxValue : 0.01
+            },
+            minPurchase : {
+                required : true,
+                number : true,
+                minimumAmt : 0.01
+            },
+            priority : {valueNotEquals : "0"},
+            /*'merchant_list[]': {
+                required : function(){
+                    if($('filterStatus').val() == 'M' && ($('discount').val == '' || $('discount').val == '0')){
+                        return false;
+                    }else return true;
+                }
+            },
+            */
+            fromDate: {
+                required: true,
+                date: true
+            },
+            toDate: {
+                required: true,
+                date: true,
+                greaterThan: "#fromDate"
+            }
+        },
+        messages: {
+            name: "Name is required",
+            discount: {
+                checkDiscount : "Discount is required",
+                checkMinimumDiscount : "Discount must greater than 0"
+            },
+            count : {
+                required : "Count is required"
+            },
+            minPurchase : {
+                required : "Minimum Purchase is required",
+                minimumAmt : "Minimum purchase must greater than 0"
+            },
+            priority : {valueNotEquals : "Please select priority"},
+            /*'merchant_list[]': {required: "Seller is required"},
+            */
+            fromDate: {
+                required: "From date is required"
+            },
+            toDate: {
+                required: "To date is required",
+                greaterThan: "To date must be greater than or equal from date"
+            }
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            $('.input_currency').autoNumeric('get');
+            $('.input_currency').each(function(key, value) {
+                $(value).val($(value).autoNumeric('get'));
+            });
+            form.submit();
+        }
+    });
+
+    $('#fromDate').on('change', function(){
+        $('#fromDate').valid();
+    });
+
+    $('#toDate').on('change', function(){
+        $('#toDate').valid();
+    });
+
+    $('#category').on('change', function(){
+        $('#category').valid();
+    });
+
+    $('#brand').on('change', function(){
+        $('#brand').valid();
+    });
+
+    $('#priority').on('change', function(){
+        $('#priority').valid();
+    });
+
+
+    $('#div-product').hide();
+    $('#div-category').hide();
+    $('#div-brand').hide();
+    $('#div-seller').hide();
+    $('#div-member').hide();
+});
+</script>

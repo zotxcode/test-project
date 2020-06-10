@@ -1,0 +1,179 @@
+@(title: String, action: String, listReseller: Map[Integer, String])
+
+@import views.html.admin.helper._
+@views.html.admin.main(title+" | Enwie Admin Page"){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Order")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div class="header pull-left">
+                            <h3 class="box-title title-module">@action @title</h3>
+                        </div>
+
+                        <div class="add pull-right">
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-xs-4 col-md-2">
+                                    <!--<select class="form-control" id="searchFilter" name="filter" >
+                                        <option value="">All</option>
+                                        <option value="V">Order Verified</option>
+                                        <option value="P">Pending</option>
+                                        <option value="E">Expire Payment</option>
+                                    </select>-->
+                                </div>
+                                <div class="col-xs-4 col-md-2">
+
+                                </div>
+                            </div>
+                        </form>
+                        <table id="listTables" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Order No</th>
+                                    <th>Order Date</th>
+                                    <th>Customer</th>
+                                    <th>Reseller</th>
+                                    <th>Pay Status</th>
+                                    <th>Order Total (Rp)</th>
+                                    <th>Status</th>
+                                    <th>Status Reseller</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+</div>
+
+<div id="modal-update" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Update Reseller</h4>
+            </div>
+            <form id="formUpdate" action="@controllers.admin.routes.SalesOrderController.updateReseller()" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="update_id" name="id">
+                    <div class="form-group">
+                        <label>Reseller *</label>
+                        <select name="reseller" id="reseller" class="form-control select2">
+                            <option value=""></option>
+                            @for((k,v) <- listReseller){<option value="@k">@v</option>}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                    <button type="button" class="btn btn-primary submit-update">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="modal-status" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">List Status Order</h4>
+            </div>
+            <div class="modal-body div-status">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-danger">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+<script type="text/javascript">
+var table;
+$(document).ready(function(){
+   //$('.select2').select2();
+   $('#action').hide();
+
+   table = $("#listTables").DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "@controllers.admin.routes.SalesOrderController.lists()"
+        },
+        columnDefs : [
+            { targets: 0, sortable: false, width: "20px"},
+            { targets: 9, sortable: false}
+        ],
+        order: [[ 3, "desc" ]],
+        language: {
+            searchPlaceholder: "Search by invoice..."
+        }
+    });
+
+   $('#searchFilter').on('change', function(){
+        table.ajax.reload();
+   });
+
+    oTable = $('#listTables').DataTable();
+
+    $('#listTables_length').hide();
+});
+
+function updateReseller(id) {
+    $('#modal-update').modal('show');
+    $('#formUpdate')[0].reset();
+    $("#update_id").val(id);
+};
+
+
+$('.submit-update').on('click', function() {
+    $('#formUpdate').ajaxSubmit({
+        dataType: 'json',
+        beforeSend: function() {
+            $('#modal-update').modal('hide');
+            MyApp.loadingOverlay.show();
+        },
+        uploadProgress: function(event, position, total, percentComplete) {
+        },
+        error: function(data ) {
+            resp = JSON.parse(data.responseText);
+            alert(resp.message);
+        },
+        success: function(resp) {
+            toastr["success"]("Data success updated", "Success")
+            table.ajax.reload();
+        },
+        complete: function(xhr) {
+            MyApp.loadingOverlay.hide();
+            try {
+                resp = JSON.parse(xhr.responseText);
+            } catch (e) {
+                alert('terjadi kesalahan');
+            }
+        }
+    });
+});
+
+</script>

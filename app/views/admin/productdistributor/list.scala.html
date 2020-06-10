@@ -1,0 +1,82 @@
+@(title: String, action: String, feature:RoleFeature)
+
+@import helper._
+@import views.html.admin.helper._
+@views.html.admin.main(title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Products")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div class="header pull-left">
+                            <h3 class="box-title title-module">@action @title</h3>
+                        </div>
+
+                        <div class="add pull-right">
+
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <table id="listTable" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Like</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+</div>
+    @mymodaldelete("productdistributor")
+}
+
+<script src='@routes.Assets.at("javascripts/additional-methods.min.js")' type='text/javascript'></script>
+<script type="text/javascript">
+    var table;
+    $(document).ready(function(){
+
+       table = $("#listTable").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "@controllers.admin.routes.ProductDistributorController.lists()"
+            },
+            language: {
+                searchPlaceholder: "Search by product name..."
+            },
+            columnDefs : [
+                { targets: 0, sortable: false, width: "20px"},
+                { targets: 6, sortable: false}
+            ],
+            order: [[ 1, "asc" ]]
+        });
+
+        oTable = $('#listTable').DataTable();
+
+        $('#listTable_length').hide();
+
+
+    });
+</script>

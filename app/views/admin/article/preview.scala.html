@@ -1,0 +1,64 @@
+@(title: String, action: String, data: Article)
+
+@import views.html.admin.helper._
+@views.html.admin.main(action + " " + title){
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Information")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    <div class="box-body">
+                        <h3 class="box-title">@data.name</h3>
+                        @Html.apply(data.content)
+                    </div>
+                    <div class="box-footer">
+                        <a class="btn btn-default" href="@controllers.admin.routes.ArticleController.index()">Back</a>
+                        <button type="button" name="save" id="btn_save" class="btn btn-primary">Confirm Publish</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#btn_save').on('click', function() {
+            $.ajax({
+                url: "/admin/information/article/@data.id/updateStatus/@Article.PUBLISH",
+                type: 'POST',
+                beforeSend: function() {
+                    MyApp.loadingOverlay.show();
+                },
+                error: function(data ) {
+                    resp = JSON.parse(data.responseText);
+                    alert(resp.message);
+                },
+                success: function(resp) {
+                    alert(resp.message);
+                    if(resp.meta.total != 0){
+                        window.location.replace("@controllers.admin.routes.ArticleController.index()");
+                    }
+                },
+                complete: function(xhr) {
+                    MyApp.loadingOverlay.hide();
+                    try {
+                        resp = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        alert('Something went wrong.');
+                    }
+                }
+            });
+       });
+    });
+</script>

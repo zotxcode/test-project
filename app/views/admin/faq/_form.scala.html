@@ -1,0 +1,161 @@
+@(title: String, action: String, formData: Form[models.Faq], url: play.api.mvc.Call, lists: Map[Integer, String], listsType: Map[Integer, String])
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Information")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id->"form-save") {
+                    <div class="box-body">
+                        @mytext(formData("id"), "", "", "hidden")
+                        @mytext(formData("name"), "Faq Name *")
+                        @mytext(formData("title"), "Meta Title *")
+                        @mytext(formData("keyword"), "Meta Keyword *")
+                        @mytext(formData("description"), "Meta Description *")
+                        @myselectbutton(formData("group_id"), "Faq Group", lists)
+                        @*<div class="row">*@
+                        @*@myselect(formData("type"), "Faq Type", listsType)*@
+                        @*</div>*@
+                        @mytextarea(formData("content"), "")
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.FaqController.index(), action.equalsIgnoreCase("add"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+
+<div id="modal-add-group" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Add Group</h4>
+            </div>
+            @form(controllers.admin.routes.FaqController.saveGroup(), 'role->"form", 'id->"formFaqGroup") {
+            <div class="modal-body">
+                @mytext(formData("name"), "Group Name")
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                <button type="button" class="btn btn-primary submit-add-group">Save</button>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+
+}
+<script>
+  $(function () {
+    $(".select2").select2();
+    CKEDITOR.replace( 'content',
+        {
+            filebrowserBrowseUrl :'/admin/ckeditor/browser?Connector=/admin/ckeditor/connector',
+            filebrowserImageBrowseUrl : '/admin/ckeditor/browser?Type=Image&Connector=/admin/ckeditor/connector',
+            filebrowserFlashBrowseUrl :'/admin/ckeditor/browser?Type=Flash&Connector=/admin/ckeditor/connector',
+            filebrowserUploadUrl  :'/admin/ckeditor/upload?Type=File',
+            filebrowserImageUploadUrl : '/admin/ckeditor/upload?Type=Image',
+            filebrowserFlashUploadUrl : '/admin/ckeditor/upload?Type=Flash'
+        });
+    CKEDITOR.config.allowedContent = true;
+    $('#idBtn').on('click', function() {
+        $('#formFaqGroup')[0].reset();
+        $('#modal-add-group').modal('show');
+    });
+
+    $('.submit-add-group').on('click', function() {
+        $('#formFaqGroup').ajaxSubmit({
+            dataType: 'json',
+            beforeSend: function() {
+                $('#modal-add-group').modal('hide');
+                MyApp.loadingOverlay.show();
+            },
+            uploadProgress: function(event, position, total, percentComplete) {
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                alert(resp.message);
+                $(".select2").select2({data: [{id: resp.data.id, text: resp.data.name}]});
+                $(".select2").val(resp.data.id).change();
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('terjadi kesalahan');
+                }
+            }
+        });
+    });
+
+  });
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#form-save").validate({
+        ignore: [],
+        rules: {
+          name: "required",
+          title: "required",
+          keyword: "required",
+          description: "required"
+        },
+        messages: {
+          name: "Name is required",
+          title: "Title is required",
+          keyword: "Keyword is required",
+          description: "Description is required"
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            form.submit();
+        }
+    });
+});
+$('#title').on('change', function(){
+	$('#keyword').val($(this).val());
+	$('#description').val($(this).val());
+})
+</script>

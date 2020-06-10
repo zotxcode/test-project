@@ -1,0 +1,137 @@
+@(title: String, action: String, formData: Form[models.PurchaseOrder], url: play.api.mvc.Call)
+
+@import helper._
+@import views.html.admin.helper._
+
+
+@views.html.admin.main(action + " " + title){
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+
+    @mybreadcumb(title, "Distributor")
+
+      <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+      <div class="row">
+
+        @myalert()
+
+        <div class="col-xs-12">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">@action @title</h3>
+            </div>
+            <div class="box-body">
+              <div class="row">
+                <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                  <label>Product Name / SKU</label>
+                  <div class="row">
+                    <div class="col-xs-5">
+                      <input type="text" id="productName" name="productName" class="form-control">
+                    </div>
+                    <div class="col-xs-2">
+                      <button type="button" id="btnsearch" class="btn btn btn-primary btn-sm form-control">
+                        <i class="fa fa-search"></i> &nbsp; Search
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            @form(url, 'role->"form", 'id->"save-form") {
+              <div class="box-body">
+                <table id="listTables" class="table table-bordered table-striped">
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      <th>Quantity</th>
+                      <th>Price</th>
+                      <th>Product Name</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                </table>
+                <div class="form-group">
+                  <label>Received</label>
+
+                  <div class="input-group date">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right" id="receivedDate" name="receivedDate">
+                  </div>
+                    <!-- /.input group -->
+                </div>
+                @mytextarea(formData("information"), "Information")
+              </div>
+              <div class="box-footer">
+                @*<button id="btn_save" class="btn btn-default" value="1" name="save" type="submit">Save as Draft</button>*@
+                <a class="btn btn-danger" href="@controllers.admin.routes.PurchaseOrderController.index()">Cancel</a>
+                <button class="btn btn-primary" value="2" name="save" type="submit">Save</button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+    </section>
+      <!-- /.content -->
+  </div>
+}
+
+<script type="text/javascript">
+        var table;
+        $(document).ready(function(){
+          $('#receivedDate').datepicker({
+            todayHighlight: true,
+            autoclose: true
+          });
+          $("#productName").keyup(function(event){
+            if(event.keyCode == 13){
+              table.ajax.reload();
+            }
+          });
+          table = $("#listTables").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+              "url": "@controllers.admin.routes.PurchaseOrderController.listsProductBySKUName()",
+              "data": function(data) {
+                data.filter = $('#productName').val();
+              }
+            },
+            columnDefs : [
+              { targets: 0, sortable: false, width: "20px"},
+              { targets: 1, sortable: false},
+              { targets: 4, sortable: false}
+            ],
+            order: [[ 4, "asc" ]],
+            "fnDrawCallback": function() {
+              $('.btn-delete').on('click', function(){
+                $(this).closest("tr").remove();
+              });
+              $('.input_currency').autoNumeric('init');
+            }
+          });
+          $('#listTables_filter').hide();
+          $('#btnsearch').on('click', function(){
+            table.ajax.reload();
+          });
+
+          oTable = $('#listTables').DataTable();
+
+          $('#listTables_length').hide();
+
+          $("#save-form").submit(function(e) {
+            MyApp.loadingOverlay.show();
+            $('.input_currency').autoNumeric('get');
+            $('.input_currency').each(function(key, value) {
+              $(value).val($(value).autoNumeric('get'));
+            });
+          });
+        });
+
+
+</script>

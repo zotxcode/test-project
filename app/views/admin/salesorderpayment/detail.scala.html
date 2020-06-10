@@ -1,0 +1,91 @@
+@(title: String, action: String, data: SalesOrderPayment)
+
+@import views.html.admin.helper.mybreadcumb
+@views.html.admin.main(action + " " + title +" | Hokeba Admin Page"){
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Shop")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    <div class="box-body">
+                        <form class="form-horizontal col-xs-12">
+                            <div class="form-group">
+                                <label class="col-sm-2">Invoice</label>
+                                <div class="col-sm-10">
+                                    @data.invoiceNo
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2">Sales Order</label>
+                                <div class="col-sm-10">
+                                    @data.salesOrder.orderNumber
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2">Date</label>
+                                <div class="col-sm-10">
+                                    @data.getConfirmAt()
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2">Customer</label>
+                                <div class="col-sm-10">
+                                    
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2">Total Order</label>
+                                <div class="col-sm-10">
+                                    Rp @data.salesOrder.getTotalFormat()
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2">Total Transfer</label>
+                                <div class="col-sm-10">
+                                    Rp @data.getTotalFormat()
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2">Account Number</label>
+                                <div class="col-sm-10">
+                                    @data.debitAccountNumber
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2">Bank</label>
+                                <div class="col-sm-10">
+                                   
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2">Status</label>
+                                <div class="col-sm-10">
+                                    @data.getStrStatus()
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2">Struct</label>
+                                <div class="col-sm-10">
+                                    <img src="@data.getImageLink()" class="col-sm-10"/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="box-footer">
+                        <a class="btn btn-default" href="@controllers.admin.routes.SalesOrderPaymentController.index()">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+}

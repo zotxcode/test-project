@@ -1,0 +1,47 @@
+@(title: String, action: String, data: UserCms)
+
+@import views.html.admin.helper._
+@views.html.admin.main(action + " " + title){
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "User Management")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    <form >
+                        <div class="box-body">
+                            @mylabel("Fisrt Name", data.firstName)
+                            @mylabel("Last Name", data.lastName)
+                            @mylabel("Full Name", data.fullName)
+                            @mylabel("Email", data.email)
+                            @mylabel("Role", data.role.name)
+                            @mylabel("Distributor", data.getIsDistributorStr())
+                            @mylabel("Province", data.getProvince())
+                            @mylabel("City", data.getCity())
+                            @mylabel("Status", data.getIsActive())
+                        </div>
+                    </form>
+                    <div class="box-footer">
+                        <a class="btn btn-default" href="@controllers.admin.routes.UserController.index()">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+}
+<script type="text/javascript">
+$(document).ready(function() {
+
+    $("input[type=checkbox]").prop("disabled", true);
+
+});
+</script>

@@ -1,0 +1,110 @@
+@(title: String, action: String, formData: Form[models.StaticPage], url: play.api.mvc.Call)
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Information")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id->"form-save") {
+                    <div class="box-body">
+                        @mytext(formData("id"), "", "", "hidden")
+                        @mytext(formData("name"), "Name *")
+                        @mytext(formData("title"), "Meta Title *")
+                        @mytext(formData("keyword"), "Meta Keyword *")
+                        @mytext(formData("description"), "Meta Description *")
+                        @mytextarea(formData("content"), "Content *")
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.StaticPageController.index(), action.equalsIgnoreCase("add"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+}
+<script>
+  $(function () {
+    CKEDITOR.replace( 'content',
+        {
+            filebrowserBrowseUrl :'/admin/ckeditor/browser?Connector=/admin/ckeditor/connector',
+            filebrowserImageBrowseUrl : '/admin/ckeditor/browser?Type=Image&Connector=/admin/ckeditor/connector',
+            filebrowserFlashBrowseUrl :'/admin/ckeditor/browser?Type=Flash&Connector=/admin/ckeditor/connector',
+            filebrowserUploadUrl  :'/admin/ckeditor/upload?Type=File',
+            filebrowserImageUploadUrl : '/admin/ckeditor/upload?Type=Image',
+            filebrowserFlashUploadUrl : '/admin/ckeditor/upload?Type=Flash'
+        });
+    CKEDITOR.config.allowedContent = true;
+  });
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#form-save").validate({
+        ignore: [],
+        rules: {
+          name: "required",
+          title: "required",
+          keyword: "required",
+          description: "required",
+          content: {
+                         required: function()
+                        {
+                         CKEDITOR.instances.content.updateElement();
+                        }
+                    }
+        },
+        messages: {
+          name: "Name is required",
+          title: "Title is required",
+          keyword: "Keyword is required",
+          description: "Description is required",
+          content: {
+                        required:"Content is required"
+                    }
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            form.submit();
+        }
+    });
+});
+$('#title').on('change', function(){
+	$('#keyword').val($(this).val());
+	$('#description').val($(this).val());
+})
+</script>

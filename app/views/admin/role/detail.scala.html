@@ -1,0 +1,88 @@
+@(title: String, action: String, data: Role, listFeature: List[Feature], initFeature: List[RoleFeature])
+
+@import java.lang.String; var sectionName="";
+@import java.lang.Integer; var checked2=0; var checked3=0; var checked5=0; var checked7=0;
+@import views.html.admin.helper._
+@views.html.admin.main(action + " " + title){
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "User Management")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    <form >
+                        <div class="box-body">
+                            @mylabel("Name", data.name)
+                            @mylabel("Description", data.description)
+                            <div class="row">
+                            <div class="form-group">
+                                <label class="col-sm-2">List Feature Enable</label>
+                            </div>
+                            </div>
+
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Menu</th>
+                                    <th>View</th>
+                                    <th>Add</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @for(feature <- listFeature) {
+                                @{checked2 = 0}
+                                @{checked3 = 0}
+                                @{checked5 = 0}
+                                @{checked7 = 0}
+                                @for(item <- initFeature){
+                                @if(item.featureId == feature.id){
+                                @{checked2 = 1}
+                                @if((item.access % 3) == 0){
+                                @{checked3 = 1}
+                                }
+                                @if((item.access % 5) == 0){
+                                @{checked5 = 1}
+                                }
+                                @if((item.access % 7) == 0){
+                                @{checked7 = 1}
+                                }
+                                }
+                                }
+                                <tr>
+                                    <td>@feature.section &nbsp;/&nbsp; @feature.name</td>
+                                    <td><input type="checkbox" id="@feature.id-2" value="@feature.id-2" name="feature_list[]" class="@feature.section.replace(' ','_')" @if(checked2 == 1){ checked }></td>
+                                    <td><input type="checkbox" id="@feature.id-3" value="@feature.id-3" name="feature_list[]" class="@feature.section.replace(' ','_') checkbox3" @if(checked3 == 1){ checked }></td>
+                                    <td><input type="checkbox" id="@feature.id-5" value="@feature.id-5" name="feature_list[]" class="@feature.section.replace(' ','_') checkbox5" @if(checked5 == 1){ checked }></td>
+                                    <td><input type="checkbox" id="@feature.id-7" value="@feature.id-7" name="feature_list[]" class="@feature.section.replace(' ','_') checkbox7" @if(checked7 == 1){ checked }></td>
+                                </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                    <div class="box-footer">
+                        <a class="btn btn-default" href="@controllers.admin.routes.RoleController.index()">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+}
+<script type="text/javascript">
+$(document).ready(function() {
+
+    $("input[type=checkbox]").prop("disabled", true);
+
+});
+</script>

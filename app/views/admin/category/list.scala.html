@@ -1,0 +1,216 @@
+@(title: String, action: String, feature:RoleFeature)
+
+@import views.html.admin.helper._
+@views.html.admin.main(title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Master Products")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div class="header pull-left">
+                            <h3 class="box-title title-module">@action @title</h3>
+                        </div>
+
+                        <div class="add pull-right">
+                            @if(feature.isAdd()){
+                            <a class="btn btn-info btn-sm" href="@controllers.admin.routes.CategoryController.add(0L)">
+                                <i class="fa fa-plus"></i> New
+                            </a>
+                            }
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <table id="listTables" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Category Name</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+</div>
+
+@mymodaldelete("category")
+}
+<link rel='stylesheet' href='@routes.Assets.at("plugins/treeview-datatables/jquery.dataTables.min.css")'>
+<script src='@routes.Assets.at("plugins/treeview-datatables/jquery.dataTables.min.js")' type='text/javascript'></script>
+<script src='@routes.Assets.at("plugins/treeview-datatables/dataTables.treeGrid.js")' type='text/javascript'></script>
+<script type="text/javascript">
+var table;
+function refreshTable(){
+    $('#listTables').find('td:nth-of-type(1) img').filter(function () {
+        $(this).on('click', function(){
+            window.setTimeout(
+                function() {
+                    $('.cb-status').bootstrapToggle();
+                    $('.cb-status').change(function() {
+                        var val = [parseInt($(this).val())];
+                        updateStatus(val, $(this).prop('checked') ? 1 : 2, false);
+                    });
+                     refreshTable();
+                },
+                100
+            );
+
+        });
+    });
+};
+$(document).ready(function(){
+    var columns = [
+    {
+        title: '',
+        target: 0,
+        width: '15px',
+        className: 'treegrid-control',
+        data: function (item) {
+            if (item.children) {
+                return '<span><img src="@routes.Assets.at("plugins/treeview-datatables/details_open.png")"></span>';
+            }
+            return '';
+        }
+    },
+    {
+        title: 'Category',
+        target: 1,
+        data: function (item) {
+            return item.name;
+        }
+    },
+    {
+        title: 'Status',
+        target: 2,
+        data: function (item) {
+            return item.status;
+        }
+    },
+    {
+        title: 'Action',
+        target: 3,
+        data: function (item) {
+            return item.action;
+        }
+    }
+    ];
+
+    table = $('#listTables').DataTable({
+        'columns': columns,
+        "ajax": "@controllers.admin.routes.CategoryController.lists()",
+        'treeGrid': {
+            'left': 20,
+            'expandIcon': '<span><img src="@routes.Assets.at("plugins/treeview-datatables/details_open.png")"></span>',
+            'collapseIcon': '<span><img src="@routes.Assets.at("plugins/treeview-datatables/details_close.png")"></span>'
+        },
+        "fnDrawCallback": function() {
+            $('.cb-status').bootstrapToggle();
+            $('.cb-status').change(function() {
+                var val = [parseInt($(this).val())];
+                updateStatus(val, $(this).prop('checked') ? 1 : 2, false);
+            });
+            refreshTable();
+        },
+        language: {
+            searchPlaceholder: "Search by Category Name..."
+        }
+    });
+    oTable = $('#listTables').DataTable();
+    $('#listTables_length').hide();
+});
+</script>
+<script type="text/javascript">
+    $(document).ready(function(){
+       $('#action').hide();
+
+        $('.submit-delete').on('click', function() {
+        var id = $("#category_id").val();
+        $.ajax({
+            url: "/admin/masterproducts/category/"+id+"/delete",
+            type: 'DELETE',
+            beforeSend: function() {
+                $('#modal-delete-category').modal('hide');
+                MyApp.loadingOverlay.show();
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                toastr["error"](resp.message, "Error")
+            },
+            success: function(resp) {
+                toastr["success"](resp.message, "Succes")
+                table.ajax.reload();
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    toastr["error"]("Something went wrong.", "Error")
+                }
+            }
+        });
+       });
+
+    });
+
+    function deleteData(id) {
+        $('#modal-delete-category').modal('show');
+        $("#category_id").val(id);
+    };
+
+    function updateStatus(id, status, reload){
+        $.ajax({
+            url: "/admin/masterproducts/category/"+id+"/updateStatus/"+status,
+            type: 'POST',
+            beforeSend: function() {
+                $('#modal-delete-banner').modal('hide');
+                MyApp.loadingOverlay.show();
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                toastr["error"](resp.message, "Error")
+            },
+            success: function(resp) {
+                $('#action option[value=""]').prop('selected', true);
+
+                if(resp.meta.total != 0){
+                    toastr["success"](resp.message, "Succes")
+                    $('#action').hide();
+                    if (reload){
+                        //table.ajax.reload();
+                        location.reload();
+                    }
+                }else{
+                    toastr["error"](resp.message, "Error")
+                    location.reload();
+                }
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    toastr["error"]("Something went wrong.", "Error")
+                }
+            }
+        });
+    }
+
+</script>

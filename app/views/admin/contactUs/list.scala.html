@@ -1,0 +1,140 @@
+@(title: String, action: String, feature : RoleFeature)
+
+@import views.html.admin.helper._
+@views.html.admin.main(title){
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Customer")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div class="header pull-left">
+                            <h3 class="box-title title-module">@action @title</h3>
+                        </div>
+
+                        <div class="add pull-right">
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-4 col-md-2">
+                                <select class="form-control" id="searchFilter" name="filter" >
+                                    <option value="-1">All</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-4 col-md-2">
+                            </div>
+                        </div>
+                        <table id="listContact" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th><input name="select_all" value="1" id="select-all" type="checkbox"></th>
+                                    <th>No</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Content</th>
+                                    <th>Sent Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+</div>
+
+}
+
+<script type="text/javascript">
+    var table;
+    $(document).ready(function(){
+       $('#action').hide();
+
+       table = $("#listContact").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "@controllers.admin.routes.ContactUsController.lists()",
+                "data": function(data) {
+                    data.filter = $("#searchFilter").val();
+                }
+            },
+            columnDefs : [
+                {
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'sortable': false,
+                    'className': 'dt-body-center',
+                    'width': "20px",
+                    'render': function (data, type, full, meta){
+                        return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                },
+                { targets: 1, sortable: false, width: "20px"},
+                { targets: 6, sortable: false, width: "85px"},
+            ],
+            order: [[ 5, "desc" ]],
+            language: {
+                searchPlaceholder: "Search by name..."
+            }
+        });
+
+        oTable = $('#listContact').DataTable();
+
+        $('#listContact_length').hide();
+
+       $('#searchFilter').on('change', function(){
+            table.ajax.reload();
+       });
+
+        // Handle click on "Select all" control
+       $('#select-all').on('click', function(){
+          var rows = table.rows({ 'search': 'applied' }).nodes();
+          $('input[type="checkbox"]', rows).prop('checked', this.checked);
+          if(this.checked){
+            $('#action').show();
+          }else{
+            $('#action').hide();
+          }
+       });
+
+       // Handle click on checkbox to set state of "Select all" control
+       $('#listContact tbody').on('change', 'input[type="checkbox"]', function(){
+          if(!this.checked){
+             var el = $('#example-select-all').get(0);
+             if(el && el.checked && ('indeterminate' in el)){
+                el.indeterminate = true;
+             }
+          }
+       });
+
+    });
+
+    function getSelectedIds(){
+        var dataId = "";
+        var i = 0;
+        table.$('input[type="checkbox"]').each(function(){
+            if(this.checked){
+               if(i > 0)
+                dataId += ","+this.value;
+               else dataId = this.value;
+               i++;
+            }
+        });
+        return dataId;
+    }
+</script>

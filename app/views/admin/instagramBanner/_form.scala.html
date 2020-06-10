@@ -1,0 +1,769 @@
+@(title: String, action: String, formData: Form[models.InstagramBanner], url: play.api.mvc.Call, listsCategory: Map[Integer, String], listSubCategory: Map[Integer, String], listsProduct: Map[Integer, String], listType: Map[Integer, String])
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title){
+<!-- Content Wrapper. Contains page content -->
+<style>
+.container-outer {
+    margin: 0 auto;
+    overflow: scroll;
+    width: 100%;
+    height: 400px;
+}
+</style>
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Information")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            @myalert()
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id -> "form-save", 'enctype -> "multipart/form-data") {
+                    <div class="box-body">
+                        @mytext(formData("id"), "", "", "hidden")
+                        @mytext(formData("name"), "Banner Name *")
+                        @mytext(formData("title"), "Meta Title *")
+                        @mytext(formData("keyword"), "Meta Keyword *")
+                        @mytext(formData("description"), "Meta Description *")
+                        <div class="row">
+                        @myselect(formData("urlType"), "Type Link", listType, "col-md-4 col-sm-8 col-xs-12", false)
+                        </div>
+                        <div id="externalUrls">
+                        @mytext(formData("externalUrl"), "External URL")
+                        </div>
+                        <div id="internalUrls">
+                            <div class="row">
+                                <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                    <label>Category *</label>
+                                    <div class="row">
+                                        <div class="col-md-11 col-sm-9 col-xs-8">
+                                            <select id="category" name="category_list[]" class="form-control" data-placeholder="Please select category">
+                                            @for((k,v) <- listsCategory){<option value="@k" >@v</option>}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-1 col-sm-3 col-xs-4">
+                                            <a href="@controllers.admin.routes.CategoryController.add(0)" target="_blank"  class="btn btn btn-primary btn-sm form-control">
+                                                Add
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-xs-12">
+                                    <label>Sub Category</label>
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <select id="subcategoryid" name="subcategory_list[]" class="form-control" data-placeholder="Please select sub category">
+                                            @for((k,v) <- listSubCategory){<option value="@k" >@v</option>}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                    <label>Product List</label>
+                                    <div class="row">
+                                        <div class="col-xs-10">
+                                            <select id="productlist" name="product_list[]" class="form-control" data-placeholder="Please select product">
+                                            @for((k,v) <- listsProduct){<option value="@k" >@v</option>}
+                                            </select>
+                                        </div>
+                                        <div class="col-xs-2">
+                                            <button type="button" class="btn btn-primary" id="listproductbtn">Show Product Item</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Image *</label>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <button type="button" name="addimage" id="addimage" class="btn btn-primary">Show Image</button>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-xs-12 margin-show">
+                                    <div id="box-add-image" class="box box-info box-solid">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Add Images</h3>
+                                            <!-- /.box-tools -->
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="col-md-12">
+                                                @mytext(formData("bannerImageName"), "Image Name *")
+                                                @mytext(formData("bannerImageTitle"), "Meta Title *")
+                                                @mytext(formData("bannerImageKeyword"), "Meta Keyword *")
+                                                @mytext(formData("bannerImageDescription"), "Meta Description *")
+                                                <div id="div_image">
+                                                    @myfile2(formData("imageUrl"), "Image", "", "", "preview","Image dimensions : 291x291px", 291,291 )
+                                                    <div class="col-md-12">
+                                                        <div class="container-outer">
+                                                            <img id="preview" src="@formData("imageLink").value"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="margin-show"></div>
+                                                    @myfile2(formData("imageUrlResponsive"), "Image Responsive", "", "", "preview2","Image dimensions : 291x291px", 291,291)
+                                                    <div class="col-md-12">
+                                                        <div class="container-outer">
+                                                            <img id="preview2" src="@formData("imageResponsiveLink").value"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @mytoglecheckbox(formData("status"), "Status")
+                        <div class="row">
+                            <div class="form-group col-md-2 col-sm-6 col-xs-12">
+                                <label>From *</label>
+
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control pull-right" id="fromDate" value="@formData("fromDate").value" name="fromDate" data-date-format="dd/mm/yyyy">
+                                </div>
+                                <!-- /.input group -->
+                            </div>
+                            <div class="form-group bootstrap-timepicker col-md-2 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-clock-o"></i>
+                                        </div>
+                                        <input type="text" class="form-control timepicker" value="@formData("fromTime").value" id="fromTime" name="fromTime">
+                                    </div>
+                                    <!-- /.input group -->
+                                </div>
+                                <!-- /.form group -->
+                            </div>
+                            <div class="form-group col-md-2 col-sm-6 col-xs-12">
+                                <label>To *</label>
+
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control pull-right" id="toDate" value="@formData("toDate").value" name="toDate" data-date-format="dd/mm/yyyy">
+                                </div>
+                                <!-- /.input group -->
+                            </div>
+                            <div class="form-group bootstrap-timepicker col-md-2 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-clock-o"></i>
+                                        </div>
+                                        <input type="text" class="form-control timepicker" value="@formData("toTime").value" id="toTime" name="toTime">
+                                    </div>
+                                    <!-- /.input group -->
+                                </div>
+                                <!-- /.form group -->
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            @mybutton(controllers.admin.routes.InstagramBannerController.index(), action.equalsIgnoreCase("add"))
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+<div id="modal-select-product" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Product Item Name</h4>
+            </div>
+            <div class="modal-body">
+                <table id="listProduct" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th><!--<input name="select_all" value="1" id="select-all" type="checkbox">--></th>
+                        <th>No</th>
+                        <th>Product Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-default">Back</button>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+<script type="text/javascript">
+var dataProducts = [];
+$("#productlist option").each(function()
+{
+    if($(this).val() != 0){
+        dataProducts.push({id:$(this).val(),text:$(this).text()});
+    }
+});
+var table;
+  $(document).ready(function () {
+        $(".select2").select2();
+
+        $('#fromDate').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat:'dd/mm/yyyy',
+            minDate: "dateToday"
+        });
+        $('#toDate').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat:'dd/mm/yyyy',
+            minDate: "dateToday"
+        });
+        $(".timepicker").timepicker({
+          showInputs: false,
+          showMeridian: false
+        });
+
+        $('#box-add-image').hide();
+
+        $('#addimage').on('click', function() {
+            if($('#box-add-image').is(":visible")){
+                $('#box-add-image').hide();
+                $('#addimage').text('Show Image');
+            }else{
+                $('#box-add-image').show();
+                $('#addimage').text('Hide Image');
+            }
+        });
+
+        $("#category").select2({
+          multiple:true,
+          ajax: {
+            url: "/admin/information/mainbanner/listsCategory",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                q: params.term, // search term
+                page: params.page
+              };
+            },
+            processResults: function (data, params) {
+              params.page = params.page || 1;
+
+              return {
+                results: data.items,
+                pagination: {
+                  more: (params.page * 30) < data.total_count
+                }
+              };
+            },
+            cache: true
+          },
+          escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+          minimumInputLength: 1,
+            templateResult: function (data) {
+                return data.name;
+            },
+            templateSelection:function (data) {
+                return data.name || data.text;
+            }
+        });
+        var arrCategory = [];
+        $("#category option").each(function()
+        {
+            arrCategory.push($(this).val());
+        });
+        if(arrCategory.length > 0){
+            $('#category').val(arrCategory).trigger("change");
+        }
+
+        $('#category').on("select2:select", function(e) {
+            $.ajax({
+                url: "/admin/information/mainbanner/listsSubCategory?q="+$('#category').val(),
+                type: 'GET',
+                beforeSend: function() {
+
+                },
+                error: function(data ) {
+                    resp = JSON.parse(data.responseText);
+                    alert(resp.message);
+                },
+                success: function(resp) {
+                    $("#subcategoryid").empty();
+                    $("#subcategoryid").select2({data: resp.items});
+                    var arrSubCategory = [];
+                    $("#subcategoryid option").each(function()
+                    {
+                        arrSubCategory.push($(this).val());
+                    });
+                    if(arrSubCategory.length > 0){
+                        $('#subcategoryid').val(arrSubCategory).trigger("change");
+                    }
+                },
+                complete: function(xhr) {
+                    try {
+                        resp = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        alert('Something went wrong.');
+                    }
+                }
+            });
+        });
+
+        $("#subcategoryid").select2({multiple:true});
+        var arrSubCategory = [];
+        $("#subcategoryid option").each(function()
+        {
+            arrSubCategory.push($(this).val());
+        });
+        if(arrSubCategory.length > 0){
+            $('#subcategoryid').val(arrSubCategory).trigger("change");
+        }
+
+        $("#productlist").select2({
+            multiple:true
+        });
+        var arrProduct = [];
+        $("#productlist option").each(function()
+        {
+            arrProduct.push($(this).val());
+        });
+        if(arrProduct.length > 0){
+            $('#productlist').val(arrProduct).trigger("change");
+        }
+
+        $('#listproductbtn').text('Show Product Item');
+        $('#listproductbtn').on('click', function(){
+            table.ajax.reload();
+            $('#modal-select-product').modal('show');
+        });
+
+        table = $("#listProduct").DataTable({
+            "lengthMenu": [[10, 25, 50, 100, 200], [10, 25, 50, 100, 200]],
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/admin/information/mainbanner/listsProduct",
+                "data": function ( d ) {
+                    d.myKey = "myValue";
+                    d.category = ""+$('#subcategoryid').val()+"";
+                }
+            },
+            columnDefs : [
+                {
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'sortable': false,
+                    'className': 'dt-body-center',
+                    'width': "20px"
+                },
+                { targets: 1, sortable: false, width: "20px"},
+            ],
+            order: [[ 2, "asc" ]],
+            fnDrawCallback: function() {
+                for(i=0; i < dataProducts.length ; i++){
+                    if($('#cb-action-'+dataProducts[i].id).length > 0){
+                       $('#cb-action-'+dataProducts[i].id).prop('checked', true);
+                    }
+                }
+            }
+        });
+
+        $('#listProduct tbody').on('change', '.cb-action', function(){
+            // If checkbox is not checked
+            if(!this.checked)
+                deleteProducts($(this).val());
+            else {
+                addProducts({id:this.value,text:this.name});
+            }
+            var arrProduct = [];
+            $("#productlist option").each(function()
+            {
+                arrProduct.push($(this).val());
+            });
+            if(arrProduct.length > 0){
+                $('#productlist').val(arrProduct).trigger("change");
+            }
+       });
+  });
+
+//var jcropApi,jcropApi2,jcropApi3;
+//var loadFile2 = function(event, previewId, fileId, width, height) {
+//    if(previewId == "preview"){
+//        if(jcropApi){
+//            jcropApi.destroy();
+//        }
+//    }else if(previewId == "preview2"){
+//        if(jcropApi2){
+//            jcropApi2.destroy();
+//        }
+//    }else if(previewId == "preview3"){
+//        if(jcropApi3){
+//            jcropApi3.destroy();
+//        }
+//    }
+//
+//    var output = document.getElementById(previewId);
+//    output.src = URL.createObjectURL(event.target.files[0]);
+//    var $img = $('#'+previewId);
+//    $img.on('load', function(){
+//        var imageWidth = $(this).prop('naturalWidth');
+//        var imageHeight = $(this).prop('naturalHeight');
+//        $('#'+fileId).removeData('imageWidth');
+//        $('#'+fileId).removeData('imageHeight');
+//
+//        $('#'+fileId).data('imageWidth', imageWidth);
+//        $('#'+fileId).data('imageHeight', imageHeight);
+//
+//        $('#'+previewId).Jcrop({
+//            onSelect: function(c){
+//                    $('#'+fileId+'X').val(c.x);
+//                    $('#'+fileId+'Y').val(c.y);
+//                    $('#'+fileId+'W').val(c.w);
+//                    $('#'+fileId+'H').val(c.h);
+//                },
+//            onChange: function(c){
+//                    $('#'+fileId+'X').val(c.x);
+//                    $('#'+fileId+'Y').val(c.y);
+//                    $('#'+fileId+'W').val(c.w);
+//                    $('#'+fileId+'H').val(c.h);
+//                },
+//            animEasing: 'easeOutQuart',
+//            bgOpacity: .35,
+//            linked: false,
+//            multi: false,
+//            canResize: true,
+//            aspectRatio: width/height
+//        },function(){
+//            this.container.addClass('jcrop-dark jcrop-hl-active');
+//            this.newSelection();
+//            this.setSelect([ 0, 0, width, height ]);
+//            this.refresh();
+//
+//            if(previewId == "preview"){
+//                jcropApi = this;
+//            }else if(previewId == "preview2"){
+//                jcropApi2 = this;
+//            }else if(previewId == "preview3"){
+//                jcropApi3 = this;
+//            }
+//        });
+//
+//    });
+//};
+
+var loadFile2 = function(event, previewId, fileId, width, height) {
+
+    var inputField = $('#' + fileId);
+    var previewArea = $('#' + previewId);
+
+    if (inputField[0].files && inputField[0].files[0]) {
+        previewArea.cropper('destroy');
+        previewArea.cropper({resizable: false, aspectRatio: width/height, crop: function(data) {
+            $('#' + fileId + 'X').val(Math.round(data.x));
+            $('#' + fileId + 'Y').val(Math.round(data.y));
+            $('#' + fileId + 'W').val(Math.round(data.width));
+            $('#' + fileId + 'H').val(Math.round(data.height));
+        }});
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            previewArea.cropper('replace', e.target.result);
+        }
+        reader.readAsDataURL(inputField[0].files[0]);
+    }
+
+    var cvs = previewArea.next().find('.cropper-canvas');
+    inputField.data('imageWidth', cvs.width());
+    inputField.data('imageHeight', cvs.height());
+};
+
+function addProducts(item){
+    dataProducts.push(item);
+    $("#productlist").select2({multiple: true, data: dataProducts});
+}
+
+function deleteProducts(id){
+    findAndRemove(dataProducts, "id", id);
+    $("#productlist").empty();
+    $("#productlist").select2({multiple: true, data: dataProducts});
+}
+
+function findAndRemove(array, property, value) {
+  array.forEach(function(result, index) {
+    if(result[property] == value) {
+        //Remove from array
+        array.splice(index, 1);
+    }
+  });
+};
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $.validator.addMethod("valueNotEquals", function(value, element, arg){
+        return arg != value;
+    }, "Value must not equal arg.");
+    $.validator.addMethod(
+            "date",
+            function (value, element) {
+                var bits = value.match(/([0-9]+)/gi), str;
+                if (!bits)
+                    return this.optional(element) || false;
+                str = bits[1] + '/' + bits[0] + '/' + bits[2];
+                return this.optional(element) || !/Invalid|NaN/.test(new Date(str));
+            },
+            "Please enter a date in the format dd/mm/yyyy"
+    );
+
+    $('button[name="save"]').on('click', function() {
+        $('#box-add-image').show();
+        $('#addimage').text('Hide Image');
+        $("#form-save").validate();
+    });
+    $.validator.addMethod('imageDimension', function(value, element, params) {
+        if($(element).data('imageWidth') != undefined && $(element).data('imageHeight') != undefined){
+            return ($(element).data('imageWidth') == params[0] && $(element).data('imageHeight') == params[1]);
+        } else return true;
+    }, function(params, element){
+        return "Your image's dimension must be " + params[0] + "x" + params[1] + "px";
+    });
+
+    $.validator.addMethod('filesize', function (value, element, param) {
+        return this.optional(element) || (element.files[0].size <= param)
+    }, 'File size must be less than 5MB');
+
+    $.validator.addMethod("extension", function(value, element, param) {
+        param = typeof param === "string" ? param.replace(/,/g, '|') : "png|jpe?g|gif";
+        return this.optional(element) || value.match(new RegExp(".(" + param + ")$", "i"));
+    }, "File must be JPG, JPEG or PNG.");
+
+    $("#form-save").validate({
+        ignore:[],
+        rules: {
+		'category_list[]': {required: true},
+             name: {
+                required: true,
+                maxlength: 100,
+                spesialChart: "name"
+            },
+            title: {
+                required: true,
+                maxlength: 100,
+                spesialChart: "title"
+            },
+            keyword: {
+                required: true,
+                maxlength: 100,
+                spesialChart: "keyword"
+            },
+            description: {
+                required: true,
+                maxlength: 200,
+                spesialChart: "description"
+            },
+            bannerImageName: {
+                required: true,
+                maxlength: 100,
+                spesialChart: "bannerImageName"
+            },
+            bannerImageTitle:{
+                required: true,
+                maxlength: 100,
+                spesialChart: "bannerImageTitle"
+            },
+            bannerImageKeyword: {
+                required: true,
+                maxlength: 100,
+                spesialChart: "bannerImageKeyword"
+            },
+            bannerImageDescription:{
+                required: true,
+                maxlength: 100,
+                spesialChart: "bannerImageDescription"
+            },
+            @if(action.equalsIgnoreCase("add")){
+                imageUrl : {
+                    required: function(element) {
+                        return true ;
+                    },
+                    extension: "png|jpe?g",
+                    filesize: 5242880
+                },
+                imageUrlResponsive : {
+                    required: function(element) {
+                        return true ;
+                    },
+                    extension: "png|jpe?g",
+                    filesize: 5242880
+                },
+            }
+            fromDate: {
+                required: true,
+                date: true
+            },
+                toDate: {
+                required: true,
+                date: true,
+                dateGreaterThan: "#fromDate"
+            }
+        },
+        messages: {
+			'category_list[]': {required: "Category is required"},
+            name: {
+                required: "Name is required"
+            },
+            title: {
+                required: "Title is required"
+            },
+            keyword: {
+                required: "Keyword is required"
+            },
+            description: {
+                required: "Description is required"
+            },
+            bannerImageName: {
+                required: "Banner Image Name is required"
+            },
+            bannerImageTitle: {
+                required: "Banner Image Title is required"
+            },
+            bannerImageKeyword: {
+                required: "Banner Image Keyword is required"
+            },
+            bannerImageDescription: {
+                required: "Banner Image Description is required"
+            },
+            @if(action.equalsIgnoreCase("add")){
+                imageUrl : {
+                    required: "Image is required"
+                },
+                imageUrlResponsive : {
+                    required: "Image responsive is required"
+                },
+            }
+            fromDate: {
+                required: "From date is required"
+            },
+            toDate: {
+                required: "To date is required",
+                dateGreaterThan: "To date must be greater than from date"
+            }
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            form.submit();
+        }
+    });
+
+    function parseDMY(value) {
+        var date = value.split("/");
+        var d = parseInt(date[0], 10),
+                m = parseInt(date[1], 10),
+                y = parseInt(date[2], 10);
+        return new Date(y, m - 1, d);
+    }
+
+    $.validator.addMethod("dateGreaterThan",
+        function(value, element, params) {
+            if ($(params).val() === "")
+                return true;
+
+            if (!/Invalid|NaN/.test(parseDMY(value))) {
+                return parseDMY(value) > parseDMY($(params).val());
+            }
+            return isNaN(value) && isNaN($(params).val())
+                    || (Number(value) > Number($(params).val()));
+        }, 'Must be greater than {0}.');
+
+    $('#fromDate').on('change', function(){
+        $('#fromDate').valid();
+    });
+
+    $('#toDate').on('change', function(){
+        $('#toDate').valid();
+    });
+
+    $('#productlist').on('change', function(){
+        $('#productlist').valid();
+    });
+
+    $('#category').on('change', function(){
+        $('#category').valid();
+    });
+
+    $('#name').on('change', function(){ $('#bannerImageName').val($(this).val()); });
+    $('#title').on('change', function(){
+        $('#bannerImageTitle').val($(this).val());
+        $('#keyword').val($(this).val());
+        $('#description').val($(this).val());
+        $('#bannerImageKeyword').val($(this).val());
+        $('#bannerImageDescription').val($(this).val());
+    });
+    $('#keyword').on('change', function(){ $('#bannerImageKeyword').val($(this).val()); });
+    $('#description').on('change', function(){ $('#bannerImageDescription').val($(this).val()); });
+
+    $('#urlType').change(function() {
+        changeUrlType($(this).val());
+    });
+
+    changeUrlType(@formData("urlType").value)
+});
+
+function changeUrlType(type) {
+    if (type == 1){
+        $("#externalUrls").hide()
+        $("#internalUrls").show()
+    }else {
+        $("#internalUrls").hide()
+        $("#externalUrls").show()
+    }
+}
+
+$.validator.addMethod("spesialChart",
+        function(value, element, params) {
+			var pattern=/[^0-9|a-z|^A-Z|^\s]/;
+			if(!document.getElementById(params).value.match(pattern))
+			return true;
+        }, 'There cannot be a special character.');
+</script>

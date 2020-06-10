@@ -1,0 +1,14 @@
+@(title: String, group: String, parentGroup: String = "")
+
+<section class="content-header">
+    <h1>
+        @title
+    </h1>
+    <ol class="breadcrumb">
+        @if(!parentGroup.equals("")){
+            <li><a href="#">@parentGroup</a></li>
+        }
+        <li><a href="#">@group</a></li>
+        <li class="active">@title</li>
+    </ol>
+</section>

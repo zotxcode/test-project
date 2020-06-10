@@ -1,0 +1,133 @@
+@(title: String, action: String, feature:RoleFeature)
+
+@import views.html.admin.helper._
+@views.html.admin.main(title){
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+
+    @mybreadcumb(title, "Distributor")
+
+      <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <div class="header pull-left">
+                <h3 class="box-title title-module">@action @title</h3>
+              </div>
+
+              <div class="add pull-right">
+              </div>
+            </div>
+            <div class="box-body">
+              <table id="listTables" class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>PO ID</th>
+                    <th>Distributor</th>
+                    <th>Received Date</th>
+                    <th>Created Date</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+              </table>
+            </div>
+              <!-- /.box-body -->
+          </div>
+            <!-- /.box -->
+        </div>
+          <!-- /.col -->
+      </div>
+        <!-- /.row -->
+
+    </section>
+      <!-- /.content -->
+  </div>
+
+  @mymodaldelete("po")
+}
+
+<script type="text/javascript">
+        var table;
+        $(document).ready(function(){
+          $('#action').hide();
+
+          table = $("#listTables").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+              "url": "@controllers.admin.routes.OrderDistributorController.lists()"
+            },
+            columnDefs : [
+              { targets: 1, sortable: false, width: "20px"},
+              { targets: 7, sortable: false}
+            ],
+            order: [[ 2, "asc" ]],
+            language: {
+              searchPlaceholder: "Search by PO ID..."
+            }
+          });
+
+          $('#searchFilter').on('change', function(){
+            table.ajax.reload();
+          });
+
+          oTable = $('#listTables').DataTable();
+
+          $('#listTables_length').hide();
+
+          $('.submit-delete').on('click', function() {
+            var id = $("#po_id").val();
+            if($('.modal-title').html() == 'Approve'){
+              approveD(id);
+            }
+          });
+        });
+
+
+        function approveD(id){
+          $.ajax({
+            url: "/admin/distributor/orderdistributor/"+id+"/approve",
+            type: 'POST',
+            beforeSend: function() {
+              $('#modal-delete-po').modal('hide');
+              MyApp.loadingOverlay.show();
+            },
+            error: function(data ) {
+              resp = JSON.parse(data.responseText);
+              alert(resp.message);
+            },
+            success: function(resp) {
+              $('#action option[value=""]').prop('selected', true);
+
+              if(resp.meta.total != 0){
+                toastr["success"](resp.message, "Succes")
+                table.ajax.reload();
+              }else{
+                toastr["error"](resp.message, "Error")
+              }
+            },
+            complete: function(xhr) {
+              MyApp.loadingOverlay.hide();
+              try {
+                resp = JSON.parse(xhr.responseText);
+              } catch (e) {
+                alert('Something went wrong.');
+              }
+            }
+          });
+        }
+
+        function approveData(id) {
+          $('#modal-delete-po').modal('show');
+          $("#po_id").val(id);
+          $('.modal-title').html('Approve');
+          $('.modal-body').html('Are you sure you want to approve this item?');
+        };
+
+</script>

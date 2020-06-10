@@ -1,0 +1,209 @@
+@(title: String, action: String, feature:RoleFeature)
+
+@import views.html.admin.helper._
+@views.html.admin.main(title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Shop")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div class="header pull-left">
+                            <h3 class="box-title title-module">@action @title</h3>
+                        </div>
+
+                        <div class="add pull-right">
+                            @if(feature.isAdd()){
+                            <a class="btn btn-info btn-sm" href="@controllers.admin.routes.CourierController.add()">
+                                <i class="fa fa-plus"></i> New
+                            </a>
+                            }
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-xs-4 col-md-2">
+                                    @if(feature.isDelete()){
+                                    <a class="btn btn-danger btn-sm" id="action">
+                                        <i class="fa fa-trash"></i> Delete All
+                                    </a>
+                                    }
+                                </div>
+                            </div>
+                        </form>
+                        <table id="listTables" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th><input name="select_all" value="1" id="select-all" type="checkbox"></th>
+                                    <th>No</th>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Logo</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+</div>
+
+@mymodaldelete("courier")
+}
+
+<script type="text/javascript">
+    var table;
+    $(document).ready(function(){
+       $('#action').hide();
+
+       table = $("#listTables").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "@controllers.admin.routes.CourierController.lists()"
+            },
+            columnDefs : [
+                {
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'sortable': false,
+                    'className': 'dt-body-center',
+                    'width': "20px",
+                    'render': function (data, type, full, meta){
+                        return '<input type="checkbox" class="cb-action" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                },
+                {
+                    'targets': 4,
+                    'searchable': false,
+                    'orderable': false,
+                    'sortable': false,
+                    'className': 'dt-body-center',
+                    'width': "100px",
+                    'render': function (data, type, full, meta){
+                        return '<img src="'+ $('<div/>').text(data).html() +'" >';
+                    }
+                },
+                { targets: 1, sortable: false, width: "20px"},
+                { targets: 5, sortable: false}
+            ],
+            order: [[ 2, "asc" ]],
+            language: {
+                searchPlaceholder: "Search by name..."
+            }
+        });
+
+       $('#searchFilter').on('change', function(){
+            table.ajax.reload();
+       });
+
+        oTable = $('#listTables').DataTable();
+
+        $('#listTables_length').hide();
+
+        // Handle click on "Select all" control
+       $('#select-all').on('click', function(){
+          // Get all rows with search applied
+          var rows = table.rows({ 'search': 'applied' }).nodes();
+          // Check/uncheck checkboxes for all rows in the table
+          $('input[type="checkbox"]', rows).prop('checked', this.checked);
+          if(this.checked){
+            $('#action').show();
+          }else{
+            $('#action').hide();
+          }
+          //
+       });
+
+       // Handle click on checkbox to set state of "Select all" control
+       $('#listTables tbody').on('change', 'input[type="checkbox"]', function(){
+          // If checkbox is not checked
+          if(!this.checked){
+             var el = $('#example-select-all').get(0);
+             // If "Select all" control is checked and has 'indeterminate' property
+             if(el && el.checked && ('indeterminate' in el)){
+                // Set visual state of "Select all" control
+                // as 'indeterminate'
+                el.indeterminate = true;
+             }
+          }
+
+          if(getSelectedIds() != ''){
+            $('#action').show();
+          }else{
+            $('#action').hide();
+          }
+       });
+
+       $('.submit-delete').on('click', function() {
+        var id = $("#courier_id").val();
+        $.ajax({
+            url: "/admin/shop/mastercourier/"+id+"/delete",
+            type: 'DELETE',
+            beforeSend: function() {
+                $('#modal-delete-courier').modal('hide');
+                MyApp.loadingOverlay.show();
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                toastr["error"](resp.message, "Error")
+            },
+            success: function(resp) {
+                toastr["success"](resp.message, "Succes")
+                table.ajax.reload();
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    toastr["error"]("Something went wrong.", "Error")
+                }
+            }
+        });
+       });
+
+        $('#action').on('click', function(){
+            $('#modal-delete-courier').modal('show');
+            $("#courier_id").val(getSelectedIds());
+            $('.modal-title').html('Delete Courier');
+            $('.modal-body').html('Are you sure you want to delete these item?');
+        });
+
+    });
+
+    function deleteData(id) {
+        $('#modal-delete-courier').modal('show');
+        $("#courier_id").val(id);
+    };
+
+    function getSelectedIds(){
+        var dataId = "";
+        var i = 0;
+        table.$('.cb-action').each(function(){
+            if(this.checked){
+               if(i > 0)
+                    dataId += ","+this.value;
+               else dataId = this.value;
+               i++;
+            }
+        });
+        return dataId;
+    }
+</script>

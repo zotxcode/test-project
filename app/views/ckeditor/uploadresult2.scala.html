@@ -1,0 +1,13 @@
+@(CKEditorFuncNum : String, url : String, message : String)
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN"
+        "http://www.w3.org/TR/html4/frameset.dtd">
+
+<html>
+<head>
+</head>
+<body>
+<script type="text/javascript">
+(function(){var d=document.domain;while (true){try{var A=window.parent.document.domain;break;}catch(e) {};d=d.replace(/.*?(?:\\.|$)/,'');if (d.length==0) break;try{document.domain=d;}catch (e){break;}}})();window.parent.CKEDITOR.tools.callFunction("@CKEditorFuncNum","@url", "@message");
+</script>
+</body>
+</html>

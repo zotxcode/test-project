@@ -1,0 +1,227 @@
+@(title: String, action: String)
+
+@import views.html.admin.helper._
+@views.html.admin.main(title+" | Enwie Admin Page"){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Shop")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header with-border">
+                        <div class="header pull-left">
+                            <h3 class="box-title title-module">@action @title</h3>
+                        </div>
+
+                        <div class="add pull-right">
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-xs-4 col-md-2">
+                                    <select class="form-control" id="searchFilter" name="filter" >
+                                        <option value="">All</option>
+                                        <option value="V">Order Verified</option>
+                                        <option value="P">Pending</option>
+                                        <option value="E">Expire Payment</option>
+                                    </select>
+                                </div>
+                                <div class="col-xs-4 col-md-2">
+
+                                </div>
+                            </div>
+                        </form>
+                        <table id="listTables" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Invoice</th>
+                                    <th>Order No</th>
+                                    <th>Date</th>
+                                    <th>Total Order (Rp)</th>
+                                    <th>Total Transfer (Rp)</th>
+                                    <th>Sent By</th>
+                                    <th>Account No</th>
+                                    <th>Destination</th>
+                                    <th>Attachment</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+</div>
+}
+
+<div id="modal-approve" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Verify Payment Confirmation</h4>
+            </div>
+            <form id="formApprove" action="" method="post">
+                <div class="modal-body">
+                    <h5 >Are you sure to verify payment with invoice <span id="approve_name"></span> ?</h5>
+                    <input type="hidden" id="approve_id" name="id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                    <button type="button" class="btn btn-primary submit-approve">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="modal-reject" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Reject Payment Confirmation</h4>
+            </div>
+            <form id="formReject" action="" method="post">
+                <div class="modal-body">
+                    <h5 >Are you sure to reject payment with invoice <span id="reject_name"></span> ?</h5>
+                    <input type="hidden" id="reject_id" name="id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                    <button type="button" class="btn btn-primary submit-reject">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+var table;
+$(document).ready(function(){
+   $('#action').hide();
+
+   table = $("#listTables").DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "@controllers.admin.routes.SalesOrderPaymentController.lists()",
+            "data": function(data) {
+                data.filter = $("#searchFilter").val();
+            }
+        },
+        columnDefs : [
+            { className: "dt-right", "targets": [3,4] },
+            { targets: 0, sortable: false, width: "20px"},
+            {
+                'targets': 9,
+                'searchable': false,
+                'orderable': false,
+                'sortable': false,
+                'className': 'dt-body-center',
+                'width': "100px",
+                'render': function (data, type, full, meta){
+                    if(data != ""){
+                        return '<img src="'+ $('<div/>').text(data).html() +'" width="150px">';
+                    }else return '';
+                }
+            },
+            { targets: 11, sortable: false}
+        ],
+        order: [[ 1, "desc" ]],
+        language: {
+            searchPlaceholder: "Search by invoice..."
+        }
+    });
+
+   $('#searchFilter').on('change', function(){
+        table.ajax.reload();
+   });
+
+    oTable = $('#listTables').DataTable();
+
+    $('#listTables_length').hide();
+});
+
+function approveData(id) {
+    $('#modal-approve').modal('show');
+    $("#approve_id").val(id);
+    $("#approve_name").html($('#name_'+id).html());
+};
+
+$('.submit-approve').on('click', function() {
+    $('#formApprove').ajaxSubmit({
+        dataType: 'json',
+        beforeSend: function() {
+            $('#modal-approve').modal('hide');
+            MyApp.loadingOverlay.show();
+        },
+        uploadProgress: function(event, position, total, percentComplete) {
+        },
+        error: function(data ) {
+            resp = JSON.parse(data.responseText);
+            alert(resp.message);
+        },
+        success: function(resp) {
+            toastr["success"]("Data success verified", "Success")
+            table.ajax.reload();
+        },
+        complete: function(xhr) {
+            MyApp.loadingOverlay.hide();
+            try {
+                resp = JSON.parse(xhr.responseText);
+            } catch (e) {
+                alert('terjadi kesalahan');
+            }
+        }
+    });
+});
+
+function rejectData(id) {
+    $('#modal-reject').modal('show');
+    $("#reject_id").val(id);
+    $("#reject_name").html($('#name_'+id).html());
+};
+
+$('.submit-reject').on('click', function() {
+    $('#formReject').ajaxSubmit({
+        dataType: 'json',
+        beforeSend: function() {
+            $('#modal-reject').modal('hide');
+            MyApp.loadingOverlay.show();
+        },
+        uploadProgress: function(event, position, total, percentComplete) {
+        },
+        error: function(data ) {
+            resp = JSON.parse(data.responseText);
+            alert(resp.message);
+        },
+        success: function(resp) {
+            toastr["success"]("Data success rejected", "Success")
+            table.ajax.reload();
+        },
+        complete: function(xhr) {
+            MyApp.loadingOverlay.hide();
+            try {
+                resp = JSON.parse(xhr.responseText);
+            } catch (e) {
+                alert('terjadi kesalahan');
+            }
+        }
+    });
+});
+</script>

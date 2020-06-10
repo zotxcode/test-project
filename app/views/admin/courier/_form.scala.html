@@ -1,0 +1,212 @@
+@(title: String, action: String, formData: Form[models.Courier], url: play.api.mvc.Call)
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Shop")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'id->"form-save", 'role->"form", 'enctype -> "multipart/form-data") {
+                    <div class="box-body">
+                        @mytext(formData("id"), "", "", "hidden")
+                        @mytext(formData("code"), "Code *")
+                        @mytext(formData("name"), "Name *")
+                        <div class="form-group">
+                            <label>Image </label>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <button type="button" name="addimage" id="addimage" class="btn btn-primary">Show Image</button>
+                                </div>
+                                <div class="col-md-8 col-sm-10 col-xs-12 margin-show">
+                                    <div id="box-add-image" class="box box-info box-solid">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Add Images</h3>
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="col-md-12">
+                                                @mytext(formData("imageName"), "Image Name *")
+                                                @mytext(formData("imageTitle"), "Meta Title *")
+                                                @mytext(formData("imageKeyword"), "Meta Keyword *")
+                                                @mytext(formData("imageDescription"), "Meta Description *")
+                                                @myfile2(formData("imageUrl"), "Image *", "", "", "preview", "Image dimensions : 100x100px", 100,100)
+                                                <div>
+                                                    <img id="preview" src="@formData("imageLink").value"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.CourierController.index(), action.equalsIgnoreCase("add"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+}
+<script type="text/javascript">
+$(document).ready(function() {
+
+    $('#box-add-image').hide();
+
+    $('.select2').select2();
+
+    $.validator.addMethod("valueNotEquals", function(value, element, arg){
+          return arg != value;
+         }, "Value must not equal arg.");
+
+    $.validator.addMethod('imageDimension', function(value, element, params) {
+        if($(element).data('imageWidth') != undefined && $(element).data('imageHeight') != undefined){
+            return ($(element).data('imageWidth') == params[0] && $(element).data('imageHeight') == params[1]);
+        } else return true;
+    }, function(params, element){
+        return "Your image's dimension must be " + params[0] + "x" + params[1] + "px";
+    });
+
+    $("#form-save").validate({
+        ignore: [],
+        rules: {
+            name: "required",
+            code: "required",
+            imageName: "required",
+            imageTitle: "required",
+            imageKeyword: "required",
+            imageDescription: "required",
+        },
+        messages: {
+            name: "Name is required",
+            code: "Code is required",
+            imageName: "Image name is required",
+            imageTitle: "Image title is required",
+            imageKeyword: "Image keyword is required",
+            imageDescription: "Image description is required"
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            form.submit();
+        }
+    });
+
+    $('#addimage').on('click', function() {
+        if($('#box-add-image').is(":visible")){
+            $('#box-add-image').hide();
+            $('#addimage').text('Show Image');
+        }else{
+            $('#box-add-image').show();
+            $('#addimage').text('Hide Image');
+        }
+    });
+
+});
+
+var jcropApi,jcropApi2,jcropApi3;
+var loadFile2 = function(event, previewId, fileId, width, height) {
+    if(previewId == "preview"){
+        if(jcropApi){
+            jcropApi.destroy();
+        }
+    }else if(previewId == "preview2"){
+        if(jcropApi2){
+            jcropApi2.destroy();
+        }
+    }else if(previewId == "preview3"){
+        if(jcropApi3){
+            jcropApi3.destroy();
+        }
+    }
+
+    var output = document.getElementById(previewId);
+    output.src = URL.createObjectURL(event.target.files[0]);
+    var $img = $('#'+previewId);
+    $img.on('load', function(){
+        var imageWidth = $(this).prop('naturalWidth');
+        var imageHeight = $(this).prop('naturalHeight');
+        $('#'+fileId).removeData('imageWidth');
+        $('#'+fileId).removeData('imageHeight');
+
+        $('#'+fileId).data('imageWidth', imageWidth);
+        $('#'+fileId).data('imageHeight', imageHeight);
+
+        $('#'+previewId).Jcrop({
+            onSelect: function(c){
+                    $('#'+fileId+'X').val(c.x);
+                    $('#'+fileId+'Y').val(c.y);
+                    $('#'+fileId+'W').val(c.w);
+                    $('#'+fileId+'H').val(c.h);
+                },
+            onChange: function(c){
+                    $('#'+fileId+'X').val(c.x);
+                    $('#'+fileId+'Y').val(c.y);
+                    $('#'+fileId+'W').val(c.w);
+                    $('#'+fileId+'H').val(c.h);
+                },
+            animEasing: 'easeOutQuart',
+            bgOpacity: .35,
+            linked: false,
+            multi: false,
+            canResize: true,
+            aspectRatio: width/height
+        },function(){
+            this.container.addClass('jcrop-dark jcrop-hl-active');
+            this.newSelection();
+            this.setSelect([ 0, 0, width, height ]);
+            this.refresh();
+
+            if(previewId == "preview"){
+                jcropApi = this;
+            }else if(previewId == "preview2"){
+                jcropApi2 = this;
+            }else if(previewId == "preview3"){
+                jcropApi3 = this;
+            }
+        });
+
+    });
+};
+$('#name').on('change', function(){
+    $('#imageName').val($(this).val());
+    $('#imageTitle').val($(this).val());
+    $('#imageKeyword').val($(this).val());
+    $('#imageDescription').val($(this).val());
+})
+</script>

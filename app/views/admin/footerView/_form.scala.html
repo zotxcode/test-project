@@ -1,0 +1,181 @@
+@(title: String, action: String, formData: Form[Footer], url: play.api.mvc.Call,lists: Map[String, String], listStaticPage: Map[Integer, String])
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Information")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id->"form-save") {
+                    <div class="box-body">
+                        @mytext(formData("id"), "", "", "hidden")
+                        @mytext(formData("name"), "Footer Name *","","text")
+                        @mytext(formData("title"), "Meta Title *","","text")
+                        @mytext(formData("keyword"), "Meta Keyword *","","text")
+                        @mytext(formData("description"), "Meta Description *","","text")
+                        <div class="row">
+                            @myselect(formData("staticPageId"), "Static Page *", listStaticPage)
+                            @mycheckbox(formData("newTab"), "Open in new tab","col-md-4 ")
+                        </div>
+                        <div class="row">
+                        @mydropdown(formData("position"), "Footer Position *",lists)
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.FooterController.index(), action.equalsIgnoreCase("add"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+}
+<script>
+  $(function () {
+    $(".select2").select2();
+    $("#staticPageId").select2({
+      ajax: {
+        url: "/admin/information/static/listsForSelect",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term, // search term
+            page: params.page
+          };
+        },
+        processResults: function (data, params) {
+          params.page = params.page || 1;
+
+          return {
+            results: data.items,
+            pagination: {
+              more: (params.page * 30) < data.total_count
+            }
+          };
+        },
+        cache: true
+      },
+      escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+      minimumInputLength: 1,
+        templateResult: function (data) {
+            return data.text;
+        },
+        templateSelection:function (data) {
+            return data.name || data.text;
+        }
+    });
+
+    $('.submit-add-group').on('click', function() {
+        $('#formFaqGroup').ajaxSubmit({
+            dataType: 'json',
+            beforeSend: function() {
+                $('#modal-add-group').modal('hide');
+                MyApp.loadingOverlay.show();
+            },
+            uploadProgress: function(event, position, total, percentComplete) {
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                alert(resp.message);
+                $(".select2").select2({data: [{id: resp.data.id, text: resp.data.name}]});
+                $(".select2").val(resp.data.id).change();
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('terjadi kesalahan');
+                }
+            }
+        });
+    });
+
+  });
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $.validator.addMethod("valueNotEquals", function(value, element, arg){
+          return arg != value;
+         }, "Value must not equal arg.");
+    $("#form-save").validate({
+        rules: {
+            name: "required",
+            title: "required",
+            keyword: "required",
+            description: "required",
+            pageUrl: "required",
+            position: "required",
+            staticPageId:{
+                valueNotEquals : "0"
+            }
+        },
+        messages: {
+            name: "Name is required",
+            title: "Title is required",
+            keyword: "Keyword is required",
+            description: "Description is required",
+            position: "Please select footer position",
+            staticPageId:{
+                valueNotEquals : "Please select page"
+            }
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            form.submit();
+        }
+    });
+
+    $('#position').on('change', function(){
+            $('#position').valid();
+    });
+
+    $('#staticPageId').on('change', function(){
+            $('#staticPageId').valid();
+    });
+});
+
+$('#title').on('change', function(){
+	$('#keyword').val($(this).val());
+	$('#description').val($(this).val());
+})
+</script>

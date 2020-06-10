@@ -1,0 +1,269 @@
+@(title: String, action: String, data: Article)
+
+@import views.html.admin.helper._
+@views.html.admin.main(action + " " + title){
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Information")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    <div class="box-body">
+                        @mylabel("Title", data.name)
+                        @mylabel("Category", data.articleCategoryName)
+                        @mylabel("Content", Html.apply(data.content))
+                        @mylabel("Tags", data.tags_list.mkString(", "))
+                        <div class="form-group">
+                            <label><h4>Add New Comment :</h4></label>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div>
+                                        <form id="formAdminComment" class="reply-comment" action="@controllers.admin.routes.ArticleController.comment()" method="post">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <img class="img-responsive img-circle img-sm"
+                                                             src="@routes.Assets.at("images/default-avatar.png")"
+                                                        alt="Alt Text">
+                                                        <div class="img-push">
+                                                            <textarea class="form-control input-sm" name="comment"
+                                                                      placeholder="Write a comment …" focus="false"
+                                                                      style=""></textarea>
+                                                        </div>
+                                                        <input type="hidden" name="article_id" value="@data.id"/>
+                                                        <button type="submit"
+                                                                class="btn btn-primary btn-xs pull-right margin-5">Add
+                                                            Comments
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <a class="btn btn-default"
+                                       href="@controllers.admin.routes.ArticleController.index()">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer box-comments">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4><label class="pull-left">Comments :</label></h4>
+                            <span class="pull-right text-muted">  @data.articleComment.size() Comments</span>
+                        </div>
+                    </div>
+                    <br/>
+                    @for(comment <- data.articleComment){
+                        @if(comment.isParent()){
+                            <div>
+                                <div class="box-comment">
+                                    <img class="img-circle img-sm" src="@routes.Assets.at("images/default-avatar.png")" alt="User Image"/>
+                                    <div class="comment-text">
+                                        <span class="username">
+                                            <span>@comment.getCommenterNameBe()</span>
+                                            <span class="text-muted pull-right">@comment.createdAt</span>
+                                        </span>
+
+                                        <span>@comment.getCommentText()
+                                            @if(!comment.isRemoved){
+                                                <a href="javascript:deleteItem(@comment.id)" class="btn btn-danger btn-xs pull-right action2">Delete</a>
+                                                <a id="cancel_@comment.id" href="javascript:cancelComment(@comment.id)" class="btn btn-danger btn-xs pull-right action2 cancel">Cancel</a>
+                                                @if(comment.status == ArticleComment.PENDING){
+                                                    <a href="javascript:rejectComment(@comment.id)" class="btn btn-danger btn-xs pull-right action2">Reject</a>
+                                                    <a href="javascript:approveComment(@comment.id)" class="btn btn-primary btn-xs pull-right action2">Approve</a>
+                                                }
+                                                @if(comment.status == ArticleComment.APPROVED){
+                                                    <a id="reply_@comment.id" href="javascript:replyComment(@comment.id)" class="btn btn-primary btn-xs pull-right action2">Reply</a>&nbsp;
+                                                }
+                                            }
+                                        </span>
+                                    </div>
+                                </div>
+
+                                @for(replyComment <- comment.replies){
+                                    <div class="col-md-12">
+                                        <div class="margin-comment">
+                                            <div class="box-comment">
+                                                <img class="img-circle img-sm" src="@routes.Assets.at("images/default-avatar.png")" alt="User Image"/>
+                                                <div class="comment-text">
+                                                <span class="username">
+                                                    <span>@replyComment.getCommenterNameBe()</span>
+                                                    <span class="text-muted pull-right">@replyComment.createdAt</span>
+                                                </span>@replyComment.getCommentText()
+                                                    @if(!replyComment.isRemoved){
+                                                        <a href="javascript:deleteItem(@replyComment.id)" class="btn btn-danger btn-xs pull-right action2">Delete</a>
+                                                        @if(replyComment.status == ArticleComment.PENDING){
+                                                            <a href="javascript:rejectComment(@replyComment.id)" class="btn btn-danger btn-xs pull-right action2">Reject</a>
+                                                            <a href="javascript:approveComment(@replyComment.id)" class="btn btn-primary btn-xs pull-right action2">Approve</a>
+                                                        }
+                                                    }
+                                                </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div id="commentForm_@comment.id" class="comment-form">
+                                    <form action="@controllers.admin.routes.ArticleController.comment()" class="reply-comment" method="post">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <img class="img-responsive img-circle img-sm"
+                                                         src="@routes.Assets.at("images/default-avatar.png")" alt="Alt Text">
+                                                    <div class="img-push">
+                                                        <textarea class="form-control input-sm" name="comment" placeholder="Write a comment …"focus="false"></textarea>
+                                                    </div>
+                                                    <input type="hidden" name="article_id" value="@data.id"/>
+                                                    <input type="hidden" name="comment_parent_id" value="@comment.id"/>
+                                                    <button type="submit" class="btn btn-primary btn-xs pull-right margin-5">Add Comments</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+
+@mymodaldelete("comment")
+}
+
+<script>
+    $(function () {
+        $(".reply-comment").submit(function(e){
+            e.preventDefault();
+            $(this).ajaxSubmit({
+                dataType: 'json',
+                beforeSend: function() {
+                    MyApp.loadingOverlay.show();
+                },
+                uploadProgress: function(event, position, total, percentComplete) {
+                },
+                error: function(data ) {
+                    resp = JSON.parse(data.responseText);
+                    alert(resp.message);
+                },
+                success: function(resp) {
+                    alert(resp.message);
+                    location.reload();
+                },
+                complete: function(xhr) {
+                    MyApp.loadingOverlay.hide();
+                    try {
+                        resp = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        alert('terjadi kesalahan');
+                    }
+                }
+            });
+        });
+        $(".reply-comment").each(function(){
+            $(this)[0].reset;
+        });
+
+        $(".comment-form").hide();
+        $(".cancel").hide();
+
+        $('.submit-delete').on('click', function() {
+            var id = $("#comment_id").val();
+            $.ajax({
+                url: "/admin/information/comment/"+id+"/delete",
+                type: 'DELETE',
+                beforeSend: function() {
+                    $('#modal-delete-comment').modal('hide');
+                    MyApp.loadingOverlay.show();
+                },
+                error: function(data ) {
+                    resp = JSON.parse(data.responseText);
+                    alert(resp.message);
+                },
+                success: function(resp) {
+                    alert(resp.message);
+                    location.reload();
+                },
+                complete: function(xhr) {
+                    MyApp.loadingOverlay.hide();
+                    try {
+                        resp = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        alert('terjadi kesalahan');
+                    }
+                }
+            });
+        });
+
+    });
+
+    function deleteItem(id){
+        $('#modal-delete-comment').modal('show');
+        $("#comment_id").val(id);
+    }
+
+    function rejectComment(id){
+        updateStatus(id, 2);
+    }
+
+    function approveComment(id){
+        updateStatus(id, 1);
+    }
+
+    function updateStatus(id, status){
+        $.ajax({
+            url: "/admin/information/comment/"+id+"/updateStatus/"+status,
+            type: 'POST',
+            beforeSend: function() {
+                MyApp.loadingOverlay.show();
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                alert(resp.message);
+                location.reload();
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('Something went wrong.');
+                }
+            }
+        });
+    }
+
+    function replyComment(id){
+        $("#cancel_"+id).show();
+        $("#commentForm_"+id).show();
+        $("#reply_"+id).hide();
+
+    }
+    function cancelComment(id){
+        $("#cancel_"+id).hide();
+        $("#commentForm_"+id).hide();
+        $("#reply_"+id).show();
+    }
+</script>

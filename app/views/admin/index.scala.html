@@ -1,0 +1,531 @@
+@(successMsg: String, errorMsg: String, countMerchants : Integer, countOrders : Integer, countProducts: Integer, countRevenue: Integer, countVisits: Integer, countMembers : Integer, today : String, lastMonth : String)
+
+
+@main("Dashboard"){
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>
+                Dashboard
+                <small>Control panel</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+                <li class="active">Dashboard</li>
+            </ol>
+        </section>
+        <section class="content">
+            <div class="row">
+                <section class="col-md-12">
+                    <div class="box box-success">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">&nbsp;</h3>
+                            <div class="box-tools pull-right">
+                                <div class="input-group">
+                                    <button type="button" class="btn btn-default pull-right" id="daterange-btn">
+                                        <span>
+                                            <i class="fa fa-calendar"></i>
+                                        </span>
+                                        <i class="fa fa-caret-down"></i>
+                                    </button>
+                                    <input type="hidden" id="top-panel-start-date" name="startDate" value="@lastMonth">
+                                    <input type="hidden" id="top-panel-end-date" name="endDate" value="@today">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="col-lg-3 col-xs-6">
+                                <div class="small-box bg-green">
+                                    <div class="inner">
+                                        <h3><span id="count_order">@countOrders</span></h3>
+                                        <p>Orders</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fa fa-cart-plus"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-xs-6">
+                                <div class="small-box bg-yellow">
+                                    <div class="inner">
+                                        <h3><span id="count_product">@countProducts</span></h3>
+                                        <p>Products</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fa fa-cubes"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-xs-6">
+                                <div class="small-box bg-purple">
+                                    <div class="inner">
+                                        <h3><span id="count_revenue">@countRevenue</span></h3>
+                                        <p>Revenue</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fa fa-money"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-xs-6">
+                                <div class="small-box bg-red">
+                                    <div class="inner">
+                                        <h3><span id="count_visit">@countMembers</span></h3>
+                                        <p>Customers</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fa fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="top-panel-overlay" class="overlay" style="display:none;">
+                            <i class="fa fa-refresh fa-spin"></i>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+            <div class="row">
+                <section class="col-md-12">
+                    <div class="box box-info">
+                        <div class="box-header with-border">
+                            <button class="btn btn-default active btn-sm action2" id="chart-period-D">D</button>
+                            <button class="btn btn-default btn-sm action2" id="chart-period-M">M</button>
+                            <button class="btn btn-default btn-sm action2" id="chart-period-Y">Y</button>
+                            <input type="hidden" id="chart-period" value="D">
+                            <div class="box-tools pull-right">
+                                <div class="input-group">
+                                    <button type="button" class="btn btn-default pull-right" id="daterange-chart-btn">
+                                        <span>
+                                            <i class="fa fa-calendar"></i>
+                                        </span>
+                                        <i class="fa fa-caret-down"></i>
+                                    </button>
+                                    <input type="hidden" id="bottom-panel-start-date" name="startDate" value="@lastMonth">
+                                    <input type="hidden" id="bottom-panel-end-date" name="endDate" value="@today">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4 class="col-md-12 text-center">Customer Chart</h4>
+                                    <canvas id="lineChartCustomer" style="height:250px"></canvas>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4 class="col-md-12 text-center">Order Chart</h4>
+                                    <canvas id="lineChartOrder" style="height:250px"></canvas>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3"></div>
+                                <div class="col-md-6">
+                                    <h4 class="col-md-12 text-center">Transaction Chart</h4>
+                                    <canvas id="lineChartTransaction" style="height:250px"></canvas>
+                                </div>
+                                <div class="col-md-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+
+        </section>
+    </div>
+}
+
+<script type="text/javascript">
+        $(function () {
+            $('#chart-period-D').on('click', function(){
+                $('#chart-period').val("D");
+                $('#chart-period-D').addClass("active");
+                $('#chart-period-M').removeClass("active");
+                $('#chart-period-Y').removeClass("active");
+                generateChartCustomer();
+                generateChartOrder();
+                generateChartTransaction();
+            });
+            $('#chart-period-M').on('click', function(){
+                $('#chart-period').val("M");
+                $('#chart-period-D').removeClass("active");
+                $('#chart-period-M').addClass("active");
+                $('#chart-period-Y').removeClass("active");
+                generateChartCustomer();
+                generateChartOrder();
+                generateChartTransaction();
+            });
+            $('#chart-period-Y').on('click', function(){
+                $('#chart-period').val("Y");
+                $('#chart-period-D').removeClass("active");
+                $('#chart-period-M').removeClass("active");
+                $('#chart-period-Y').addClass("active");
+                generateChartCustomer();
+                generateChartOrder();
+                generateChartTransaction();
+            });
+            $('#daterange-btn').daterangepicker(
+                    {
+                        ranges: {
+                            'Today': [moment(), moment()],
+                            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                            'This Month': [moment().startOf('month'), moment().endOf('month')],
+                            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                        },
+                        startDate: moment().subtract(29, 'days'),
+                        endDate: moment()
+                    },
+                    function (start, end) {
+                        $('#daterange-btn span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                        $('#top-panel-start-date').val(start.format('MM/DD/YYYY'));
+                        $('#top-panel-end-date').val(end.format('MM/DD/YYYY'));
+                        generateTopPanel();
+                    }
+            );
+
+            $('#daterange-chart-btn').daterangepicker(
+                    {
+                        ranges: {
+                            'Today': [moment(), moment()],
+                            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                            'This Month': [moment().startOf('month'), moment().endOf('month')],
+                            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                        },
+                        startDate: moment().subtract(29, 'days'),
+                        endDate: moment()
+                    },
+                    function (start, end) {
+                        $('#daterange-chart-btn span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                        $('#bottom-panel-start-date').val(start.format('MM/DD/YYYY'));
+                        $('#bottom-panel-end-date').val(end.format('MM/DD/YYYY'));
+                        generateChartCustomer();
+                        generateChartOrder();
+                        generateChartTransaction();
+                    }
+            );
+        });
+
+</script>
+<script>
+        $(document).ready(function () {
+            generateTopPanel();
+        });
+        function generateTopPanel(){
+            $('#top-panel-overlay').show();
+            var gData = [];
+
+            var jsonData = JSON.stringify({
+                gData: gData
+            });
+            $.ajax({
+                type: "GET",
+                url: "/admin/dashboard/top-panel?startDate="+$("#top-panel-start-date").val()+"&endDate="+$("#top-panel-end-date").val(),
+                data: jsonData,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: OnSuccess_,
+                error: OnErrorCall_
+            });
+
+            function OnSuccess_(response) {
+                $('#top-panel-overlay').hide();
+                $('#count_merchant').html(response.countMerchants);
+                $('#count_order').html(response.countOrders);
+                $('#count_product').html(response.countProducts);
+                $('#count_visit').html(response.countMembers);
+                $('#count_revenue').html(response.countRevenue);
+            }
+
+            function OnErrorCall_(response) {
+                $('#top-panel-overlay').hide();
+                $('#count_merchant').html(0);
+                $('#count_order').html(0);
+                $('#count_product').html(0);
+                $('#count_visit').html(0);
+                $('#count_revenue').html(0);
+            }
+        };
+</script>
+
+<script>
+        $(document).ready(function () {
+            generateChartCustomer();
+            generateChartOrder();
+            generateChartTransaction();
+        });
+        function generateChartCustomer(){
+            //e.preventDefault();
+            var gData = [];
+
+            var jsonData = JSON.stringify({
+                gData: gData
+            });
+            $.ajax({
+                type: "GET",
+                url: "/admin/dashboard/chart-customer?startDate="+$("#bottom-panel-start-date").val()+"&endDate="+$("#bottom-panel-end-date").val()+"&type="+$("#chart-period").val(),
+                data: jsonData,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: OnSuccess_,
+                error: OnErrorCall_
+            });
+
+            function OnSuccess_(response) {
+                var aData = response.items;
+                var arr = [];
+                var labels = [];
+                var data = [];
+                $.each(aData, function (inx, val) {
+                    labels.push(val.label);
+                    data.push(val.value);
+                });
+                var areaChartDataCustomer = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: "Customers",
+                            fillColor: "rgba(210, 214, 222, 1)",
+                            strokeColor: "rgba(210, 214, 222, 1)",
+                            pointColor: "rgba(210, 214, 222, 1)",
+                            pointStrokeColor: "#c1c7d1",
+                            pointHighlightFill: "#fff",
+                            pointHighlightStroke: "rgba(220,220,220,1)",
+                            data: data
+                        }
+                    ]
+                };
+                var areaChartOptionsCustomer = {
+                    //Boolean - If we should show the scale at all
+                    showScale: true,
+                    //Boolean - Whether grid lines are shown across the chart
+                    scaleShowGridLines: false,
+                    //String - Colour of the grid lines
+                    scaleGridLineColor: "rgba(0,0,0,.05)",
+                    //Number - Width of the grid lines
+                    scaleGridLineWidth: 1,
+                    //Boolean - Whether to show horizontal lines (except X axis)
+                    scaleShowHorizontalLines: true,
+                    //Boolean - Whether to show vertical lines (except Y axis)
+                    scaleShowVerticalLines: true,
+                    //Boolean - Whether the line is curved between points
+                    bezierCurve: true,
+                    //Number - Tension of the bezier curve between points
+                    bezierCurveTension: 0.3,
+                    //Boolean - Whether to show a dot for each point
+                    pointDot: true,
+                    //Number - Radius of each point dot in pixels
+                    pointDotRadius: 4,
+                    //Number - Pixel width of point dot stroke
+                    pointDotStrokeWidth: 1,
+                    //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+                    pointHitDetectionRadius: 20,
+                    //Boolean - Whether to show a stroke for datasets
+                    datasetStroke: true,
+                    //Number - Pixel width of dataset stroke
+                    datasetStrokeWidth: 2,
+                    //Boolean - Whether to fill the dataset with a color
+                    datasetFill: true,
+                    //String - A legend template
+                    legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].lineColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+                    //Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
+                    maintainAspectRatio: true,
+                    //Boolean - whether to make the chart responsive to window resizing
+                    responsive: true
+                };
+
+                var lineChartCanvasCustomer = $("#lineChartCustomer").get(0).getContext("2d");
+                var lineChartCustomer = new Chart(lineChartCanvasCustomer);
+                var lineChartOptionsCustomer = areaChartOptionsCustomer;
+                lineChartOptionsCustomer.datasetFill = false;
+                lineChartCustomer.Line(areaChartDataCustomer, lineChartOptionsCustomer);
+            }
+
+            function OnErrorCall_(response) {}
+            //e.preventDefault();
+        };
+        function generateChartOrder(){
+            //e.preventDefault();
+            var gData = [];
+
+            var jsonData = JSON.stringify({
+                gData: gData
+            });
+            $.ajax({
+                type: "GET",
+                url: "/admin/dashboard/chart-order?startDate="+$("#bottom-panel-start-date").val()+"&endDate="+$("#bottom-panel-end-date").val()+"&type="+$("#chart-period").val(),
+                data: jsonData,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: OnSuccess_,
+                error: OnErrorCall_
+            });
+
+            function OnSuccess_(response) {
+                var aData = response.items;
+                var arr = [];
+                var labels = [];
+                var data = [];
+                $.each(aData, function (inx, val) {
+                    labels.push(val.label);
+                    data.push(val.value);
+                });
+                var areaChartDataCustomer = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: "Customers",
+                            fillColor: "rgba(210, 214, 222, 1)",
+                            strokeColor: "rgba(210, 214, 222, 1)",
+                            pointColor: "rgba(210, 214, 222, 1)",
+                            pointStrokeColor: "#c1c7d1",
+                            pointHighlightFill: "#fff",
+                            pointHighlightStroke: "rgba(220,220,220,1)",
+                            data: data
+                        }
+                    ]
+                };
+                var areaChartOptionsCustomer = {
+                    //Boolean - If we should show the scale at all
+                    showScale: true,
+                    //Boolean - Whether grid lines are shown across the chart
+                    scaleShowGridLines: false,
+                    //String - Colour of the grid lines
+                    scaleGridLineColor: "rgba(0,0,0,.05)",
+                    //Number - Width of the grid lines
+                    scaleGridLineWidth: 1,
+                    //Boolean - Whether to show horizontal lines (except X axis)
+                    scaleShowHorizontalLines: true,
+                    //Boolean - Whether to show vertical lines (except Y axis)
+                    scaleShowVerticalLines: true,
+                    //Boolean - Whether the line is curved between points
+                    bezierCurve: true,
+                    //Number - Tension of the bezier curve between points
+                    bezierCurveTension: 0.3,
+                    //Boolean - Whether to show a dot for each point
+                    pointDot: true,
+                    //Number - Radius of each point dot in pixels
+                    pointDotRadius: 4,
+                    //Number - Pixel width of point dot stroke
+                    pointDotStrokeWidth: 1,
+                    //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+                    pointHitDetectionRadius: 20,
+                    //Boolean - Whether to show a stroke for datasets
+                    datasetStroke: true,
+                    //Number - Pixel width of dataset stroke
+                    datasetStrokeWidth: 2,
+                    //Boolean - Whether to fill the dataset with a color
+                    datasetFill: true,
+                    //String - A legend template
+                    legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].lineColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+                    //Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
+                    maintainAspectRatio: true,
+                    //Boolean - whether to make the chart responsive to window resizing
+                    responsive: true
+                };
+
+                var lineChartCanvasCustomer = $("#lineChartOrder").get(0).getContext("2d");
+                var lineChartCustomer = new Chart(lineChartCanvasCustomer);
+                var lineChartOptionsCustomer = areaChartOptionsCustomer;
+                lineChartOptionsCustomer.datasetFill = false;
+                lineChartCustomer.Line(areaChartDataCustomer, lineChartOptionsCustomer);
+            }
+
+            function OnErrorCall_(response) {}
+            //e.preventDefault();
+        };
+        function generateChartTransaction(){
+            //e.preventDefault();
+            var gData = [];
+
+            var jsonData = JSON.stringify({
+                gData: gData
+            });
+            $.ajax({
+                type: "GET",
+                url: "/admin/dashboard/chart-transaction?startDate="+$("#bottom-panel-start-date").val()+"&endDate="+$("#bottom-panel-end-date").val()+"&type="+$("#chart-period").val(),
+                data: jsonData,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: OnSuccess_,
+                error: OnErrorCall_
+            });
+
+            function OnSuccess_(response) {
+                var aData = response.items;
+                var arr = [];
+                var labels = [];
+                var data = [];
+                $.each(aData, function (inx, val) {
+                    labels.push(val.label);
+                    data.push(val.value);
+                });
+                var areaChartDataCustomer = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: "Customers",
+                            fillColor: "rgba(210, 214, 222, 1)",
+                            strokeColor: "rgba(210, 214, 222, 1)",
+                            pointColor: "rgba(210, 214, 222, 1)",
+                            pointStrokeColor: "#c1c7d1",
+                            pointHighlightFill: "#fff",
+                            pointHighlightStroke: "rgba(220,220,220,1)",
+                            data: data
+                        }
+                    ]
+                };
+                var areaChartOptionsCustomer = {
+                    //Boolean - If we should show the scale at all
+                    showScale: true,
+                    //Boolean - Whether grid lines are shown across the chart
+                    scaleShowGridLines: false,
+                    //String - Colour of the grid lines
+                    scaleGridLineColor: "rgba(0,0,0,.05)",
+                    //Number - Width of the grid lines
+                    scaleGridLineWidth: 1,
+                    //Boolean - Whether to show horizontal lines (except X axis)
+                    scaleShowHorizontalLines: true,
+                    //Boolean - Whether to show vertical lines (except Y axis)
+                    scaleShowVerticalLines: true,
+                    //Boolean - Whether the line is curved between points
+                    bezierCurve: true,
+                    //Number - Tension of the bezier curve between points
+                    bezierCurveTension: 0.3,
+                    //Boolean - Whether to show a dot for each point
+                    pointDot: true,
+                    //Number - Radius of each point dot in pixels
+                    pointDotRadius: 4,
+                    //Number - Pixel width of point dot stroke
+                    pointDotStrokeWidth: 1,
+                    //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+                    pointHitDetectionRadius: 20,
+                    //Boolean - Whether to show a stroke for datasets
+                    datasetStroke: true,
+                    //Number - Pixel width of dataset stroke
+                    datasetStrokeWidth: 2,
+                    //Boolean - Whether to fill the dataset with a color
+                    datasetFill: true,
+                    //String - A legend template
+                    legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].lineColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+                    //Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
+                    maintainAspectRatio: true,
+                    //Boolean - whether to make the chart responsive to window resizing
+                    responsive: true
+                };
+
+                var lineChartCanvasCustomer = $("#lineChartTransaction").get(0).getContext("2d");
+                var lineChartCustomer = new Chart(lineChartCanvasCustomer);
+                var lineChartOptionsCustomer = areaChartOptionsCustomer;
+                lineChartOptionsCustomer.datasetFill = false;
+                lineChartCustomer.Line(areaChartDataCustomer, lineChartOptionsCustomer);
+            }
+
+            function OnErrorCall_(response) {}
+            //e.preventDefault();
+        };
+</script>

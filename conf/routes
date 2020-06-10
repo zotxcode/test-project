@@ -1,0 +1,621 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+#GET    /images/*file							    controllers.Static.at(path="/public/images",file)
+GET     /images/:id                                 controllers.ApplicationController.image(id: String)
+GET     /images/:folder/:id                         controllers.ApplicationController.imageByFolder(folder:String, id: String)
+GET     /ckeditorimages/:id                         controllers.ApplicationController.ckeditorImage(id: String)
+GET     /ckeditorimages/:f1/:id                     controllers.ApplicationController.ckeditorImageByFolder(f1:String, id: String)
+GET     /ckeditorimages/:f1/:f2/:id                 controllers.ApplicationController.ckeditorImageByFolder2(f1:String, f2:String, id: String)
+GET     /ckeditorimages/:f1/:f2/:f3/:id             controllers.ApplicationController.ckeditorImageByFolder3(f1:String, f2:String, f3:String, id: String)
+GET     /ckeditorimages/:f1/:f2/:f3/:f4/:id         controllers.ApplicationController.ckeditorImageByFolder4(f1:String, f2:String, f3:String, f4:String, id: String)
+GET     /ckeditorimages/:f1/:f2/:f3/:f5/:id         controllers.ApplicationController.ckeditorImageByFolder5(f1:String, f2:String, f3:String, f4:String, f5:String, id: String)
+OPTIONS /*all                           		    controllers.ApplicationController.preflight(all)
+
+# CMS
+GET     /						                    controllers.admin.HomeController.index()
+GET     /admin/login                                controllers.admin.AuthController.login()
+POST    /admin/login                                controllers.admin.AuthController.postLogin()
+GET     /admin/logout                               controllers.admin.AuthController.logout()
+GET     /oauth/signin/:f1/:f2                       controllers.OAuthController.login(f1:String, f2:String)
+POST    /oauth/signin                               controllers.OAuthController.postLogin()
+
+
+#Role
+GET     /admin/usermanagement/role					    controllers.admin.RoleController.index()
+GET     /admin/usermanagement/role/lists			    controllers.admin.RoleController.lists()
+GET     /admin/usermanagement/role/:id/detail           controllers.admin.RoleController.detail(id:Long)
+POST    /admin/usermanagement/role					    controllers.admin.RoleController.save()
+GET     /admin/usermanagement/role/add			        controllers.admin.RoleController.add()
+POST    /admin/usermanagement/role/update			    controllers.admin.RoleController.update()
+GET     /admin/usermanagement/role/:id/edit             controllers.admin.RoleController.edit(id:Long)
+DELETE  /admin/usermanagement/role/:id/delete           controllers.admin.RoleController.delete(id:String)
+
+#User
+GET     /admin/usermanagement/users					    controllers.admin.UserController.index()
+GET     /admin/usermanagement/users/lists			    controllers.admin.UserController.lists()
+GET     /admin/usermanagement/users/:id/detail          controllers.admin.UserController.detail(id:Long)
+POST    /admin/usermanagement/users					    controllers.admin.UserController.save()
+GET     /admin/usermanagement/users/add			        controllers.admin.UserController.add()
+POST    /admin/usermanagement/users/update			    controllers.admin.UserController.update()
+GET     /admin/usermanagement/users/:id/edit            controllers.admin.UserController.edit(id:Long)
+DELETE  /admin/usermanagement/users/:id/delete          controllers.admin.UserController.delete(id:String)
+GET     /admin/usermanagement/users/profile             controllers.admin.UserController.profile()
+GET     /admin/usermanagement/users/edit-profile	    controllers.admin.UserController.changePassword()
+POST    /admin/usermanagement/users/edit-profile	    controllers.admin.UserController.savePassword()
+GET     /admin/usermanagement/users/cities/:id          controllers.admin.UserController.cityLists(id: Long)
+
+#Brand
+GET     /admin/usermanagement/brand					            controllers.admin.BrandController.index()
+POST    /admin/usermanagement/brand					            controllers.admin.BrandController.save()
+POST    /admin/usermanagement/brand/update			            controllers.admin.BrandController.update()
+GET     /admin/usermanagement/brand/lists			            controllers.admin.BrandController.lists()
+GET     /admin/usermanagement/brand/add			                controllers.admin.BrandController.add()
+GET     /admin/usermanagement/brand/:id/edit                    controllers.admin.BrandController.edit(id:Long)
+DELETE  /admin/usermanagement/brand/:id/delete                  controllers.admin.BrandController.delete(id:String)
+POST    /admin/usermanagement/brand/:id/updateStatus/:status    controllers.admin.BrandController.updateStatus(id:String, status:String)
+
+#Static Page
+GET     /admin/information/static					controllers.admin.StaticPageController.index()
+POST    /admin/information/static					controllers.admin.StaticPageController.save()
+POST    /admin/information/static/update			controllers.admin.StaticPageController.update()
+GET     /admin/information/static/lists			    controllers.admin.StaticPageController.lists()
+GET     /admin/information/static/add			    controllers.admin.StaticPageController.add()
+GET     /admin/information/static/:id/detail        controllers.admin.StaticPageController.detail(id:Long)
+GET     /admin/information/static/:id/edit          controllers.admin.StaticPageController.edit(id:Long)
+DELETE  /admin/information/static/:id/delete        controllers.admin.StaticPageController.delete(id:String)
+GET     /admin/information/static/listsForSelect    controllers.admin.StaticPageController.listsForSelect()
+
+#FAQ
+GET     /admin/information/faq					    controllers.admin.FaqController.index()
+POST    /admin/information/faq					    controllers.admin.FaqController.save()
+POST    /admin/information/faq/update			    controllers.admin.FaqController.update()
+POST    /admin/information/faq/faqgroup			    controllers.admin.FaqController.saveGroup()
+GET     /admin/information/faq/lists			    controllers.admin.FaqController.lists()
+GET     /admin/information/faq/add			        controllers.admin.FaqController.add()
+GET     /admin/information/faq/seqgroup			    controllers.admin.FaqController.seqGroup()
+POST    /admin/information/faq/seqgroup			    controllers.admin.FaqController.updateSeqGroup()
+GET     /admin/information/faq/seqfaq			    controllers.admin.FaqController.seqFaq()
+POST    /admin/information/faq/seqfaq			    controllers.admin.FaqController.updateSeqFaq()
+GET     /admin/information/faq/:id/detail           controllers.admin.FaqController.detail(id:Long)
+GET     /admin/information/faq/:id/edit             controllers.admin.FaqController.edit(id:Long)
+DELETE  /admin/information/faq/:id/delete           controllers.admin.FaqController.delete(id:String)
+
+#Footer
+GET     /admin/information/footer					controllers.admin.FooterController.index()
+POST    /admin/information/footer					controllers.admin.FooterController.save()
+POST    /admin/information/footer/update			controllers.admin.FooterController.update()
+GET     /admin/information/footer/lists			    controllers.admin.FooterController.lists()
+GET     /admin/information/footer/add			    controllers.admin.FooterController.add()
+GET     /admin/information/footer/:id/edit          controllers.admin.FooterController.edit(id:Long)
+DELETE  /admin/information/footer/:id/delete        controllers.admin.FooterController.delete(id:String)
+GET     /admin/information/footer/seq			    controllers.admin.FooterController.seq()
+POST    /admin/information/footer/seq			    controllers.admin.FooterController.updateSeq()
+
+#Article
+GET     /admin/information/article                  controllers.admin.ArticleController.index()
+POST    /admin/information/article                  controllers.admin.ArticleController.save()
+POST    /admin/information/article/update           controllers.admin.ArticleController.update()
+POST    /admin/information/article/comment			controllers.admin.ArticleController.comment()
+GET     /admin/information/article/lists            controllers.admin.ArticleController.lists()
+GET     /admin/information/article/add              controllers.admin.ArticleController.add()
+GET     /admin/information/article/:id/detail       controllers.admin.ArticleController.detail(id:Long)
+GET     /admin/information/article/:id/preview      controllers.admin.ArticleController.preview(id:Long)
+GET     /admin/information/article/:id/edit         controllers.admin.ArticleController.edit(id:Long)
+DELETE  /admin/information/article/:id/delete       controllers.admin.ArticleController.delete(id:String)
+POST    /admin/information/article/articlecategory  controllers.admin.ArticleController.saveCategory()
+POST    /admin/information/article/:id/updateStatus/:status      controllers.admin.ArticleController.updateStatus(id:String, status:String)
+
+#Article Comment
+GET     /admin/information/comment					controllers.admin.CommentController.index()
+GET     /admin/information/comment/lists			controllers.admin.CommentController.lists()
+DELETE  /admin/information/comment/:id/delete       controllers.admin.CommentController.delete(id:String)
+POST    /admin/information/comment/:id/updateStatus/:status      controllers.admin.CommentController.updateStatus(id:String, status:Integer)
+
+
+GET     /admin/information/location					                controllers.admin.LocationController.index()
+POST    /admin/information/location/update			                controllers.admin.LocationController.update()
+GET     /admin/information/location/edit                              controllers.admin.LocationController.edit()
+
+GET     /admin/information/ourstory					                controllers.admin.OurStoryController.index()
+POST    /admin/information/ourstory/update			                controllers.admin.OurStoryController.update()
+GET     /admin/information/ourstory/edit                              controllers.admin.OurStoryController.edit()
+
+#Banner
+GET     /admin/information/mainbanner					            controllers.admin.BannerController.index()
+GET     /admin/information/mainbanner/lists			                controllers.admin.BannerController.lists()
+GET     /admin/information/mainbanner/add			                controllers.admin.BannerController.add()
+POST    /admin/information/mainbanner					            controllers.admin.BannerController.save()
+POST    /admin/information/mainbanner/update			            controllers.admin.BannerController.update()
+GET     /admin/information/mainbanner/:id/edit                      controllers.admin.BannerController.edit(id:Long)
+DELETE  /admin/information/mainbanner/:id/delete                    controllers.admin.BannerController.delete(id:String)
+POST    /admin/information/mainbanner/:id/updateStatus/:status      controllers.admin.BannerController.updateStatus(id:String, status:String)
+GET     /admin/information/mainbanner/sequence			            controllers.admin.BannerController.sequence()
+POST    /admin/information/mainbanner/sequence			            controllers.admin.BannerController.updateSequence()
+GET     /admin/information/mainbanner/listsCategory                  controllers.admin.BannerController.listsCategoryAjax()
+GET     /admin/information/mainbanner/listsSubCategory               controllers.admin.BannerController.listsSubCategory()
+GET     /admin/information/mainbanner/listsProduct                   controllers.admin.BannerController.listsProduct()
+
+#Category List
+POST    /admin/masterproducts/category/saveCategoryJson             controllers.admin.CategoryController.saveCategoryJson()
+GET     /admin/masterproducts/category					            controllers.admin.CategoryController.index()
+POST    /admin/masterproducts/category					            controllers.admin.CategoryController.save()
+POST    /admin/masterproducts/category/update			            controllers.admin.CategoryController.update()
+GET     /admin/masterproducts/category/lists			            controllers.admin.CategoryController.lists()
+GET     /admin/masterproducts/category/add/:id			            controllers.admin.CategoryController.add(id:Long)
+GET     /admin/masterproducts/category/:id/edit                     controllers.admin.CategoryController.edit(id:Long)
+POST    /admin/masterproducts/category/:id/updateStatus/:status     controllers.admin.CategoryController.updateStatus(id:String, status:String)
+DELETE  /admin/masterproducts/category/:id/delete                   controllers.admin.CategoryController.delete(id:String)
+GET     /admin/masterproducts/category/listsSubCategory               controllers.admin.CategoryController.listsSubCategory()
+
+#New Arrival Banner
+GET     /admin/information/newarrivalbanner					            controllers.admin.NewArrivalBannerController.index()
+GET     /admin/information/newarrivalbanner/lists			                controllers.admin.NewArrivalBannerController.lists()
+GET     /admin/information/newarrivalbanner/add			                controllers.admin.NewArrivalBannerController.add()
+POST    /admin/information/newarrivalbanner					            controllers.admin.NewArrivalBannerController.save()
+POST    /admin/information/newarrivalbanner/update			            controllers.admin.NewArrivalBannerController.update()
+GET     /admin/information/newarrivalbanner/:id/edit                      controllers.admin.NewArrivalBannerController.edit(id:Long)
+DELETE  /admin/information/newarrivalbanner/:id/delete                    controllers.admin.NewArrivalBannerController.delete(id:String)
+POST    /admin/information/newarrivalbanner/:id/updateStatus/:status      controllers.admin.NewArrivalBannerController.updateStatus(id:String, status:String)
+#GET     /admin/information/newarrivalbanner/sequence			            controllers.admin.NewArrivalBannerController.sequence()
+#POST    /admin/information/newarrivalbanner/sequence			            controllers.admin.NewArrivalBannerController.updateSequence()
+
+
+#On Sale
+GET     /admin/information/onsaleproduct					            controllers.admin.OnSaleController.index()
+GET     /admin/information/onsaleproduct/lists			                controllers.admin.OnSaleController.lists()
+GET     /admin/information/onsaleproduct/add			                controllers.admin.OnSaleController.add()
+POST    /admin/information/onsaleproduct					            controllers.admin.OnSaleController.save()
+DELETE  /admin/information/onsaleproduct/:id/delete                    controllers.admin.OnSaleController.delete(id:String)
+POST    /admin/information/onsaleproduct/:id/updateStatus/:status      controllers.admin.OnSaleController.updateStatus(id:String, status:String)
+GET     /admin/information/onsaleproduct/sequence			            controllers.admin.OnSaleController.sequence()
+POST    /admin/information/onsaleproduct/sequence			            controllers.admin.OnSaleController.updateSequence()
+
+#Best Seller Banner
+GET     /admin/information/bestsellerbanner					            controllers.admin.BestSellerBannerController.index()
+GET     /admin/information/bestsellerbanner/lists			                controllers.admin.BestSellerBannerController.lists()
+GET     /admin/information/bestsellerbanner/add			                controllers.admin.BestSellerBannerController.add()
+POST    /admin/information/bestsellerbanner					            controllers.admin.BestSellerBannerController.save()
+POST    /admin/information/bestsellerbanner/update			            controllers.admin.BestSellerBannerController.update()
+GET     /admin/information/bestsellerbanner/:id/edit                      controllers.admin.BestSellerBannerController.edit(id:Long)
+DELETE  /admin/information/bestsellerbanner/:id/delete                    controllers.admin.BestSellerBannerController.delete(id:String)
+POST    /admin/information/bestsellerbanner/:id/updateStatus/:status      controllers.admin.BestSellerBannerController.updateStatus(id:String, status:String)
+#GET     /admin/information/bestsellerbanner/sequence			            controllers.admin.BestSellerBannerController.sequence()
+#POST    /admin/information/bestsellerbanner/sequence			            controllers.admin.BestSellerBannerController.updateSequence()
+
+#Instagram Banner
+GET     /admin/information/instagrambanner					            controllers.admin.InstagramBannerController.index()
+GET     /admin/information/instagrambanner/lists			                controllers.admin.InstagramBannerController.lists()
+GET     /admin/information/instagrambanner/add			                controllers.admin.InstagramBannerController.add()
+POST    /admin/information/instagrambanner					            controllers.admin.InstagramBannerController.save()
+POST    /admin/information/instagrambanner/update			            controllers.admin.InstagramBannerController.update()
+GET     /admin/information/instagrambanner/:id/edit                      controllers.admin.InstagramBannerController.edit(id:Long)
+DELETE  /admin/information/instagrambanner/:id/delete                    controllers.admin.InstagramBannerController.delete(id:String)
+POST    /admin/information/instagrambanner/:id/updateStatus/:status      controllers.admin.InstagramBannerController.updateStatus(id:String, status:String)
+GET     /admin/information/instagrambanner/sequence			            controllers.admin.InstagramBannerController.sequence()
+POST    /admin/information/instagrambanner/sequence			            controllers.admin.InstagramBannerController.updateSequence()
+
+#Instagram Banner
+GET     /admin/information/categorybanner					            controllers.admin.CategoryBannerController.index()
+GET     /admin/information/categorybanner/lists			                controllers.admin.CategoryBannerController.lists()
+GET     /admin/information/categorybanner/add			                controllers.admin.CategoryBannerController.add()
+POST    /admin/information/categorybanner					            controllers.admin.CategoryBannerController.save()
+POST    /admin/information/categorybanner/update			            controllers.admin.CategoryBannerController.update()
+GET     /admin/information/categorybanner/:id/edit                      controllers.admin.CategoryBannerController.edit(id:Long)
+DELETE  /admin/information/categorybanner/:id/delete                    controllers.admin.CategoryBannerController.delete(id:String)
+POST    /admin/information/categorybanner/:id/updateStatus/:status      controllers.admin.CategoryBannerController.updateStatus(id:String, status:String)
+GET     /admin/information/categorybanner/sequence			            controllers.admin.CategoryBannerController.sequence()
+POST    /admin/information/categorybanner/sequence			            controllers.admin.CategoryBannerController.updateSequence()
+
+
+#New Arrival
+GET     /admin/information/newarrivalproduct					            controllers.admin.NewArrivalController.index()
+GET     /admin/information/newarrivalproduct/lists			                controllers.admin.NewArrivalController.lists()
+GET     /admin/information/newarrivalproduct/add			                controllers.admin.NewArrivalController.add()
+POST    /admin/information/newarrivalproduct					            controllers.admin.NewArrivalController.save()
+DELETE  /admin/information/newarrivalproduct/:id/delete                    controllers.admin.NewArrivalController.delete(id:String)
+POST    /admin/information/newarrivalproduct/:id/updateStatus/:status      controllers.admin.NewArrivalController.updateStatus(id:String, status:String)
+GET     /admin/information/newarrivalproduct/sequence			            controllers.admin.NewArrivalController.sequence()
+POST    /admin/information/newarrivalproduct/sequence			            controllers.admin.NewArrivalController.updateSequence()
+
+#Best Seller
+GET     /admin/information/bestsellerproduct					            controllers.admin.BestSellerController.index()
+GET     /admin/information/bestsellerproduct/lists			                controllers.admin.BestSellerController.lists()
+GET     /admin/information/bestsellerproduct/add			                controllers.admin.BestSellerController.add()
+POST    /admin/information/bestsellerproduct					            controllers.admin.BestSellerController.save()
+DELETE  /admin/information/bestsellerproduct/:id/delete                    controllers.admin.BestSellerController.delete(id:String)
+POST    /admin/information/bestsellerproduct/:id/updateStatus/:status      controllers.admin.BestSellerController.updateStatus(id:String, status:String)
+GET     /admin/information/bestsellerproduct/sequence			            controllers.admin.BestSellerController.sequence()
+POST    /admin/information/bestsellerproduct/sequence			            controllers.admin.BestSellerController.updateSequence()
+
+#Socmed
+GET     /admin/information/socmed					            controllers.admin.SocmedController.index()
+GET     /admin/information/socmed/lists			                controllers.admin.SocmedController.lists()
+GET     /admin/information/socmed/add			                controllers.admin.SocmedController.add()
+POST    /admin/information/socmed					            controllers.admin.SocmedController.save()
+POST    /admin/information/socmed/update			            controllers.admin.SocmedController.update()
+GET     /admin/information/socmed/:id/edit                      controllers.admin.SocmedController.edit(id:Long)
+DELETE  /admin/information/socmed/:id/delete                    controllers.admin.SocmedController.delete(id:String)
+POST    /admin/information/socmed/:id/updateStatus/:status      controllers.admin.SocmedController.updateStatus(id:String, status:String)
+
+#Master Customer Allergy
+GET     /admin/customer/masterallergy					    controllers.admin.AllergyController.index()
+POST    /admin/customer/masterallergy					    controllers.admin.AllergyController.save()
+POST    /admin/customer/masterallergy/update			    controllers.admin.AllergyController.update()
+GET     /admin/customer/masterallergy/lists			        controllers.admin.AllergyController.lists()
+GET     /admin/customer/masterallergy/add			        controllers.admin.AllergyController.add()
+GET     /admin/customer/masterallergy/:id/edit              controllers.admin.AllergyController.edit(id:Long)
+DELETE  /admin/customer/masterallergy/:id/delete            controllers.admin.AllergyController.delete(id:String)
+
+#Customer List
+GET     /admin/customer/customer					        controllers.admin.CustomerController.index()
+GET     /admin/customer/customer/lists			            controllers.admin.CustomerController.lists()
+GET     /admin/customer/customer/download			        controllers.admin.CustomerController.download()
+POST    /admin/customer/customer/upload			            controllers.admin.CustomerController.upload()
+GET     /admin/customer/customer/:id/detail			        controllers.admin.CustomerController.detail(id:Long)
+GET     /admin/customer/customer/:id/referrer			    controllers.admin.CustomerController.memberReferrer(id:Long)
+POST    /admin/customer/customer/updateStatus/:st           controllers.admin.CustomerController.updateStatus(st: String)
+POST    /admin/customer/customer/upgradeToReseller          controllers.admin.CustomerController.upgradeToReseller()
+
+#Blacklist Setting
+GET     /admin/customer/blacklist					controllers.admin.BlacklistController.index()
+POST    /admin/customer/blacklist					controllers.admin.BlacklistController.save()
+POST    /admin/customer/blacklist/update			controllers.admin.BlacklistController.update()
+GET     /admin/customer/blacklist/lists			    controllers.admin.BlacklistController.lists()
+GET     /admin/customer/blacklist/add			    controllers.admin.BlacklistController.add()
+GET     /admin/customer/blacklist/:id/edit          controllers.admin.BlacklistController.edit(id:Long)
+DELETE  /admin/customer/blacklist/:id/delete        controllers.admin.BlacklistController.delete(id:String)
+
+#Contact Us
+GET     /admin/customer/contact_us					controllers.admin.ContactUsController.index()
+GET     /admin/customer/contact_us/lists			    controllers.admin.ContactUsController.lists()
+GET     /admin/customer/contact_us/:id/detail			controllers.admin.ContactUsController.detail(id:Long)
+
+#Attribute
+GET     /admin/masterproducts/attribute			    controllers.admin.AttributeController.index()
+GET     /admin/masterproducts/attribute/lists		    controllers.admin.AttributeController.lists()
+GET     /admin/masterproducts/attribute/add		    controllers.admin.AttributeController.add()
+POST    /admin/masterproducts/attribute			    controllers.admin.AttributeController.save()
+POST    /admin/masterproducts/attribute/update	                                        controllers.admin.AttributeController.update()
+GET     /admin/masterproducts/attribute/:id/edit                                        controllers.admin.AttributeController.edit(id:Long)
+DELETE  /admin/masterproducts/attribute/:id/delete                                      controllers.admin.AttributeController.delete(id:String)
+GET     /admin/masterproducts/attribute/:id/detail                                      controllers.admin.AttributeController.detail(id:Long)
+GET     /admin/masterproducts/attribute/addDetail		                                controllers.admin.AttributeController.addDetail(id:Long)
+GET     /admin/masterproducts/attribute/:id/detail/list	                                controllers.admin.AttributeController.listsDetail(id:Long)
+GET     /admin/masterproducts/attribute/:id/editDetail                                  controllers.admin.AttributeController.editDetail(id:Long)
+POST    /admin/masterproducts/attribute/:id/updateDetail                                controllers.admin.AttributeController.updateDetail(id:Long)
+POST    /admin/masterproducts/attribute/:id/saveDetail                                  controllers.admin.AttributeController.saveDetail(id:Long)
+DELETE  /admin/masterproducts/attribute/:id/deleteDetail                                controllers.admin.AttributeController.deleteDetail(id:String)
+GET     /admin/masterproducts/attribute/listsBaseAttribute                              controllers.admin.AttributeController.listsBaseAttribute()
+GET     /admin/masterproducts/attribute/listsBaseAttributeForSelect                     controllers.admin.AttributeController.listsBaseAttributeForSelect()
+GET     /admin/masterproducts/attribute/listsBaseAttributeForSelectByCategory           controllers.admin.AttributeController.listsBaseAttributeForSelectByCategory()
+GET     /admin/masterproducts/attribute/listsAttributeForSelect                         controllers.admin.AttributeController.listsAttributeForSelect()
+
+#Master Size
+GET     /admin/masterproducts/size					            controllers.admin.SizeController.index()
+POST    /admin/masterproducts/size					            controllers.admin.SizeController.save()
+POST    /admin/masterproducts/size/update			            controllers.admin.SizeController.update()
+GET     /admin/masterproducts/size/lists			            controllers.admin.SizeController.lists()
+GET     /admin/masterproducts/size/add			                controllers.admin.SizeController.add()
+GET     /admin/masterproducts/size/:id/edit                     controllers.admin.SizeController.edit(id:Long)
+DELETE  /admin/masterproducts/size/:id/delete                   controllers.admin.SizeController.delete(id:String)
+GET     /admin/masterproducts/size/sequence			            controllers.admin.SizeController.sequence()
+POST    /admin/masterproducts/size/sequence			            controllers.admin.SizeController.updateSequence()
+
+#hashtag
+GET     /admin/preference/hashtag					                controllers.admin.HashtagController.index()
+POST    /admin/preference/hashtag/update			                controllers.admin.HashtagController.update()
+GET     /admin/preference/hashtag/edit                              controllers.admin.HashtagController.edit()
+
+#SEO Page
+GET     /admin/preference/seo					                controllers.admin.SeoPageController.index()
+POST    /admin/preference/seo/update			                controllers.admin.SeoPageController.update()
+GET     /admin/preference/seo/edit                              controllers.admin.SeoPageController.edit()
+
+#Cart Button
+GET     /admin/preference/cartbutton					                controllers.admin.CartButtonController.index()
+POST    /admin/preference/cartbutton/update/:status			            controllers.admin.CartButtonController.update(status:String)
+
+#Theme
+GET     /admin/preference/theme					                controllers.admin.ThemeController.index()
+POST    /admin/preference/theme/update			                controllers.admin.ThemeController.update()
+GET     /admin/preference/theme/edit                              controllers.admin.ThemeController.edit()
+
+#Payment Expiration
+GET     /admin/preference/setpaymentexpire					            controllers.admin.PaymentExpirationController.index()
+POST    /admin/preference/setpaymentexpire					            controllers.admin.PaymentExpirationController.save()
+POST    /admin/preference/setpaymentexpire/update			            controllers.admin.PaymentExpirationController.update()
+GET     /admin/preference/setpaymentexpire/add			                controllers.admin.PaymentExpirationController.add()
+GET     /admin/preference/setpaymentexpire/edit                         controllers.admin.PaymentExpirationController.edit()
+
+#Voucher Signup
+GET     /admin/preference/setvouchersignup					            controllers.admin.VoucherSignupController.index()
+POST    /admin/preference/setvouchersignup					            controllers.admin.VoucherSignupController.save()
+GET     /admin/preference/setvouchersignup/edit                         controllers.admin.VoucherSignupController.edit()
+POST    /admin/preference/setvouchersignup/update			            controllers.admin.VoucherSignupController.update()
+GET     /admin/preference/setvouchersignup/add			                controllers.admin.VoucherSignupController.add()
+
+
+#Master Courier
+GET     /admin/shop/mastercourier					    controllers.admin.CourierController.index()
+POST    /admin/shop/mastercourier					    controllers.admin.CourierController.save()
+POST    /admin/shop/mastercourier/update			    controllers.admin.CourierController.update()
+GET     /admin/shop/mastercourier/lists			        controllers.admin.CourierController.lists()
+GET     /admin/shop/mastercourier/add			        controllers.admin.CourierController.add()
+GET     /admin/shop/mastercourier/:id/edit              controllers.admin.CourierController.edit(id:Long)
+DELETE  /admin/shop/mastercourier/:id/delete            controllers.admin.CourierController.delete(id:String)
+
+
+#Bank
+GET     /admin/shop/bank					            controllers.admin.BankController.index()
+POST    /admin/shop/bank					            controllers.admin.BankController.save()
+POST    /admin/shop/bank/update			                controllers.admin.BankController.update()
+GET     /admin/shop/bank/lists			                controllers.admin.BankController.lists()
+GET     /admin/shop/bank/add			                controllers.admin.BankController.add()
+GET     /admin/shop/bank/:id/edit                       controllers.admin.BankController.edit(id:Long)
+DELETE  /admin/shop/bank/:id/delete                     controllers.admin.BankController.delete(id:String)
+POST    /admin/shop/bank/:id/updateStatus/:status       controllers.admin.BankController.updateStatus(id:String, status:String)
+
+#Product
+GET     /admin/products/new/add		                    controllers.admin.ProductController.add()
+POST    /admin/products/new			                    controllers.admin.ProductController.save()
+POST    /admin/products/lists/updateStock			    controllers.admin.ProductController.updateStock()
+POST    /admin/products/lists/updateLike			    controllers.admin.ProductController.updateLike()
+GET     /admin/products/lists					        controllers.admin.ProductController.index()
+GET     /admin/products/listsProducts			        controllers.admin.ProductController.lists()
+POST    /admin/products/lists/saveReview		        controllers.admin.ProductController.saveReview()
+GET     /admin/products/lists/:id/detail                controllers.admin.ProductController.detail(id:Long)
+POST    /admin/products/lists/update			        controllers.admin.ProductController.update()
+GET     /admin/products/lists/checkeditstock/:id	    controllers.admin.ProductController.checkEditStock(id:Long)
+GET     /admin/products/lists/checkedit/:id			    controllers.admin.ProductController.checkEdit(id:Long)
+GET     /admin/products/lists/:id/edit                  controllers.admin.ProductController.edit(id:Long)
+POST    /admin/products/lists/:id/updateStatus/:status  controllers.admin.ProductController.updateStatus(id:String, status:String)
+DELETE  /admin/products/lists/:id/delete                controllers.admin.ProductController.delete(id:String)
+
+#Product Review
+GET     /admin/products/review/				                        controllers.admin.ProductReviewController.index()
+GET     /admin/products/review/lists		                        controllers.admin.ProductReviewController.lists()
+DELETE  /admin/products/review/:id/delete                           controllers.admin.ProductReviewController.delete(id:String)
+POST    /admin/products/review/:id/updateStatus/:status             controllers.admin.ProductReviewController.updateStatus(id:String, status:String)
+GET     /admin/products/review/:id/detail                           controllers.admin.ProductReviewController.detail(id:Long)
+POST    /admin/products/review/saveReview		                    controllers.admin.ProductReviewController.saveReview()
+
+#Product Variant Group
+GET     /admin/products/productvariantgroup/			        controllers.admin.ProductVariantGroupController.index()
+GET     /admin/products/productvariantgroup/list			    controllers.admin.ProductVariantGroupController.lists()
+GET     /admin/products/productvariantgroup/add		            controllers.admin.ProductVariantGroupController.add()
+POST    /admin/products/productvariantgroup/			        controllers.admin.ProductVariantGroupController.save()
+GET     /admin/products/productvariantgroup/listsProductBySKUName			    controllers.admin.ProductVariantGroupController.listsProductBySKUName()
+GET     /admin/products/productvariantgroup/:id/detail			                controllers.admin.ProductVariantGroupController.detail(id:Long)
+GET     /admin/products/productvariantgroup/:id/listsDetail			            controllers.admin.ProductVariantGroupController.listsDetail(id:Long)
+GET     /admin/products/productvariantgroup/:id/edit		                    controllers.admin.ProductVariantGroupController.edit(id:Long)
+POST    /admin/products/productvariantgroup/update			                    controllers.admin.ProductVariantGroupController.update()
+GET     /admin/products/productvariantgroup/:id/listsDetailEdit                 controllers.admin.ProductVariantGroupController.listsDetailEdit(id:Long)
+DELETE  /admin/products/productvariantgroup/:id/delete                          controllers.admin.ProductVariantGroupController.delete(id:String)
+
+#Product Also View
+GET    /admin/products/productalsoview/							 controllers.admin.ProductController.index()
+POST    /admin/products/productalsoview/			             controllers.admin.ProductAlsoViewController.save()
+GET     /admin/products/productalsoview/:id/add                  controllers.admin.ProductAlsoViewController.add(id:Long)
+
+#Voucher
+GET     /admin/voucher/					    controllers.admin.VoucherController.index()
+GET     /admin/voucher/lists			    controllers.admin.VoucherController.lists()
+POST    /admin/voucher/					    controllers.admin.VoucherController.save()
+GET     /admin/voucher/add			        controllers.admin.VoucherController.add()
+GET     /admin/voucher/:id/edit             controllers.admin.VoucherController.edit(id:Long)
+POST    /admin/voucher/update			    controllers.admin.VoucherController.update()
+GET     /admin/voucher/:id/detail           controllers.admin.VoucherController.detail(id:Long)
+GET     /admin/voucher/:id/listsDetail      controllers.admin.VoucherController.listsDetail(id:Long)
+DELETE  /admin/voucher/:id/delete           controllers.admin.VoucherController.delete(id:String)
+POST    /admin/voucher/:id/updateStatus/:status         controllers.admin.VoucherController.updateStatus(id:String, status:String)
+GET     /admin/voucher/:id/listsProduct     controllers.admin.VoucherController.listsProduct(id:Long)
+GET     /admin/voucher/:id/listsCustomer    controllers.admin.VoucherController.listsCustomer(id:Long)
+GET     /admin/voucher/listsMember          controllers.admin.VoucherController.listsMember()
+
+#Sales Order
+GET     /admin/orders					            controllers.admin.SalesOrderController.index()
+GET     /admin/orders/lists			                controllers.admin.SalesOrderController.lists()
+GET     /admin/orders/:id/detail                   controllers.admin.SalesOrderController.detail(id:Long)
+POST     /admin/orders/updateReseller			    controllers.admin.SalesOrderController.updateReseller()
+
+#Sales Order Payment
+GET     /admin/orders/payments					        controllers.admin.SalesOrderPaymentController.index()
+GET     /admin/payments/lists			            controllers.admin.SalesOrderPaymentController.lists()
+GET     /admin/payments/:id/detail			        controllers.admin.SalesOrderPaymentController.detail(id:Long)
+
+#API
+GET     /api-docs/v1/cms	       			        controllers.ApiHelpController.getResource(path = "/v1/cms")
+GET     /v1/cms/categories    					controllers.api.CmsController.categories()
+GET     /v1/cms/footer    					    controllers.api.CmsController.footer()
+GET     /v1/cms/faq          				    controllers.api.CmsController.faq(search:String ?= "")
+GET     /v1/cms/static/:slug    					controllers.api.CmsController.staticPage(slug:String)
+GET     /v1/cms/faq/:slug          				controllers.api.CmsController.faqBySlug(slug:String)
+GET     /v1/cms/categories/:id                   controllers.api.CmsController.categoryById(id: Long)
+GET     /v1/cms/banner/slider-banner                   controllers.api.CmsController.banner(limit:Int ?= 5)
+GET     /v1/cms/banner/new-arrival                   controllers.api.CmsController.newArrivalBanner(limit:Int ?= 5)
+GET     /v1/cms/banner/on-sale                   controllers.api.CmsController.onSaleBanner(limit:Int ?= 5)
+GET     /v1/cms/banner/best-seller                   controllers.api.CmsController.bestSellerBanner(limit:Int ?= 5)
+GET     /v1/cms/banner/instagram                   controllers.api.CmsController.instagramBanner(limit:Int ?= 5)
+GET     /v1/cms/banner/category                   controllers.api.CmsController.categoryBanner(limit:Int ?= 5)
+GET     /v1/cms/location    					controllers.api.CmsController.configSetting(module:String ?= "information", key:String ?= "location_setting")
+GET     /v1/cms/our-story    					controllers.api.CmsController.configSetting(module:String ?= "information", key:String ?= "our_story")
+GET     /v1/cms/hashtag    					controllers.api.CmsController.configSetting(module:String ?= "preference", key:String ?= "hashtag")
+GET     /v1/cms/new-arrival    					controllers.api.CmsController.newArrival(limit:Int ?= 5)
+GET     /v1/cms/best-seller    					controllers.api.CmsController.bestSeller(limit:Int ?= 5)
+GET     /v1/cms/on-sale    					controllers.api.CmsController.onSale(limit:Int ?= 5)
+GET     /v1/cms/socmed    					controllers.api.CmsController.socmed(limit:Int ?= 5)
+GET     /v1/cms/colors    					controllers.api.CmsController.colors()
+GET     /v1/cms/size    					controllers.api.CmsController.size()
+POST     /v1/cms/contact_us    					controllers.api.CmsController.postContactUs()
+GET     /v1/cms/vouchers          				controllers.api.CmsController.vouchers()
+GET     /v1/cms/promotions          				controllers.api.CmsController.promotions()
+GET     /v1/cms/banner_promotions          				controllers.api.CmsController.bannerPromotions()
+GET     /v1/cms/allergies          				controllers.api.CmsController.allergies()
+GET     /v1/cms/presentations          				controllers.api.CmsController.presentations()
+GET     /v1/cms/fetch_instagram_banner      controllers.api.CmsController.fetchInstagramBanner()
+GET     /v1/provinces                       controllers.api.OrderController.provinceLists()
+GET     /v1/cities/:id                      controllers.api.OrderController.cityLists(id: Long)
+
+GET     /v1/articles/all          				controllers.api.ArticlesController.all(offset:Int ?= 0, limit:Int ?= 0)
+GET     /v1/articles/tag/:tag          		    controllers.api.ArticlesController.tags(tag: String, offset:Int ?= 0, limit:Int ?= 0)
+GET     /v1/articles/popular          			controllers.api.ArticlesController.popular(limit:Int ?= 0)
+GET     /v1/articles/slug/:slug                  controllers.api.ArticlesController.showBySlug(slug: String)
+GET     /v1/articles/:id/related          		controllers.api.ArticlesController.getRelatedArticle(id:Long, offset:Int ?= 0, limit:Int ?= 0)
+GET     /v1/articles/:id/comments          		controllers.api.ArticlesController.getArticleComment(id:Long, offset:Int ?= 0, limit:Int ?= 0)
+GET     /v1/articles/comments/:id/replies        controllers.api.ArticlesController.getCommentByIdReplies(id:Long, offset:Int ?= 0, limit:Int ?= 0)
+POST    /v1/articles/comments                    controllers.api.ArticlesController.postComment()
+
+POST    /v1/session/login              			controllers.api.SessionsController.signIn()
+POST    /v1/session/login_with_socmed           controllers.api.SessionsController.signInWithSocmed()
+GET     /v1/session/logout              		controllers.api.SessionsController.signOut()
+POST    /v1/session/refresh						controllers.api.SessionsController.refreshToken()
+POST    /v1/session/forgot_password				controllers.api.SessionsController.forgetPassword()
+PATCH 	/v1/session/reset_password				controllers.api.SessionsController.resetPassword()
+PATCH   /v1/session/change_password			    controllers.api.SessionsController.changePassword()
+POST    /v1/session/signup              		controllers.api.SessionsController.signUp()
+
+GET    /v1/profile/member					    controllers.api.ProfileController.getMemberProfile()
+GET    /v1/profile/myaccount					controllers.api.ProfileController.myAccount()
+GET    /v1/profile/my_referral					controllers.api.ProfileController.findReferral()
+PATCH  /v1/profile/update					    controllers.api.ProfileController.updateProfile()
+PATCH  /v1/profile/update_photo					controllers.api.ProfileController.uploadPhotoProfile()
+PATCH  /v1/profile/update_allergy_info			controllers.api.ProfileController.updateAllergyInfo()
+GET    /v1/profile/shipping_address			    controllers.api.ProfileController.getShippingAddress()
+POST   /v1/profile/shipping_address/save		controllers.api.ProfileController.addShippingAddress()
+PATCH  /v1/profile/shipping_address/:id/update	controllers.api.ProfileController.updateShippingAddress(id: Long)
+PATCH  /v1/profile/shipping_address/:id/set_as_default	controllers.api.ProfileController.setDefaultShippingAddress(id: Long)
+DELETE /v1/profile/shipping_address/:id/delete	controllers.api.ProfileController.deleteShippingAddress(id: Long)
+
+POST    /v1/products/search                     controllers.api.ProductsController.search()
+GET     /v1/products/top_sales                  controllers.api.ProductsController.topSales(limit:Int ?= 0)
+GET     /v1/products/filter                     controllers.api.ProductsController.attributes()
+GET     /v1/products/fast_search                controllers.api.ProductsController.fastSearch(query:String ?= "*", offset:Int ?= 0, limit:Int ?= 0)
+GET     /v1/products/:id                        controllers.api.ProductsController.detail(id:Long)
+POST    /v1/products/reviews                    controllers.api.ProductsController.reviews()
+POST    /v1/products/wishlist                   controllers.api.ProductsController.saveWhislist()
+GET     /v1/products/wishlist/get               controllers.api.ProductsController.getWhislist()
+DELETE  /v1/products/wishlist/:id				controllers.api.ProductsController.deleteWishlist(id: Long)
+
+GET     /v1/orders/bank                   controllers.api.OrderController.bankLists()
+GET     /v1/orders/province                   controllers.api.OrderController.provinceLists()
+GET     /v1/orders/city/:id                   controllers.api.OrderController.cityLists(id: Long)
+GET     /v1/orders/courier                   controllers.api.OrderController.courierLists()
+GET     /v1/orders/cart                   controllers.api.OrderController.cartLists()
+POST     /v1/orders/cart/save                   controllers.api.OrderController.saveCart()
+DELETE  /v1/orders/cart/:id				controllers.api.OrderController.deleteCart(id: Long)
+POST     /v1/orders/courier-cost                   controllers.api.OrderController.countCourier()
+POST     /v1/orders/save                   controllers.api.OrderController.save()
+PATCH     /v1/orders/upload-struct/:order                   controllers.api.OrderController.upload(order:String)
+GET     /v1/orders/list                   controllers.api.OrderController.orderLists(type:String ?= "ALL", status:String ?= "", name:String ?= "", offset:Int ?= 0, limit:Int ?= 0)
+POST     /v1/orders/apply-voucher          controllers.api.OrderController.applyVoucher()
+
+POST     /notification/handling          controllers.api.NotificationController.handling()
+
+
+#Merchant API
+POST     /v1/merchant/products                     controllers.api.MerchantController.getProductList()
+GET      /v1/merchant/product/:id/detail           controllers.api.MerchantController.getProductDetail(id:Long)
+POST     /v1/merchant/purchase_orders              controllers.api.MerchantController.getPurchaseOrders()
+GET      /v1/merchant/purchase_order/:id/detail    controllers.api.MerchantController.getPurchaseOrderDetail(id:Long)
+POST     /v1/merchant/find_products                controllers.api.MerchantController.findProducts()
+POST     /v1/merchant/purchase_order/create        controllers.api.MerchantController.savePurchaseOrder()
+DELETE   /v1/merchant/purchase_order/:id/delete    controllers.api.MerchantController.removePurchaseOrder(id:Long)
+POST     /v1/merchant/customers                    controllers.api.MerchantController.getCustomers()
+POST     /v1/merchant/customer/create              controllers.api.MerchantController.saveCustomer()
+POST     /v1/merchant/orders                       controllers.api.MerchantController.getOrders()
+GET      /v1/merchant/order/:id/detail             controllers.api.MerchantController.getOrderDetail(id:Long)
+PATCH    /v1/merchant/order/:id/approve            controllers.api.MerchantController.approveOrder(id:Long)
+PATCH    /v1/merchant/order/:id/reject             controllers.api.MerchantController.rejectOrder(id:Long)
+PATCH    /v1/merchant/order/:id/update_status      controllers.api.MerchantController.updateStatusOrder(id:Long)
+
+#Promotion
+GET     /admin/promotion/					    controllers.admin.PromotionController.index()
+GET     /admin/promotion/lists			    controllers.admin.PromotionController.lists()
+POST    /admin/promotion/					    controllers.admin.PromotionController.save()
+GET     /admin/promotion/add			        controllers.admin.PromotionController.add()
+GET     /admin/promotion/:id/edit             controllers.admin.PromotionController.edit(id:Long)
+POST    /admin/promotion/update			    controllers.admin.PromotionController.update()
+#GET     /admin/promotion/:id/detail           controllers.admin.PromotionController.detail(id:Long)
+DELETE  /admin/promotion/:id/delete           controllers.admin.PromotionController.delete(id:String)
+POST    /admin/promotion/:id/updateStatus/:status         controllers.admin.PromotionController.updateStatus(id:String, status:String)
+GET     /admin/promotion/:id/listsProduct     controllers.admin.PromotionController.listsProduct(id:Long)
+POST     /admin/promotion/add_product_discount            controllers.admin.PromotionController.addProductDiscount()
+GET      /admin/promotion/:id/lists_promotion_product   controllers.admin.PromotionController.listsPromotionProduct(id:Long)
+
+#Presentation
+GET     /admin/presentations/				    controllers.admin.PresentationController.index()
+GET     /admin/presentations/lists			    controllers.admin.PresentationController.lists()
+GET     /admin/presentations/add			        controllers.admin.PresentationController.add()
+GET     /admin/presentations/:id/detail           controllers.admin.PresentationController.detail(id:Long)
+GET     /admin/presentations/:id/edit             controllers.admin.PresentationController.edit(id:Long)
+POST    /admin/presentations/					    controllers.admin.PresentationController.save()
+POST    /admin/presentations/update			    controllers.admin.PresentationController.update()
+POST    /admin/presentations/:id/updateStatus/:status     controllers.admin.PresentationController.updateStatus(id:String, status:String)
+
+
+#Promotion Product
+DELETE  /admin/promotion_product/:id/delete     controllers.admin.PromotionProductController.delete(id:String)
+
+GET     /v1/private/prov                   controllers.internal.InternalController.syncProvince()
+GET     /v1/private/city                   controllers.internal.InternalController.syncCity()
+#GET     /v1/private/gramedia                   controllers.internal.InternalController.gramedia()
+GET     /v1/private/midtrans                   controllers.internal.InternalController.testMidTrans()
+
+#CKEditor
+POST    /admin/ckeditor/upload			                controllers.admin.CKEditorController.upload(Type:String ?= "", CKEditor:String ?= "", CKEditorFuncNum:String ?= "", langCode: String ?= "")
+GET     /admin/ckeditor/connector			            controllers.admin.CKEditorController.connector(Command:String ?= "", Type:String ?= "", CurrentFolder:String ?= "", NewFolderName:String ?= "")
+POST    /admin/ckeditor/connector			            controllers.admin.CKEditorController.connectorUpload(Command:String ?= "", Type:String ?= "", CurrentFolder:String ?= "", NewFolderName:String ?= "")
+GET     /admin/ckeditor/browser			                controllers.admin.CKEditorController.browser()
+GET     /admin/ckeditor/frmresourcetype			        controllers.admin.CKEditorController.frmresourcetype()
+GET     /admin/ckeditor/frmfolders			            controllers.admin.CKEditorController.frmfolders()
+GET     /admin/ckeditor/frmactualfolder			        controllers.admin.CKEditorController.frmactualfolder()
+GET     /admin/ckeditor/frmresourceslist			    controllers.admin.CKEditorController.frmresourceslist()
+GET     /admin/ckeditor/frmcreatefolder			        controllers.admin.CKEditorController.frmcreatefolder()
+GET     /admin/ckeditor/frmupload			            controllers.admin.CKEditorController.frmupload()
+
+#Newsletter 
+GET     /admin/newsletter					            controllers.admin.NewsletterController.index()
+POST     /admin/newsletter 				            controllers.admin.NewsletterController.save()
+GET     /admin/newsletter/add			                controllers.admin.NewsletterController.add()
+GET     /admin/newsletter/:id/edit                       controllers.admin.NewsletterController.edit(id:Long)
+POST    /admin/newsletter/update			            controllers.admin.NewsletterController.update()
+GET     /admin/newsletter/lists			                controllers.admin.NewsletterController.lists()
+DELETE  /admin/newsletter/:id/delete                     controllers.admin.NewsletterController.delete(id:String)
+POST    /admin/newsletter/:id/updateStatus/:status       controllers.admin.NewsletterController.updateStatus(id:String, status:String)
+
+
+#Purchase Order
+GET     /admin/distributor/purchaseorder/				    controllers.admin.PurchaseOrderController.index()
+GET     /admin/distributor/purchaseorder/lists			    controllers.admin.PurchaseOrderController.lists()
+GET     /admin/distributor/purchaseorder/add		        controllers.admin.PurchaseOrderController.add()
+POST    /admin/distributor/purchaseorder		            controllers.admin.PurchaseOrderController.save()
+GET     /admin/distributor/purchaseorder/listsProductBySKUName			    controllers.admin.PurchaseOrderController.listsProductBySKUName()
+POST    /admin/distributor/purchaseorder/:id/updateStatus/:status          controllers.admin.PurchaseOrderController.updateStatus(id:String, status:Integer)
+DELETE  /admin/distributor/purchaseorder/:id/delete                        controllers.admin.PurchaseOrderController.delete(id:String)
+GET     /admin/distributor/purchaseorder/:id/detail                        controllers.admin.PurchaseOrderController.detail(id:Long)
+GET     /admin/distributor/purchaseorder/:id/listsProductDetail		    controllers.admin.PurchaseOrderController.listsProductDetail(id:Long)
+
+
+#Order Distributor
+GET     /admin/distributor/orderdistributor/				    controllers.admin.OrderDistributorController.index()
+GET     /admin/distributor/orderdistributor/lists			    controllers.admin.OrderDistributorController.lists()
+POST    /admin/distributor/orderdistributor/:id/approve          controllers.admin.OrderDistributorController.updateStatus(id:String)
+GET     /admin/distributor/orderdistributor/:id/detail                        controllers.admin.OrderDistributorController.detail(id:Long)
+GET     /admin/distributor/orderdistributor/:id/listsProductDetail		    controllers.admin.OrderDistributorController.listsProductDetail(id:Long)
+
+#Order Reseller
+GET     /admin/distributor/orderreseller/				    controllers.admin.OrderResellerController.index()
+GET     /admin/distributor/orderreseller/lists			    controllers.admin.OrderResellerController.lists()
+POST    /admin/distributor/orderreseller/:id/approve          controllers.admin.OrderResellerController.updateStatus(id:String)
+GET     /admin/distributor/orderreseller/:id/detail                        controllers.admin.OrderResellerController.detail(id:Long)
+GET     /admin/distributor/orderreseller/:id/listsProductDetail		    controllers.admin.OrderResellerController.listsProductDetail(id:Long)
+
+#Product Distributor
+GET     /admin/productdistributor/lists					        controllers.admin.ProductDistributorController.index()
+GET     /admin/productdistributor/listsProducts			        controllers.admin.ProductDistributorController.lists()
+GET     /admin/productdistributor/lists/:id/detail              controllers.admin.ProductDistributorController.detail(id:Long)

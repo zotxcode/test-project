@@ -1,0 +1,254 @@
+@(title: String, action: String, formData: Form[models.ProductAlsoView], url: play.api.mvc.Call, listsProduct: Map[Integer, String])
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title){
+<!-- Content Wrapper. Contains page content -->
+<style>
+.container-outer {
+    margin: 0 auto;
+    overflow: scroll;
+    width: 100%;
+    height: 400px;
+}
+</style>
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Information")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            @myalert()
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id -> "form-save", 'enctype -> "multipart/form-data") {
+                    <div class="box-body">
+                        @mytext(formData("productId"), "", "", "hidden")
+                       
+                            <div class="row">
+                                <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                    <label>Product List</label>
+                                    <div class="row">
+                                        <div class="col-xs-10">
+                                            <select id="productlist" name="product_list[]" class="form-control" data-placeholder="Please select product">
+                                            @for((k,v) <- listsProduct){<option value="@k" >@v</option>}
+                                            </select>
+                                        </div>
+                                        <div class="col-xs-2">
+                                            <button type="button" class="btn btn-primary" id="listproductbtn">Show Product Item</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+							
+                        
+                    
+                        <div class="box-footer">
+                            @mybutton(controllers.admin.routes.InstagramBannerController.index(), action.equalsIgnoreCase("add"))
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+<div id="modal-select-product" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Product Item Name</h4>
+            </div>
+            <div class="modal-body">
+                <table id="listProduct" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th><!--<input name="select_all" value="1" id="select-all" type="checkbox">--></th>
+                        <th>No</th>
+                        <th>Product Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-default">Back</button>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+<script type="text/javascript">
+var dataProducts = [];
+$("#productlist option").each(function()
+{
+    if($(this).val() != 0){
+        dataProducts.push({id:$(this).val(),text:$(this).text()});
+    }
+});
+var table;
+  $(document).ready(function () {
+       
+
+       
+      
+        $("#productlist").select2({
+            multiple:true
+        });
+        var arrProduct = [];
+        $("#productlist option").each(function()
+        {
+            arrProduct.push($(this).val());
+        });
+        if(arrProduct.length > 0){
+            $('#productlist').val(arrProduct).trigger("change");
+        }
+
+        $('#listproductbtn').text('Show Product Item');
+        $('#listproductbtn').on('click', function(){
+            table.ajax.reload();
+            $('#modal-select-product').modal('show');
+        });
+
+        table = $("#listProduct").DataTable({
+            "lengthMenu": [[10, 25, 50, 100, 200], [10, 25, 50, 100, 200]],
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/admin/information/mainbanner/listsProduct",
+                "data": function ( d ) {
+                    d.myKey = "myValue";
+                    d.category = "";
+                }
+            },
+            columnDefs : [
+                {
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'sortable': false,
+                    'className': 'dt-body-center',
+                    'width': "20px"
+                },
+                { targets: 1, sortable: false, width: "20px"},
+            ],
+            order: [[ 2, "asc" ]],
+            fnDrawCallback: function() {
+                for(i=0; i < dataProducts.length ; i++){
+                    if($('#cb-action-'+dataProducts[i].id).length > 0){
+                       $('#cb-action-'+dataProducts[i].id).prop('checked', true);
+                    }
+                }
+            }
+        });
+
+        $('#listProduct tbody').on('change', '.cb-action', function(){
+            // If checkbox is not checked
+            if(!this.checked)
+                deleteProducts($(this).val());
+            else {
+                addProducts({id:this.value,text:this.name});
+            }
+            var arrProduct = [];
+            $("#productlist option").each(function()
+            {
+                arrProduct.push($(this).val());
+            });
+            if(arrProduct.length > 0){
+                $('#productlist').val(arrProduct).trigger("change");
+            }
+       });
+  });
+
+
+
+
+function addProducts(item){
+    dataProducts.push(item);
+    $("#productlist").select2({multiple: true, data: dataProducts});
+}
+
+function deleteProducts(id){
+    findAndRemove(dataProducts, "id", id);
+    $("#productlist").empty();
+    $("#productlist").select2({multiple: true, data: dataProducts});
+}
+
+function findAndRemove(array, property, value) {
+  array.forEach(function(result, index) {
+    if(result[property] == value) {
+        //Remove from array
+        array.splice(index, 1);
+    }
+  });
+};
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $.validator.addMethod("valueNotEquals", function(value, element, arg){
+        return arg != value;
+    }, "Value must not equal arg.");
+    
+
+    $('button[name="save"]').on('click', function() {
+        
+        $("#form-save").validate();
+    });
+    
+    $("#form-save").validate({
+        ignore:[],
+        rules: {
+          
+            
+            
+        },
+        messages: {
+        
+           
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            form.submit();
+        }
+    });
+
+    
+
+
+  
+    
+    $('#productlist').on('change', function(){
+        $('#productlist').valid();
+    });
+
+        
+  
+});
+
+
+</script>

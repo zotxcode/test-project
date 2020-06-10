@@ -1,0 +1,362 @@
+@(title: String, data: Product, detail : ProductDetail, reviews : List[ProductReview], url: play.api.mvc.Call, urlBack: play.api.mvc.Call, feature:RoleFeature)
+
+@import com.enwie.util.CommonFunction
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(title){
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Products")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@title</h3>
+                    </div>
+                    <div class="box-body">
+
+                        <form class="form-horizontal">
+                            <div class="col-xs-6">
+                                <img alt="Photo" src="@data.getImageUrl()" class="img-responsive pad">
+                                <div class="row">
+                                @for((k,v) <- detail.getImage3And1Link() ){
+
+                                    <a class="thumb" href="#" data-image-id="" data-toggle="modal" data-title="" data-caption="" data-image="@v" data-target="#image-gallery">
+                                        <img class="col-xs-2 img-responsive" alt="" src="@k">
+                                    </a>
+                                }
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="form-group">
+                                    <label class="col-sm-3">SKU</label>
+                                    <div class="col-sm-9">
+                                        @data.sku
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3">Product Name</label>
+                                    <div class="col-sm-9">
+                                        @data.name
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3">Category</label>
+                                    <div class="col-sm-9">
+                                        @data.category.name
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3">Brand</label>
+                                    <div class="col-sm-9">
+                                        @data.brand.name
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3">Weight</label>
+                                    <div class="col-sm-9">
+                                        @("%,.2f".format(detail.weight)) Gr
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3">Price</label>
+                                    <div class="col-sm-9">
+                                        @CommonFunction.currencyFormat(data.price)
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3">Discount</label>
+                                    <div class="col-sm-9">
+                                        @if(data.discount == 0){
+                                            -
+                                        }else{
+                                            @if(data.discountType == 1){
+                                            @CommonFunction.currencyFormat(data.discount)
+                                            }else{
+                                            @data.discount %
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                @if(data.discount != 0){
+                                <div class="form-group">
+                                    <label class="col-sm-3">Discount From</label>
+                                    <div class="col-sm-9">
+                                        @CommonFunction.getDateTime(data.discountActiveFrom)
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3">Discount To</label>
+                                    <div class="col-sm-9">
+                                        @CommonFunction.getDateTime(data.discountActiveTo)
+                                    </div>
+                                </div>
+                                }
+                                <div class="form-group">
+                                    <label class="col-sm-3">Stock</label>
+                                    <div class="col-sm-9">
+                                        @data.itemCount
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="col-xs-12">
+                            <h4>Product Reviews</h4> @if(feature.isAdd()){<button class="btn btn-primary add-review">Add Review</button>}
+                            <div class="row"></div>
+                            <div class="div-add-review col-xs-6" style="display:none; margin-top:20px;">
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Add Review</h3>
+                                    </div>
+                                    <!-- /.box-header -->
+                                    <!-- form start -->
+                                    @form(url, 'role->"form", 'id -> "form-save", 'class -> "form-horizontal") {
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" >Rating</label>
+                                            <div class="col-sm-10">
+                                                <input id="rating" name="rating" class="rating rating-loading" data-min="0" data-max="5" data-step="1">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="review">Name</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" rows="3" id="reviewer" name="reviewer" placeholder="Name" class="form-control" ></input>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="review">Review</label>
+                                            <div class="col-sm-10">
+                                                <textarea rows="3" id="review" name="review" placeholder="Review" class="form-control" ></textarea>
+                                                <input type="hidden" name="product_id" value="@data.id">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /.box-body -->
+                                    <div class="box-footer">
+                                        <button class="btn btn-primary pull-right" type="submit">Save</button>
+                                    </div>
+                                    <!-- /.box-footer -->
+                                    }
+                                </div>
+                            </div>
+                            <div class="row"></div>
+                            <hr/>
+                            @for(v <- reviews){
+                            <div id="post-@v.id" class="post clearfix">
+                                <div class="user-block">
+                                    @if(v.member != null){
+                                    <img class="img-circle img-bordered-sm" src="@v.member.getThumbnailImageLink()" alt="user image">
+                                    }
+                                    @if(v.user != null){
+                                    <img class="img-circle img-bordered-sm" src="@v.user.getThumbnailImageLink()" alt="user image">
+                                    }
+
+                                    <span class="username">
+                                            @if(v.reviewer != null){
+                                                <a href="#">@v.reviewer</a>
+                                            } else {
+                                                @if(v.member != null){
+                                                    <a href="#">@v.member.fullName</a>
+                                                }
+                                                @if(v.user != null){
+                                                    <a href="#">@v.user.fullName</a>
+                                                }
+                                            }
+
+                                            @if(feature.isDelete()){<a href="#" class="pull-right btn-box-tool delete-review" name="@v.id"><i class="fa fa-trash"></i> Delete</a>}
+                                            @if(v.approvedStatus == "P" && feature.isEdit()){
+                                                <a href="#" class="pull-right btn-box-tool reject-review" id="reject-@v.id" name="@v.id"><i class="fa fa-close"></i> Reject</a>
+                                                <a href="#" class="pull-right btn-box-tool approve-review" id="approve-@v.id" name="@v.id"><i class="fa fa-check"></i> Approve</a>
+                                            }
+                                        </span>
+                                    <span class="description"><span id="stars-existing" class="starrr" data-rating='@v.rating'></span>&nbsp;<span class="starrr-label"></span> - @CommonFunction.getDateTime2(v.createdAt)<br>@v.title</span>
+                                </div>
+                                <!-- /.user-block -->
+                                @if(v.getImageLink() != ""){
+                                <img src="@v.getImageLink()" style="max-width:400px;">
+                                }
+                                <p>
+                                    @v.comment
+                                </p>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <a class="btn btn-default" href="@urlBack">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+<div class="modal fade" id="image-gallery" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                @*<h4 class="modal-title" id="image-gallery-title"></h4>*@
+            </div>
+            <div class="modal-body">
+                <img id="image-gallery-image" class="img-responsive" src="">
+            </div>
+            @*<div class="modal-footer">
+
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary" id="show-previous-image">Previous</button>
+                </div>
+
+                <div class="col-md-8 text-justify" id="image-gallery-caption">
+                    This text will be overwritten by jQuery
+                </div>
+
+                <div class="col-md-2">
+                    <button type="button" id="show-next-image" class="btn btn-default">Next</button>
+                </div>
+            </div>*@
+        </div>
+    </div>
+</div>
+@mymodaldelete("review")
+}
+<link rel='stylesheet' href='@routes.Assets.at("plugins/starr/star-rating.css")'>
+<script src='@routes.Assets.at("plugins/starr/starr.js")' type='text/javascript'></script>
+<script src='@routes.Assets.at("plugins/starr/star-rating.js")' type='text/javascript'></script>
+<script type="text/javascript">
+function updateGallery(selector) {
+    var $sel = selector;
+    current_image = $sel.data('image-id');
+    //$('#image-gallery-caption').text($sel.data('caption'));
+    //$('#image-gallery-title').text($sel.data('title'));
+    $('#image-gallery-image').attr('src', $sel.data('image'));
+}
+$(document).ready(function(){
+    $('.thumb').on('click', function(){
+        updateGallery($(this));
+    });
+
+    $('.submit-delete').on('click', function() {
+        var id = $("#review_id").val();
+
+        if($('.modal-title').html() == 'Delete'){
+            deleteFunc(id);
+        }else if($('.modal-title').html() == 'Approve'){
+            updateStatus(id, 'A');
+        }else if($('.modal-title').html() == 'Reject'){
+            updateStatus(id, 'R');
+        }
+    });
+    $('.delete-review').on('click', function(){
+        var id = $(this).prop('name');
+        $('#modal-delete-review').modal('show');
+        $("#review_id").val(id);
+        $('.modal-title').html('Delete');
+        $('.modal-body').html('Are you sure want to delete this item?');
+
+    });
+    $('.reject-review').on('click', function(){
+        var id = $(this).prop('name');
+        $('#modal-delete-review').modal('show');
+        $("#review_id").val(id);
+        $('.modal-title').html('Reject');
+        $('.modal-body').html('Are you sure want to reject this item?');
+    });
+    $('.approve-review').on('click', function(){
+        var id = $(this).prop('name');
+        $('#modal-delete-review').modal('show');
+        $("#review_id").val(id);
+        $('.modal-title').html('Approve');
+        $('.modal-body').html('Are you sure want to approve this item?');
+    });
+
+    $('').on('click', function(){
+        $('.div-add-review').show();
+    });
+    $('.add-review').on('click', function() {
+        if($('.div-add-review').is(":visible")){
+            $('.div-add-review').hide();
+            $('.add-review').text('Add Review');
+        }else{
+            $('.div-add-review').show();
+            $('.add-review').text('Hide Form Add Review');
+        }
+    });
+});
+
+function deleteFunc(id){
+    $.ajax({
+        url: "/admin/products/review/"+id+"/delete",
+        type: 'DELETE',
+        beforeSend: function() {
+            $('#modal-delete-review').modal('hide');
+            MyApp.loadingOverlay.show();
+        },
+        error: function(data ) {
+            resp = JSON.parse(data.responseText);
+            toastr["error"](resp.message, "Error")
+        },
+        success: function(resp) {
+            $('#action option[value=""]').prop('selected', true);
+
+            if(resp.meta.total != 0){
+                toastr["success"](resp.message, "Succes")
+                $('#action').hide();
+                $('#post-'+id).remove();
+            }else{
+                toastr["error"](resp.message, "Error")
+            }
+        },
+        complete: function(xhr) {
+            MyApp.loadingOverlay.hide();
+            try {
+                resp = JSON.parse(xhr.responseText);
+            } catch (e) {
+                toastr["error"]("Something went wrong.", "Error")
+            }
+        }
+    });
+}
+
+// Handle update status action
+function updateStatus(id, status){
+    $.ajax({
+        url: "/admin/products/review/"+id+"/updateStatus/"+status,
+        type: 'POST',
+        beforeSend: function() {
+            $('#modal-delete-review').modal('hide');
+            MyApp.loadingOverlay.show();
+        },
+        error: function(data ) {
+            resp = JSON.parse(data.responseText);
+            toastr["error"](resp.message, "Error")
+        },
+        success: function(resp) {
+            $('#action option[value=""]').prop('selected', true);
+
+            if(resp.meta.total != 0){
+                toastr["success"](resp.message, "Succes")
+                $('#action').hide();
+                $('#reject-'+id).remove();
+                $('#approve-'+id).remove();
+            }else{
+                toastr["error"](resp.message, "Error")
+            }
+        },
+        complete: function(xhr) {
+            MyApp.loadingOverlay.hide();
+            try {
+                resp = JSON.parse(xhr.responseText);
+            } catch (e) {
+                toastr["error"]("Something went wrong.", "Error")
+            }
+        }
+    });
+}
+</script>

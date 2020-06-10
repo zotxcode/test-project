@@ -1,0 +1,15 @@
+@(field: Field, label: String = "", style: String = "")
+<div class="form-group @style ">
+    <label for="@field.id">&nbsp;</label>
+    <div class="checkbox">
+        <label>
+        <input type="checkbox"
+             name="@field.name"
+             id="@field.id"
+             value="true"
+             @if(field.value.contains("true")){checked="checked"}> @label
+         </label>
+
+    </div>
+
+</div>

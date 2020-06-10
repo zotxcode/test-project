@@ -1,0 +1,164 @@
+@(title: String, action: String, formData: Form[models.ProductVariantGroup], url: play.api.mvc.Call, listsBaseAttribute: Map[Integer, String])
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Products")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id->"form-save") {
+                    <div class="box-body">
+                        @mytext(formData("id"), "", "", "hidden")
+                        @mytext(formData("name"), "Group Name *")
+                        <div class="row">
+                            <div class="form-group col-xs-12">
+                                <label>Base Attribute *</label>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <select id="baseattribute" name="base_attribute_list[]" class="form-control" data-placeholder="Please select base attribute">
+                                            <option value="" ></option>
+                                            @for((k,v) <- listsBaseAttribute){<option value="@k" >@v</option>}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                <label>Product Name / SKU</label>
+                                <div class="row">
+                                    <div class="col-xs-5">
+                                        <input type="text" id="productName" name="productName" class="form-control">
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <button type="button" id="btnsearch" class="btn btn btn-primary btn-sm form-control">
+                                            <i class="fa fa-search"></i> &nbsp; Search
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table id="listTables" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Product SKU</th>
+                                <th>Product Name</th>
+                                <th>Price (IDR)</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                        </table>
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.ProductVariantGroupController.index(), action.equalsIgnoreCase("add"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+}
+
+<script type="text/javascript">
+var table;
+$(document).ready(function(){
+        $("#baseattribute").select2({
+            multiple:true
+        });
+        $('#receivedDate').datepicker({
+            todayHighlight: true,
+            autoclose: true
+        });
+        $("#productName").keyup(function(event){
+            if(event.keyCode == 13){
+                table.ajax.reload();
+            }
+        });
+       table = $("#listTables").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "@controllers.admin.routes.ProductVariantGroupController.listsProductBySKUName()",
+                "data": function(data) {
+                    data.filter = $('#productName').val(),
+                    data.idGroup = $('#id').val()
+                }
+            },
+            columnDefs : [
+                { targets: 0, sortable: false, width: "20px"},
+                { targets: 1, sortable: false},
+                { targets: 3, sortable: false},
+                { targets: 4, sortable: false}
+            ],
+            order: [[ 2, "asc" ]],
+            "fnDrawCallback": function() {
+                $('.btn-delete').on('click', function(){
+                    $(this).closest("tr").remove();
+                });
+            }
+        });
+        $('#listTables_filter').hide();
+        $('#btnsearch').on('click', function(){
+            table.ajax.reload();
+        });
+
+        oTable = $('#listTables').DataTable();
+
+        $('#listTables_length').hide();
+
+    $("#form-save").validate({
+        ignore:[],
+        rules: {
+            name: "required",
+            'base_attribute_list[]': {required: true}
+        },
+        messages: {
+            name: "Name is required",
+            'base_attribute_list[]': {required: "Base attribute is required"}
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            form.submit();
+        }
+    });
+});
+
+
+</script>

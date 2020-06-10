@@ -1,0 +1,31 @@
+@(title: String, action: String, data: ContactUs)
+
+@import views.html.admin.helper._
+@views.html.admin.main(action + " " + title){
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Customer")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    <div class="box-body">
+                        <h3 class="box-title">@data.name - @data.email</h3>
+                        @Html.apply(data.content)
+                    </div>
+                    <div class="box-footer">
+                        <a class="btn btn-primary" href="@controllers.admin.routes.ContactUsController.index()">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+}

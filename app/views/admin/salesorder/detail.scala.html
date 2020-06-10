@@ -1,0 +1,300 @@
+@(title: String, action: String, data: models.SalesOrder)
+
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title ){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Shop")
+
+    <section class="content">
+        <div class="row">
+            @myalert()
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div class="header pull-left">
+                            <h3 class="box-title title-module">@action @title</h3>
+                        </div>
+
+                        <div class="add pull-right">
+                            <a class="btn btn-info btn-sm" href="@controllers.admin.routes.SalesOrderController.index()">
+                                <i class="fa fa-arrow-left"></i> Back
+                            </a>
+                        </div>
+                    </div>
+                    <form class="form-horizontal col-xs-12">
+                        <div class="form-group">
+                            <label class="col-sm-2">Order No</label>
+                            <div class="col-sm-10">
+                                @data.orderNumber
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2">Customer</label>
+                            <div class="col-sm-10">
+                              @data.member.fullName
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2">Reseller</label>
+                            <div class="col-sm-10">
+                              @data.reseller.fullName
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2">Date</label>
+                            <div class="col-sm-10">
+                                @data.getTanggal()
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2">Total</label>
+                            <div class="col-sm-10">
+                                Rp @data.getTotalFormat()
+                            </div>
+                        </div>
+                    </form>
+                    <div class="box-body"></div>
+                </div>
+                
+				
+				<div class="box box-primary">
+                       <div class="box-header with-border">
+                            <div class="row">
+                                <div class="col-sm-6">
+								@for(sdata <- data.salesOrderDetail){
+                                    <b>Status : </b>@sdata.getStatus()
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table id="listTables" class="table table-no-bordered">
+                                <tbody>
+                                
+                                    <tr>
+                                        <th width="50px"><img src="@sdata.getImage()" width="50px"></th>
+                                        <th>name : @sdata.productName
+                                           @*<br>color : <span class="box-title"><a>@sdata.getColor()</a></span>*@
+                                        </th>
+                                        <th width="150px">@sdata.getPriceString()</th>
+                                        <th width="50px">x @sdata.quantity</th>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                            <br/>
+                            <b>Tracking Number: </b>@data.trackingNumber
+                            
+                        </div>
+                    </div>
+				
+				<div class="row">
+                   <div class="col-xs-3">
+                        <div class="box box-primary">
+                            <div class="box-header">
+                                <h3 class="box-title">Billing Address</h3>
+                            </div>
+                            <div class="box-body">
+								<p>@Html(HtmlFormat.escape(data.getBillingAddress()).toString.replace("\n", "<br />"))</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xs-6">
+                        <div class="box box-primary">
+                            <div class="box-header">
+                                <h3 class="box-title">Total</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <p>Sub Total</p>
+                                    </div>
+                                    <div class="col-sm-6 text-right">
+                                        <b>@data.getSubTotalFormat()</b>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <p>Discount</p>
+                                    </div>
+                                    <div class="col-sm-6 text-right">
+                                        <b>@data.getDiscountFormat()</b>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <p>Voucher</p>
+                                    </div>
+                                    <div class="col-sm-6 text-right">
+                                        <b>@data.getVoucherFormat()</b>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <p>Shipping</p>
+                                    </div>
+                                    <div class="col-sm-6 text-right">
+                                        <b>@data.getShippingFormat()</b>
+                                    </div>
+                                </div>
+                                <hr/>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <p>Total</p>
+                                    </div>
+                                    <div class="col-sm-6 text-right">
+                                        <b>@data.getTotalFormat()</b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+
+
+}
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $.validator.addMethod("valueNotEquals", function(value, element, arg){
+        return arg != value;
+    }, "Value must not equal arg.");
+
+    $.validator.addMethod("validateTracking", function(value, element, arg){
+        if(value == "" && $('#status').val() == "OD")
+            return false;
+        else return true;
+    }, "Tracking Number is required");
+
+    $("#formUpdate").validate({
+        ignore:[],
+        rules: {
+            status: {valueNotEquals : ""},
+            tracking_number : {validateTracking : true}
+        },
+        messages: {
+            status: {valueNotEquals : "Please select status"}
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            form.submit();
+        }
+    });
+});
+function updateStatus(id, status) {
+    $('#modal-update').modal('show');
+    $('#formUpdate')[0].reset();
+    $('#div_tracking').hide();
+    $("#update_id").val(id);
+    switch(status) {
+        case "OV":
+            disableOption('OV,EX');
+            break;
+        case "EX":
+            disableOption('OV,EX');
+            break;
+        case "PA":
+            disableOption('OV,EX,PA');
+            break;
+        case "OD":
+            disableOption('OV,EX,PA,OD');
+            break;
+        case "RC":
+            disableOption('OV,EX,PA,OD,RC,NA');
+            break;
+        case "NA":
+            disableOption('OV,EX,PA,OD,RC,NA');
+            break;
+        case "CA":
+            disableOption('OV,EX,PA,OD,RC,NA,CA,CC');
+            break;
+        case "CC":
+            disableOption('OV,EX,PA,OD,RC,NA,CA,CC');
+            break;
+    }
+};
+
+function disableOption(list) {
+    enableAllOption();
+    var res = list.split(",");
+    for (var i = 0; i < res.length; i++) {
+        $("#status option[value='"+res[i]+"']").attr('disabled','disabled');
+    }
+};
+
+function enableAllOption() {
+    var list = 'WC,OV,EX,PI,PA,OD,RC,NA,CA,RT,RP,CC';
+    var res = list.split(",");
+    for (var i = 0; i < res.length; i++) {
+        $("#status option[value='"+res[i]+"']").removeAttr('disabled');
+    }
+};
+
+$('.submit-update').on('click', function() {
+    if($('#status').valid() && $('#tracking_number').valid()){
+        $('#formUpdate').ajaxSubmit({
+            dataType: 'json',
+            beforeSend: function() {
+                $('#modal-update').modal('hide');
+                MyApp.loadingOverlay.show();
+            },
+            uploadProgress: function(event, position, total, percentComplete) {
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                toastr["success"]("Data success updated", "Success");
+                location.reload();
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('terjadi kesalahan');
+                }
+            }
+        });
+    }
+});
+
+$('#status').on('change', function(){
+    if($(this).val() == 'OD'){
+        $('#div_tracking').show();
+    }else $('#div_tracking').hide();
+});
+$('#div_tracking').hide();
+
+function trackingOrder(id) {
+    $('#modal-tracking-status').modal('show');
+    $("#modal-tracking-status-body").load("/admin/shop/orders/"+id+"/trackingStatus", function(responseTxt, statusTxt, xhr){
+        if(statusTxt == "error")
+            alert("Error: " + xhr.status + ": " + xhr.statusText);
+    });
+};
+</script>

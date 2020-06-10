@@ -1,0 +1,152 @@
+@(title: String, action: String, formData: Form[models.Bank], url: play.api.mvc.Call)
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Shop")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id->"form-save", 'enctype -> "multipart/form-data") {
+                    <div class="box-body">
+                        @mytext(formData("id"), "", "", "hidden")
+                        @mytext(formData("bankName"), "Bank Name *")
+                        @mytext(formData("accountName"), "Account Name *")
+                        @mytext(formData("accountNumber"), "Account Number *")
+                        @mytext(formData("description"), "Description")
+                        <div class="form-group">
+                            <label>Image </label>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <button type="button" name="addimage" id="addimage" class="btn btn-primary">Show Image</button>
+                                </div>
+                                <div class="col-md-8 col-sm-10 col-xs-12 margin-show">
+                                    <div id="box-add-image" class="box box-info box-solid">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Add Images</h3>
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="col-md-12">
+                                                @mytext(formData("imageName"), "Image Name *")
+                                                @mytext(formData("imageTitle"), "Meta Title *")
+                                                @mytext(formData("imageKeyword"), "Meta Keyword *")
+                                                @mytext(formData("imageDescription"), "Meta Description *")
+                                                @myfile(formData("imageUrl"), "Image", "", "", "preview","Image dimensions : 55x40")
+                                                <div >
+                                                    <img id="preview" src="@formData("imageLink").value"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @mytoglecheckbox(formData("status"), "Status")
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.BankController.index(), action.equalsIgnoreCase("add"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#box-add-image').hide();
+
+    $('#addimage').on('click', function() {
+        if($('#box-add-image').is(":visible")){
+            $('#box-add-image').hide();
+            $('#addimage').text('Show Image');
+        }else{
+            $('#box-add-image').show();
+            $('#addimage').text('Hide Image');
+        }
+    });
+
+    $("#form-save").validate({
+        ignore: [],
+        rules: {
+            bankName: "required",
+            accountName: "required",
+            accountNumber: {
+                required: true,
+                number: true
+            },
+            imageName: "required",
+            imageTitle: "required",
+            imageKeyword: "required",
+            imageDescription: "required"
+        },
+        messages: {
+            bankName: "Bank name is required",
+            accountName: "Account name is required",
+            accountNumber: {
+                required: "Account number is required"
+            }
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            form.submit();
+        }
+    });
+});
+
+var loadFile = function(event, previewId, fileId) {
+    var output = document.getElementById(previewId);
+    output.src = URL.createObjectURL(event.target.files[0]);
+    var $img = $('#'+previewId);
+    $img.on('load', function(){
+        var imageWidth = $(this).prop('naturalWidth');
+        var imageHeight = $(this).prop('naturalHeight');
+        $('#'+fileId).removeData('imageWidth');
+        $('#'+fileId).removeData('imageHeight');
+
+        $('#'+fileId).data('imageWidth', imageWidth);
+        $('#'+fileId).data('imageHeight', imageHeight);
+    });
+};
+$('#bankName').on('change', function(){
+	$('#imageName').val($(this).val());
+	$('#imageTitle').val($(this).val());
+	$('#imageKeyword').val($(this).val());
+	$('#imageDescription').val($(this).val());
+})
+</script>

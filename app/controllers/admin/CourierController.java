@@ -1,0 +1,228 @@
+package controllers.admin;
+
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Page;
+import com.avaje.ebean.Transaction;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.enwie.api.BaseResponse;
+import com.enwie.util.CommonFunction;
+import controllers.BaseController;
+import models.*;
+import play.data.Form;
+import play.libs.Json;
+import play.mvc.Http;
+import play.mvc.Result;
+import play.mvc.Security;
+import play.twirl.api.Html;
+import views.html.admin.courier.*;
+
+import java.io.File;
+import java.util.*;
+
+public class CourierController extends BaseController {
+    private static final String TITLE = "Master Courier";
+    private static final String TITLE_SERVICE = "Service";
+    private static final String TITLE_POINT = "Pick Up Point";
+    private static final String featureKey = "courier";
+
+
+    private static Html htmlList(){
+        RoleFeature feature = getUserAccessByFeature(featureKey);
+        return list.render(TITLE, "List", feature);
+    }
+
+    private static Html htmlEdit(Form<Courier> data){
+        return _form.render(TITLE, "Edit", data, routes.CourierController.update());
+    }
+
+    private static Html htmlAdd(Form<Courier> data){
+        return _form.render(TITLE, "Add", data, routes.CourierController.save());
+    }
+
+    @Security.Authenticated(Secured.class)
+    public static Result index() {
+        return ok(htmlList());
+    }
+
+    @Security.Authenticated(Secured.class)
+    public static Result add() {
+        Courier courier = new Courier();
+        Form<Courier> formData = Form.form(Courier.class).fill(courier);
+        return ok(htmlAdd(formData));
+    }
+
+    @Security.Authenticated(Secured.class)
+    public static Result edit(Long id) {
+        Courier dt = Courier.find.byId(id);
+        Form<Courier> formData = Form.form(Courier.class).fill(dt);
+        return ok(htmlEdit(formData));
+    }
+
+    @Security.Authenticated(Secured.class)
+    public static Result lists() {
+        RoleFeature feature = getUserAccessByFeature(featureKey);
+        Map<String, String[]> params = request().queryString();
+
+
+        Integer iTotalRecords = Courier.findRowCount(getBrandId());
+        String name = params.get("search[value]")[0];
+
+
+        Integer pageSize = Integer.valueOf(params.get("length")[0]);
+        Integer page = Integer.valueOf(params.get("start")[0]) / pageSize;
+
+        String sortBy = "name";
+        String order = params.get("order[0][dir]")[0];
+
+        switch (Integer.valueOf(params.get("order[0][column]")[0])) {
+            case 1 :  sortBy = "id"; break;
+            case 2 :  sortBy = "name"; break;
+        }
+
+        Page<Courier> datas = Courier.page(page, pageSize, sortBy, order, name, getBrandId());
+        Integer iTotalDisplayRecords = datas.getTotalRowCount();
+
+        ObjectNode result = Json.newObject();
+
+        result.put("draw", Integer.valueOf(params.get("draw")[0]));
+        result.put("recordsTotal", iTotalRecords);
+        result.put("recordsFiltered", iTotalDisplayRecords);
+
+        ArrayNode an = result.putArray("data");
+        int num = Integer.valueOf(params.get("start")[0]) + 1;
+        for (Courier dt : datas.getList()) {
+
+            ObjectNode row = Json.newObject();
+            String action = "";
+            if(feature.isEdit()){
+                action += "<a class=\"btn btn-primary btn-sm action\" href=\""+ routes.CourierController.edit(dt.id)+"\"><i class=\"fa fa-pencil\"></i></a>&nbsp;" ;
+            }
+//            if(feature.isDelete()){
+//                action += "<a class=\"btn btn-danger btn-sm action\" href=\"javascript:deleteData("+dt.id+");\"><i class=\"fa fa-trash\"></i></a>&nbsp;";
+//            }
+
+            row.put("0", dt.id.toString());
+            row.put("1", num);
+            row.put("2", dt.code);
+            row.put("3", dt.name);
+            row.put("4", dt.getImageUrl());
+            row.put("5", action);
+            an.add(row);
+            num++;
+        }
+
+        return ok(result);
+    }
+
+    @Security.Authenticated(Secured.class)
+    public static Result save() {
+        Form<Courier> form = Form.form(Courier.class).bindFromRequest();
+        if (form.hasErrors()){
+            flash("error", "Please correct errors bellow.");
+            return badRequest(htmlAdd(form));
+        }else{
+            Http.MultipartFormData body = request().body().asMultipartFormData();
+            Courier data = form.get();
+            Transaction txn = Ebean.beginTransaction();
+            try {
+                Http.MultipartFormData.FilePart picture = body.getFile("imageUrl");
+                File newFile = Photo.uploadImageCrop2(picture, "cou", CommonFunction.slugGenerate(data.name), data.imageUrlX, data.imageUrlY, data.imageUrlW, data.imageUrlH, Photo.courrierImageSize, "jpg");
+
+                UserCms cms = getUserCms();
+                data.userCms = cms;
+                data.brand = getBrand();
+                data.imageUrl = newFile != null ? Photo.createUrl("cou", newFile.getName()) : "";
+                data.save();
+
+                String roleKey = cms.role.key;
+                if (newFile != null){
+                    Photo.saveRecord("cou", newFile.getName(), "", "", "", picture.getFilename(), cms.id, roleKey,
+                            "Courier", data.id);
+                }
+
+                txn.commit();
+            }catch (Exception e) {
+                e.printStackTrace();
+                txn.rollback();
+                flash("error", "Please correct errors bellow.");
+                return badRequest(htmlAdd(form));
+            } finally {
+                txn.end();
+            }
+            flash("success", TITLE + " instance created");
+            if (data.save.equals("1")){
+                return redirect(routes.CourierController.index());
+            }else{
+                return redirect(routes.CourierController.add());
+            }
+        }
+    }
+
+    @Security.Authenticated(Secured.class)
+    public static Result update() {
+        Form<Courier> form = Form.form(Courier.class).bindFromRequest();
+        if (form.hasErrors()){
+            flash("error", "Please correct errors bellow.");
+            return badRequest(htmlAdd(form));
+        }else{
+            Courier data = form.get();
+            Transaction txn = Ebean.beginTransaction();
+            Http.MultipartFormData body = request().body().asMultipartFormData();
+            try {
+                UserCms cms = getUserCms();
+
+                Http.MultipartFormData.FilePart picture = body.getFile("imageUrl");
+                File newFile = Photo.uploadImageCrop2(picture, "cou", CommonFunction.slugGenerate(data.name), data.imageUrlX, data.imageUrlY, data.imageUrlW, data.imageUrlH, Photo.courrierImageSize, "jpg");
+                String roleKey = cms.role.key;
+                if (newFile != null){
+                    data.imageUrl = Photo.createUrl("cou", newFile.getName());
+                    Photo.saveRecord("cou", newFile.getName(), "", "", "", picture.getFilename(), cms.id, roleKey,
+                            "Courier", data.id);
+                }
+
+                data.update();
+
+                txn.commit();
+            }catch (Exception e) {
+                e.printStackTrace();
+                txn.rollback();
+                flash("error", "Please correct errors bellow.");
+                return badRequest(htmlAdd(form));
+            } finally {
+                txn.end();
+            }
+            flash("success", TITLE + " instance edited");
+            return redirect(routes.CourierController.index());
+        }
+    }
+
+    @Security.Authenticated(Secured.class)
+    public static Result delete(String id) {
+        Ebean.beginTransaction();
+        int status = 0;
+        try {
+            for (String aTmp : id.split(",")) {
+                Courier data = Courier.findById(Long.parseLong(aTmp), getBrandId());
+                data.isDeleted = true;
+                data.update();
+                status = 1;
+            }
+
+            Ebean.commitTransaction();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Ebean.rollbackTransaction();
+            status = 0;
+        } finally {
+            Ebean.endTransaction();
+        }
+
+        BaseResponse response = new BaseResponse();
+        String message = status == 1 ? "Data success deleted" : "Data failed deleted";
+
+        response.setBaseResponse(status, offset, 1, message, null);
+        return ok(Json.toJson(response));
+    }
+
+}

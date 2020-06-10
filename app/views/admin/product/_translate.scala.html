@@ -1,0 +1,109 @@
+@*(title: String, action : String, url: play.api.mvc.Call, formData: models.Product, languages : List[models.Language], map : HashMap[models.Language, models.ProductDetailTranslation])*@
+@(title: String, action : String, url: play.api.mvc.Call, formData: models.Product)
+
+@import helper._
+@import views.html.admin.helper._;
+@views.html.admin.main(title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    <section class="content-header">
+        <h1>
+            @title
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#">Products</a></li>
+            <li class="active">@title</li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    @form(url, 'role->"form", 'id->"form-save", 'enctype -> "multipart/form-data") {
+                    <div class="box-body">
+                        <div class="table-responsive">
+                            <table id="listTable" class="table table-bordered table-striped" style="overflow-x:scroll">
+                                <thead>
+                                <tr>
+                                    <th>Language</th>
+                                    <th>Name</th>
+                                    <th>Short Description</th>
+                                    <th>Detail Description</th>
+                                    <th>What's In The Box</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>English</td>
+                                    <td><input type="text" size="60"></td>
+                                    <td><input type="text" size="60"></td>
+                                    <td><button class="btn btn-primary" type="button" onclick="showContent(1)">Show</button></td>
+                                    <td><textarea name="" rows="3" cols="40"></textarea></td>
+                                </tr>
+                                @*for(m <- map){
+                                <tr>
+                                    <td></td>
+                                    <td><input type="text" size="60"></td>
+                                    <td><input type="text" size="60"></td>
+                                    <td><button class="btn btn-primary" type="button" onclick="showContent(1)">Show</button></td>
+                                    <td><textarea name="" rows="3" cols="40"></textarea></td>
+                                </tr>
+                                }*@
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <button type="submit" name="save" value="1" id="btn_save" class="btn btn-primary pull-right">Save</button>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+<div id="modal-content" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+            </div>
+            <form id="formApprove" action="" method="post">
+                <div class="modal-body">
+                    <textarea id="content" rows="3" cols="200">kumaha</textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                    <button type="button" class="btn btn-primary submit-approve">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+}
+<script>
+$(function () {
+    CKEDITOR.replace( 'content',
+        {
+            filebrowserBrowseUrl :'/admin/ckeditor/browser?Connector=/admin/ckeditor/connector',
+            filebrowserImageBrowseUrl : '/admin/ckeditor/browser?Type=Image&Connector=/admin/ckeditor/connector',
+            filebrowserFlashBrowseUrl :'/admin/ckeditor/browser?Type=Flash&Connector=/admin/ckeditor/connector',
+            filebrowserUploadUrl  :'/admin/ckeditor/upload?Type=File',
+            filebrowserImageUploadUrl : '/admin/ckeditor/upload?Type=Image',
+            filebrowserFlashUploadUrl : '/admin/ckeditor/upload?Type=Flash'
+        });
+});
+// Handle delete action
+function showContent(id){
+    $('#modal-content').modal('show');
+    $('#content').val('samimawon <a href>samimawon</a>');
+}
+</script>

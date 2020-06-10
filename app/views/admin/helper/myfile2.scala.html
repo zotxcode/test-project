@@ -1,0 +1,19 @@
+@(field: Field, label: String = "CHANGEME", placeholder: String = "", style : String = "", event:String="", desc:String="", width:Integer=0,height:Integer=0)
+
+<div class="form-group @style @if(field.hasErrors) {has-error}">
+    <label>@label</label>
+    <input type="file"
+           id="@field.id"
+           name="@field.name"
+           accept="image/*"
+           onchange="loadFile2(event, '@event', '@field.id', @width, @height)"
+    placeholder="@placeholder" />
+    @if(desc != ""){
+        <span class="form-information-label clearfix">@desc</span>
+    }
+    <span class="help-block">@{field.error.map { error => error.message }}</span>
+    <input type="hidden" id="@{field.id + 'X'}" name="@{field.id + 'X'}" value="0"/>
+    <input type="hidden" id="@{field.id + 'Y'}" name="@{field.id + 'Y'}" value="0"/>
+    <input type="hidden" id="@{field.id + 'W'}" name="@{field.id + 'W'}" value="0"/>
+    <input type="hidden" id="@{field.id + 'H'}" name="@{field.id + 'H'}" value="0"/>
+</div>

@@ -1,0 +1,1561 @@
+@(title: String, action : String, url: play.api.mvc.Call, formData: Form[models.Product], listsCategory: Map[Integer, String], listsSubCategory: Map[Integer, String], listsSubSubCategory: Map[Integer, String], listsType: Map[Integer, String], listsBaseAttribute: List[BaseAttribute], listsAttribute: List[Attribute], listsDiscountType: Map[Integer, String]
+, listsCurrency: Map[String, String], listsWarranty: Map[Integer, String], listsShortDescription: Map[Integer, String], listsImage :List[String], listsSize: Map[Integer, String], listsSizeId: List[Size], isEversac: Boolean, listsColor :List[String], listProducts: Map[Integer, String])
+
+@import helper._
+@import views.html.admin.helper._; var idxImage=1; var b=1; var bool=false; var idxImageColor=1;var idxAttr=1;
+@views.html.admin.main(title){
+<!-- Content Wrapper. Contains page content -->
+<style>
+.container-outer {
+    margin: 0 auto;
+    overflow: scroll;
+    width: 856px;
+    height: 440px;
+}
+</style>
+<div class="content-wrapper">
+
+    <section class="content-header">
+        <h1>
+            @title
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#">Products</a></li>
+            <li class="active">@title</li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            <div class="col-xs-12">
+                <!-- Custom Tabs -->
+
+            </div>
+            <!-- /.col -->
+
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    @form(url, 'role->"form", 'id->"form-save", 'enctype -> "multipart/form-data") {
+                    <div class="box-body">
+                        <div class="nav-tabs-custom">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#tab_1">Name & Category</a></li>
+                                <li ><a href="#tab_2">Detail</a></li>
+                                <li ><a href="#tab_3">Description</a></li>
+                                <li ><a href="#tab_4">Also View</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="tab_1">
+                                    @*<div class="row">
+                                        <div class="form-group col-xs-12">
+                                            <label for="newProduct">New Product ?</label>&nbsp;&nbsp;&nbsp;
+                                            <input id="newProduct" type="checkbox" value="true" name="newProduct">
+                                        </div>
+                                    </div>
+                                    <div class="row" id="div-name-select">
+                                        @myselect(formData("idtmp"), "Product Name *", listsMerchant, "col-xs-12")
+                                    </div>*@
+                                    <div id="div-name-text">
+                                        @mytext(formData("name"), "Product Name *")
+                                    </div>
+                                    @mytext(formData("title"), "Meta Title *")
+                                    @mytext(formData("keyword"), "Meta Keyword *")
+                                    @mytext(formData("description"), "Meta Description *")
+                                    <div class="form-group">
+                                        <label for="category">Category *</label>
+                                        <div class="row">
+                                            <div class="col-xs-6">
+                                                @*if(k==Integer.valueOf(formData("categoryId").value.getOrElse("0"))) {selected="selected"}*@
+                                                <select id="category" name="categoryId" class="form-control select2" style="width: 100%;">
+                                                    <option value="0" selected="selected"></option>
+                                                    @for((k,v) <- listsCategory){<option value="@k" @if(k==Integer.valueOf(formData("categoryId").value)){selected="selected"}>@v</option>}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="subcategory">Sub Category *</label>
+                                        <div class="row">
+                                            <div class="col-xs-6">
+                                                <select id="subcategory" name="subCategoryId" class="form-control select2" style="width: 100%;">
+                                                    <option value="0" selected="selected"></option>
+                                                    @for((k,v) <- listsSubCategory){<option value="@k" @if(k==Integer.valueOf(formData("subCategoryId").value)) {selected="selected"}>@v</option>}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="subsubcategory">Sub Category *</label>
+                                        <div class="row">
+                                            <div class="col-xs-6">
+                                                <select id="subsubcategory" name="subSubCategoryId" class="form-control select2" style="width: 100%;">
+                                                    <option value="0" selected="selected"></option>
+                                                    @for((k,v) <- listsSubSubCategory){<option value="@k" @if(k==Integer.valueOf(formData("subSubCategoryId").value)) {selected="selected"}>@v</option>}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+									
+						
+                                </div>
+                                <!-- /.tab-pane -->
+                                <div class="tab-pane" id="tab_2">
+                                    <div class="row">
+                                        @mytext(formData("id"), "", "", "hidden")
+                                        @mytext(formData("idImagetmp"), "", "", "hidden")
+                                        <div class="col-xs-6">
+                                            @mytext(formData("sku"), "SKU ID *")
+                                            @mytext(formData("articleCode"), "Article Code *")
+                                            @*<div class="row">*@
+                                                @*@myselect(formData("productType"), "Product Type *", listsType, "col-xs-12", false)*@
+                                            @*</div>*@
+                                            <div class="form-group">
+                                                <label >Size</label>
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        @for((k,v) <- listsSize){
+                                                            @{bool = false}
+                                                            @for((x) <- listsSizeId){
+                                                                @if(k == x.id){
+                                                                    @{bool = true}
+                                                                }
+                                                            }
+                                                            <div class="col-xs-2">
+                                                            <input type="checkbox"
+                                                               name="sizeids[]"
+                                                               value="@k"
+                                                                @if(bool == true){checked="checked"}
+                                                            > @v
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @mytext(formData("weight"), "Weight (Gram) *")
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <label id="lbl_dimension">Dimensi (cm x cm x cm) *</label>
+                                                </div>
+                                                <div class="col-xs-12">
+                                                    <div id="div_dimension1" class="row form-group text col-xs-3">
+                                                        <input type="text" placeholder="" value="@formData("dimension1").value" name="dimension1" id="dimension1" class="form-control">
+                                                    </div>
+                                                    <div class="form-group text col-xs-1">
+                                                        <span class="label-control">x</span>
+                                                    </div>
+                                                    <div id="div_dimension2" class="form-group text col-xs-3">
+                                                        <input type="text" placeholder="" value="@formData("dimension2").value" name="dimension2" id="dimension2" class="form-control">
+                                                    </div>
+                                                    <div class="form-group text col-xs-1">
+                                                        <div class="row">
+                                                            <span class="label-control">x</span>
+                                                        </div>
+                                                    </div>
+                                                    <div id="div_dimension3" class="form-group text col-xs-3">
+                                                        <input type="text" placeholder="" value="@formData("dimension3").value" name="dimension3" id="dimension3" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row col-xs-12">
+                                                <h3>Attribute</h3>
+                                                <div class="row col-xs-12">
+                                                    <table class="table table-bordered table-striped dataTable no-footer" id="table-attribute">
+                                                        <thead>
+                                                            <th>Name</th>
+                                                            <th>Value</th>
+                                                        </thead>
+                                                        <tbody>
+                                                        @for((v) <- listsBaseAttribute){
+                                                        <tr>
+                                                            <td>@v.name</td>
+                                                            <td>
+                                                                <select id="listAttribute@{idxAttr}" name="listAttribute[]" class="form-control select-attribute multiple-select">
+                                                                    <option value="0" >Not Available</option>
+                                                                @for((y) <- v.attributesData){
+                                                                    @{bool = false}
+                                                                    @for((x) <- listsAttribute){
+                                                                        @if(y.id == x.id){
+                                                                            @{bool = true}
+                                                                        }
+                                                                    }
+                                                                    <option value="@y.id" @if(bool){ischeck="ischeck"}>@y.value</option>
+                                                                }
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                            @{idxAttr=idxAttr+1}
+                                                        }
+                                                        </tbody>
+                                                    </table>
+                                                    <label id="attribute-error" class="error" for="" style="display:none;">Minimum 1 attribute is required</label>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                @myselect(formData("warrantyType"), "Warranty", listsWarranty, "col-xs-12")
+                                            </div>
+                                            @mytext(formData("warrantyPeriod"), "Warranty Period (months)")
+
+                                            <div class="row col-xs-12">
+                                            <h3>Image Product</h3>
+                                                <span class="clearfix" style="color:green;">Please upload images with dimensions 1200x1200px</span>
+                                            @for((v) <- listsImage){
+                                                <div class="row col-xs-12">
+                                                    <img class="col-xs-2 img-responsive" alt="" src="@v">
+                                                    <input type="file" id="imageUrl@idxImage" placeholder="Replace" accept="image/*" name="imageUrl@idxImage" accept="image/*"
+                                                           onchange="loadFile3(event, 'preview@idxImage', 'imageUrl@idxImage', 1200,1200)">
+                                                    <input type="hidden" id="imageUrl@{idxImage}X" name="imageUrl@{idxImage}X" value="0"/>
+                                                    <input type="hidden" id="imageUrl@{idxImage}Y" name="imageUrl@{idxImage}Y" value="0"/>
+                                                    <input type="hidden" id="imageUrl@{idxImage}W" name="imageUrl@{idxImage}W" value="0"/>
+                                                    <input type="hidden" id="imageUrl@{idxImage}H" name="imageUrl@{idxImage}H" value="0"/>
+                                                    <a href="#" data-toggle="modal" data-target="#modal-preview@idxImage">Preview</a>
+                                                </div>
+                                                @{idxImage=idxImage+1}
+                                            }
+                                            @if(idxImage < 6){
+                                                @for(a <- idxImage to 5){
+                                                    <input type="file" placeholder="Replace" accept="image/*" id="imageUrl@a" name="imageUrl@a" accept="image/*"
+                                                           onchange="loadFile3(event, 'preview@a', 'imageUrl@a', 1024,1497)">
+                                                <input type="hidden" id="imageUrl@{a}X" name="imageUrl@{a}X" value="0"/>
+                                                <input type="hidden" id="imageUrl@{a}Y" name="imageUrl@{a}Y" value="0"/>
+                                                <input type="hidden" id="imageUrl@{a}W" name="imageUrl@{a}W" value="0"/>
+                                                <input type="hidden" id="imageUrl@{a}H" name="imageUrl@{a}H" value="0"/>
+                                                    <a href="#" data-toggle="modal" data-target="#modal-preview@a">Preview</a>
+                                                }
+
+                                            }
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            @*<div class="row">
+                                                <div class="form-group col-xs-12">
+                                                    <label>Currency *</label>
+                                                    <select id="currencyCode" name="currencyCode" class="form-control select2" style="width: 100%;">
+                                                        @for((k,v) <- listsCurrency){
+                                                            <option value="@k" @if(formData("currencyCode").value.equals(k)) {selected="selected"}>@v</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>*@
+                                            @mytextnumeric(formData("buyPrice"), "Buy Price *")
+                                            @mytextnumeric(formData("price"), "Sell Price *")
+
+                                            <div class="row">
+                                                <div class="form-group col-xs-12">
+                                                    <label for="">Profit for Support System</label>
+                                                </div>
+                                                <div class="form-group col-xs-6">
+                                                    <select name="pss_type" class="form-control">
+                                                        <option value="0" >Value</option>
+                                                        <option value="1" >Percentage</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-xs-6">
+                                                    <div class="input-group">
+                                                        <div class="input-group-addon">Rp</div>
+                                                        <input type="text" class="form-control input_currency" id="pss_value"
+                                                               name="@formData("profitSSValue").name" value="@formData("profitSSValue").value" />
+                                                    </div>
+                                                    <div class="input-group hide">
+                                                        <input type="number" class="form-control" id="pss_percentage"
+                                                               name="@formData("profitSSPercentage").name" value="@formData("profitSSPercentage").value" min="0" max="100" disabled />
+                                                        <div class="input-group-addon">%</div>
+                                                    </div>
+                                                    <span class="help-block"></span>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-xs-12">
+                                                    <label for="">Profit for Distributor</label>
+                                                </div>
+                                                <div class="form-group col-xs-6">
+                                                    <select name="pd_type" class="form-control">
+                                                        <option value="0" >Value</option>
+                                                        <option value="1" >Percentage</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-xs-6">
+                                                    <div class="input-group">
+                                                        <div class="input-group-addon">Rp</div>
+                                                        <input type="text" class="form-control input_currency" id="pd_value"
+                                                               name="@formData("profitDValue").name" value="@formData("profitDValue").value" />
+                                                    </div>
+                                                    <div class="input-group hide">
+                                                        <input type="number" class="form-control" id="pd_percentage"
+                                                               name="@formData("profitDPercentage").name" value="@formData("profitDPercentage").value" min="0" max="100" disabled />
+                                                        <div class="input-group-addon">%</div>
+                                                    </div>
+                                                    <span class="help-block"></span>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-xs-12">
+                                                    <label for="">Profit for Sub Distributor</label>
+                                                </div>
+                                                <div class="form-group col-xs-6">
+                                                    <select name="psd_type" class="form-control">
+                                                        <option value="0" >Value</option>
+                                                        <option value="1" >Percentage</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-xs-6">
+                                                    <div class="input-group">
+                                                        <div class="input-group-addon">Rp</div>
+                                                        <input type="text" class="form-control input_currency" id="psd_value"
+                                                               name="@formData("profitSDValue").name" value="@formData("profitSDValue").value" />
+                                                    </div>
+                                                    <div class="input-group hide">
+                                                        <input type="number" class="form-control" id="psd_percentage"
+                                                               name="@formData("profitSDPercentage").name" value="@formData("profitSDPercentage").value" min="0" max="100" disabled />
+                                                        <div class="input-group-addon">%</div>
+                                                    </div>
+                                                    <span class="help-block"></span>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-xs-12">
+                                                    <label for="">Profit for Reseller</label>
+                                                </div>
+                                                <div class="form-group col-xs-6">
+                                                    <select name="pr_type" class="form-control">
+                                                        <option value="0" >Value</option>
+                                                        <option value="1" >Percentage</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-xs-6">
+                                                    <div class="input-group">
+                                                        <div class="input-group-addon">Rp</div>
+                                                        <input type="text" class="form-control input_currency" id="pr_value"
+                                                               name="@formData("profitRValue").name" value="@formData("profitRValue").value" />
+                                                    </div>
+                                                    <div class="input-group hide">
+                                                        <input type="number" class="form-control" id="pr_percentage"
+                                                               name="@formData("profitRPercentage").name" value="@formData("profitRPercentage").value" min="0" max="100" disabled />
+                                                        <div class="input-group-addon">%</div>
+                                                    </div>
+                                                    <span class="help-block"></span>
+                                                </div>
+                                            </div>
+
+                                            @mytext(formData("itemCount"), "Stock *", "","text")
+                                            <!-- div class="row">
+                                                @mytextnumeric(formData("discount"), "Discount", "","text", "col-xs-6 ")
+                                                @myselect(formData("discountType"), "   ", listsDiscountType, "col-xs-6 ", false)
+                                            </div -->
+                                            <!--div class="row">
+                                                <div class="form-group col-xs-6">
+                                                    <label>Discount from </label>
+
+                                                    <div class="input-group date">
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-calendar"></i>
+                                                        </div>
+                                                        <input type="text" class="form-control pull-right" id="fromDate" value="@formData("fromDate").value" name="fromDate">
+                                                    </div>
+                                                    <!-- /.input group >
+                                                </div>
+                                                <div class="form-group bootstrap-timepicker col-xs-6">
+                                                    <div class="form-group">
+                                                        <label>&nbsp;</label>
+
+                                                        <div class="input-group">
+                                                            <div class="input-group-addon">
+                                                                <i class="fa fa-clock-o"></i>
+                                                            </div>
+                                                            <input type="text" class="form-control timepicker" value="@formData("fromTime").value" id="fromTime" name="fromTime">
+                                                        </div>
+                                                        <!-- /.input group >
+                                                    </div>
+                                                    <!-- /.form group >
+                                                </div>
+                                            </div -->
+                                            <!--div class="row">
+                                                <div class="form-group col-xs-6">
+                                                    <label>To</label>
+
+                                                    <div class="input-group date">
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-calendar"></i>
+                                                        </div>
+                                                        <input type="text" class="form-control pull-right" id="toDate" value="@formData("toDate").value" name="toDate">
+                                                    </div>
+                                                    <!-- /.input group >
+                                                </div>
+                                                <div class="form-group bootstrap-timepicker col-xs-6">
+                                                    <div class="form-group">
+                                                        <label>&nbsp;</label>
+
+                                                        <div class="input-group">
+                                                            <div class="input-group-addon">
+                                                                <i class="fa fa-clock-o"></i>
+                                                            </div>
+                                                            <input type="text" class="form-control timepicker" value="@formData("toTime").value" id="toTime" name="toTime">
+                                                        </div>
+                                                        <!-- /.input group >
+                                                    </div>
+                                                    <!-- /.form group >
+                                                </div>
+                                            </div -->
+                                            @mytext(formData("embededYoutube"), "Embeded Youtube *")
+
+                                            @*<label>Upload Thumbnail Youtube *</label>*@
+                                            @*<span class="clearfix" style="color:green;">Please upload images with dimensions 1024x1497px</span>*@
+
+                                            @*<img class="col-xs-2 img-responsive" alt="" src="@formData("imageYoutubeLink").value">*@
+                                            @*<input type="file" placeholder="Replace" accept="image/*" id="thumbnailYoutubeUr1" name="thumbnailYoutubeUr1" accept="image/*"*@
+                                            @*onchange="loadFile3(event, 'preview0_1', 'thumbnailYoutubeUr1', 1024,1497)">*@
+                                            @*<input type="hidden" id="thumbnailYoutubeUr1X" name="thumbnailYoutubeUr1X" value="0"/>*@
+                                            @*<input type="hidden" id="thumbnailYoutubeUr1Y" name="thumbnailYoutubeUr1Y" value="0"/>*@
+                                            @*<input type="hidden" id="thumbnailYoutubeUr1W" name="thumbnailYoutubeUr1W" value="0"/>*@
+                                            @*<input type="hidden" id="thumbnailYoutubeUr1H" name="thumbnailYoutubeUr1H" value="0"/>*@
+                                            @*<a href="#" data-toggle="modal" data-target="#modal-preview0_1">Preview</a>*@
+
+                                            <div class="row col-xs-12">
+                                                <h3>Other Color</h3>
+                                                <span class="clearfix" style="color:green;">Please upload images with dimensions 200x200px</span>
+												
+													@for((v) <- listsColor){
+													@if(idxImageColor == 1){
+														<div class="row col-xs-12">
+															<img class="col-xs-2 img-responsive" alt="" src="@v">
+															<input type="file" id="imageIcon0_1" placeholder="Replace" accept="image/*" name="imageIcon0_1" accept="image/*"
+															onchange="loadFile3(event, 'previewIcon0_1', 'imageIcon0_1', 200,200)">
+															<input type="hidden" id="imageIcon0_1X" name="imageIcon0_1X" value="0"/>
+															<input type="hidden" id="imageIcon0_1Y" name="imageIcon0_1Y" value="0"/>
+															<input type="hidden" id="imageIcon0_1W" name="imageIcon0_1W" value="0"/>
+															<input type="hidden" id="imageIcon0_1H" name="imageIcon0_1H" value="0"/>
+															<a href="#" data-toggle="modal" data-target="#modal-previewIcon0_1">Preview</a>
+															<!--input type="file" id="imageIcon0_@idxImageColor" placeholder="Replace" accept="image/*" name="imageIcon0_@idxImageColor" accept="image/*"
+															onchange="loadFile3(event, 'previewIcon0_@idxImageColor', 'imageIcon0_@idxImageColor', 200,200)">
+															<input type="hidden" id="imageIcon0_@{idxImageColor}X" name="imageIcon0_@{idxImageColor}X" value="0"/>
+															<input type="hidden" id="imageIcon0_@{idxImageColor}Y" name="imageIcon0_@{idxImageColor}Y" value="0"/>
+															<input type="hidden" id="imageIcon0_@{idxImageColor}W" name="imageIcon0_@{idxImageColor}W" value="0"/>
+															<input type="hidden" id="imageIcon0_@{idxImageColor}H" name="imageIcon0_@{idxImageColor}H" value="0"/>
+															<a href="#" data-toggle="modal" data-target="#modal-previewIcon0_@idxImageColor">Preview</a-->
+														</div>
+														<!--@{idxImageColor=idxImageColor+1}-->
+														}
+													}
+                                                <!--@if(idxImageColor < 6){
+                                                    @for(a <- idxImageColor to 5) {
+                                                        <input type="file" placeholder="Replace" accept="image/*" id="imageIcon0_@a" name="imageIcon0_@a" accept="image/*"
+                                                        onchange="loadFile3(event, 'previewIcon0_@a', 'imageIcon0_@a', 200,200)">
+                                                        <input type="hidden" id="imageIcon0_@{a}X" name="imageIcon0_@{a}X" value="0"/>
+                                                        <input type="hidden" id="imageIcon0_@{a}Y" name="imageIcon0_@{a}Y" value="0"/>
+                                                        <input type="hidden" id="imageIcon0_@{a}W" name="imageIcon0_@{a}W" value="0"/>
+                                                        <input type="hidden" id="imageIcon0_@{a}H" name="imageIcon0_@{a}H" value="0"/>
+                                                        <a href="#" data-toggle="modal" data-target="#modal-previewIcon0_@a">Preview</a>
+                                                    }
+                                                }-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.tab-pane -->
+                                <div class="tab-pane" id="tab_3">
+                                    <div class="row">
+                                        <div class="form-group col-xs-9">
+                                            <label>Short Description</label>
+                                            <input type="text" placeholder="" class="form-control"
+                                                   @if(listsShortDescription.size() > 0){
+                                                        value="@listsShortDescription(0)"
+                                                    }
+                                                   name="listShortDescriptions[]">
+                                            <table id="listShortDescription">
+                                                <tbody>
+                                                @for(i <- 1 to listsShortDescription.size()-1){
+                                                <tr>
+                                                    <td>
+                                                        <input type="text" value="@listsShortDescription(i)" placeholder="" class="form-control" name="listShortDescriptions[]">
+                                                    </td>
+                                                    <td>
+                                                        <a href="#" class="removeShortDescription"><span class="fa fa-close"></span></a>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                                }
+                                            </table>
+                                        </div>
+                                        <div class="form-group col-xs-3">
+                                            <label>&nbsp;</label>
+                                            <div class="row">
+                                                <button type="button" id="addShortDescription" class="btn btn-primary">Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @mytextarea(formData("productDescription"), "Detail Description")
+                                    @if(isEversac){
+                                        @mytextarea(formData("feature"), "Feature")
+                                        @mytextarea(formData("specifications"), "Specifications")
+                                        @mytextarea(formData("recomendedCare"), "Recommended Care")
+                                        @mytextarea(formData("waranty"), "Waranty")
+                                    }
+@*//                                    @mytextarea(formData("whatInTheBox"), "What's In The Box")*@
+                                </div>
+                                <div class="tab-pane" id="tab_4">
+                                    <div class="row">
+                                        <div class="col-xs-10">
+                                            <select id="productlist" name="product_list[]" class="form-control" data-placeholder="Please select product">
+                                                @for((k,v) <- listProducts){<option value="@k" >@v</option>}
+                                            </select>
+                                        </div>
+                                        <div class="col-xs-2">
+                                            <button type="button" class="btn btn-primary" id="listproductbtn">Show Product Item</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.tab-pane -->
+
+                            </div>
+                            <!-- /.tab-content -->
+                        </div>
+                        <!-- nav-tabs-custom -->
+                    </div>
+                    <div class="box-footer">
+					
+                        <button type="button" id="btn_prev" class="btn btn-primary" style="display:none;">Previous</button>
+                        <button type="button" id="btn_next" class="btn btn-primary pull-right">Next</button>
+                        <a href="@controllers.admin.routes.ProductController.index()"><button type="button" id="btn_list" class="btn btn-primary" >Back to List</button> <a/>
+						
+                        @if(action.equalsIgnoreCase("add")){
+                            <button type="submit" name="save" value="2" id="btn_save_next" class="btn btn-primary pull-right" style="display:none;margin-left:10px;">Save and Next</button>
+                        }
+                        <button type="submit" name="save" value="1" id="btn_save" class="btn btn-primary pull-right" style="display:none;">Save</button>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+<div id="modal-preview0_1" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Preview Thumbnail</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-outer">
+                    <img id="preview0_1" src="@formData("imageYoutubeLink").value"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" >Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+@for(b <- 1 to 5){
+<div id="modal-preview@b" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Preview Image</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-outer">
+                    <img id="preview@{b}"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" >Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="modal-previewIcon0_@b" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">Preview Icon</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-outer">
+                        <img id="previewIcon0_@{b}"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" >Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<div id="modal-select-product" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Product Item Name</h4>
+            </div>
+            <div class="modal-body">
+                <table id="listProduct" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th><!--<input name="select_all" value="1" id="select-all" type="checkbox">--></th>
+                        <th>No</th>
+                        <th>Product Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-default">Back</button>
+            </div>
+        </div>
+    </div>
+</div>
+}
+}
+<script src='@routes.Assets.at("plugins/swfupload/swfupload.js")' type='text/javascript'></script>
+<script src='@routes.Assets.at("plugins/swfupload/jquery.swfupload.js")' type='text/javascript'></script>
+<script>
+$(function () {
+    CKEDITOR.replace( 'productDescription',
+        {
+            filebrowserBrowseUrl :'/admin/ckeditor/browser?Connector=/admin/ckeditor/connector',
+            filebrowserImageBrowseUrl : '/admin/ckeditor/browser?Type=Image&Connector=/admin/ckeditor/connector',
+            filebrowserFlashBrowseUrl :'/admin/ckeditor/browser?Type=Flash&Connector=/admin/ckeditor/connector',
+            filebrowserUploadUrl  :'/admin/ckeditor/upload?Type=File',
+            filebrowserImageUploadUrl : '/admin/ckeditor/upload?Type=Image',
+            filebrowserFlashUploadUrl : '/admin/ckeditor/upload?Type=Flash'
+        });
+    /*$('#div-name-text').hide();
+    $('#newProduct').on('change', function(){
+        if($(this).prop('checked')) {
+            $('#div-name-select').hide();
+            $('#div-name-text').show();
+        } else {
+            $('#div-name-text').hide();
+            $('#div-name-select').show();
+        }
+    });*/
+});
+</script>
+
+<script type="text/javascript">
+var tabIdx = 1;
+var dataProducts = [];
+$("#productlist option").each(function()
+{
+    if($(this).val() != 0){
+        dataProducts.push({id:$(this).val(),text:$(this).text()});
+    }
+});
+$(document).ready(function () {
+
+    var arrProduct = [];
+    $("#productlist option").each(function() {
+        arrProduct.push($(this).val());
+    });
+
+    $('#listproductbtn').text('Show Product Item');
+    $('#listproductbtn').on('click', function(){
+        table.ajax.reload();
+        $('#modal-select-product').modal('show');
+    });
+
+    $('select[name=pss_type]').on('change', function(){
+        if($(this).val() == '1') {
+            $('#pss_percentage').removeAttr('disabled');
+            $('#pss_percentage').parent().removeClass('hide');
+            $('#pss_value').attr('disabled', 'disabled');
+            $('#pss_value').parent().addClass('hide');
+        } else {
+            $('#pss_value').removeAttr('disabled');
+            $('#pss_value').parent().removeClass('hide');
+            $('#pss_percentage').attr('disabled', 'disabled');
+            $('#pss_percentage').parent().addClass('hide');
+        }
+    });
+    $('select[name=pss_type]').change();
+
+    $('select[name=pd_type]').on('change', function(){
+        if($(this).val() == '1') {
+            $('#pd_percentage').removeAttr('disabled');
+            $('#pd_percentage').parent().removeClass('hide');
+            $('#pd_value').attr('disabled', 'disabled');
+            $('#pd_value').parent().addClass('hide');
+        } else {
+            $('#pd_value').removeAttr('disabled');
+            $('#pd_value').parent().removeClass('hide');
+            $('#pd_percentage').attr('disabled', 'disabled');
+            $('#pd_percentage').parent().addClass('hide');
+        }
+    });
+    $('select[name=pd_type]').change();
+
+    $('select[name=psd_type]').on('change', function(){
+        if($(this).val() == '1') {
+            $('#psd_percentage').removeAttr('disabled');
+            $('#psd_percentage').parent().removeClass('hide');
+            $('#psd_value').attr('disabled', 'disabled');
+            $('#psd_value').parent().addClass('hide');
+        } else {
+            $('#psd_value').removeAttr('disabled');
+            $('#psd_value').parent().removeClass('hide');
+            $('#psd_percentage').attr('disabled', 'disabled');
+            $('#psd_percentage').parent().addClass('hide');
+        }
+    });
+    $('select[name=psd_type]').change();
+
+    $('select[name=pr_type]').on('change', function(){
+        if($(this).val() == '1') {
+            $('#pr_percentage').removeAttr('disabled');
+            $('#pr_percentage').parent().removeClass('hide');
+            $('#pr_value').attr('disabled', 'disabled');
+            $('#pr_value').parent().addClass('hide');
+        } else {
+            $('#pr_value').removeAttr('disabled');
+            $('#pr_value').parent().removeClass('hide');
+            $('#pr_percentage').attr('disabled', 'disabled');
+            $('#pr_percentage').parent().addClass('hide');
+        }
+    });
+    $('select[name=pr_type]').change();
+
+    if(parseInt($('#pss_percentage').val(), 0) > 0) {
+        $('select[name=pss_type]').val('1');
+        $('select[name=pss_type]').change();
+    }
+
+    if(parseInt($('#pd_percentage').val(), 0) > 0) {
+        $('select[name=pd_type]').val('1');
+        $('select[name=pd_type]').change();
+    }
+
+    if(parseInt($('#psd_percentage').val(), 0) > 0) {
+        $('select[name=psd_type]').val('1');
+        $('select[name=psd_type]').change();
+    }
+
+    if(parseInt($('#pr_percentage').val(), 0) > 0) {
+        $('select[name=pr_type]').val('1');
+        $('select[name=pr_type]').change();
+    }
+
+    table = $("#listProduct").DataTable({
+        "lengthMenu": [[10, 25, 50, 100, 200], [10, 25, 50, 100, 200]],
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "/admin/information/mainbanner/listsProduct",
+            "data": function ( d ) {
+                d.myKey = "myValue";
+                d.category = "";
+            }
+        },
+        columnDefs : [
+            {
+                'targets': 0,
+                'searchable': false,
+                'orderable': false,
+                'sortable': false,
+                'className': 'dt-body-center',
+                'width': "20px"
+            },
+            { targets: 1, sortable: false, width: "20px"},
+        ],
+        order: [[ 2, "asc" ]],
+        fnDrawCallback: function() {
+            for(i=0; i < dataProducts.length ; i++){
+                if($('#cb-action-'+dataProducts[i].id).length > 0){
+                    $('#cb-action-'+dataProducts[i].id).prop('checked', true);
+                }
+            }
+        }
+    });
+
+    function addProducts(item){
+        dataProducts.push(item);
+        $("#productlist").select2({multiple: true, data: dataProducts});
+    }
+
+    function deleteProducts(id){
+        findAndRemove(dataProducts, "id", id);
+        $("#productlist").empty();
+        $("#productlist").select2({multiple: true, data: dataProducts});
+    }
+
+    function findAndRemove(array, property, value) {
+        array.forEach(function(result, index) {
+            if(result[property] == value) {
+                //Remove from array
+                array.splice(index, 1);
+            }
+        });
+    };
+
+    $('#listProduct tbody').on('change', '.cb-action', function(){
+        // If checkbox is not checked
+        if(!this.checked)
+            deleteProducts($(this).val());
+        else {
+            addProducts({id:this.value,text:this.name});
+        }
+        var arrProduct = [];
+        $("#productlist option").each(function()
+        {
+            arrProduct.push($(this).val());
+        });
+        if(arrProduct.length > 0){
+            $('#productlist').val(arrProduct).trigger("change");
+        }
+    });
+
+    $("#btn_prev").on('click', function(){
+        showTab(tabIdx-1);
+    });
+    $("#btn_next").on('click', function(){
+        if(validPage(tabIdx))
+            showTab(tabIdx+1);
+    });
+    $('.input_currency').autoNumeric('init');
+});
+
+var dataAttr = [];
+$("#listAttribute1 option").each(function()
+{
+    if($(this).val() != 0){
+        dataAttr.push({id:$(this).val(),text:$(this).text()});
+    }
+});
+
+function validPage(idx){
+    var isValid = false;
+    if(idx == 1){
+        //$('#idtmp').valid();
+        $('#name').valid(); $('#title').valid(); $('#keyword').valid(); $('#description').valid();
+        $('#keyword').valid(); $('#category').valid(); $('#subcategory').valid(); $('#subsubcategory').valid();
+
+        isValid = $('#name').valid() && $('#title').valid() && $('#keyword').valid() && $('#description').valid()
+                && $('#keyword').valid() &&  $('#category').valid() &&  $('#subcategory').valid() && $('#subsubcategory').valid();
+    }else if(idx == 2){
+        $('#weight').valid(); $('#dimension1').valid(); $('#dimension2').valid(); $('#dimension3').valid(); $('#price').valid(); $('#buyPrice').valid(); $('#itemCount').valid();
+
+        isValid = $('#weight').valid() && $('#dimension1').valid() && $('#dimension2').valid() && $('#dimension3').valid() && $('#price').valid()
+                && $('#buyPrice').valid() && $('#warrantyPeriod').valid() && $('#itemCount').valid();
+
+
+        var valid = false;
+        $("select.select-attribute").each(function(i, sel){
+            if($(sel).val() != 0)
+            valid = true;
+
+            if(!valid){
+                $('#attribute-error').show();
+            }else{
+                $('#attribute-error').hide();
+            }
+        });
+        isValid = isValid && valid;
+
+
+        @if(action.equalsIgnoreCase("add")){
+            //$( "input[name='imageUrl[]']" ).valid();
+            //isValid = isValid && $("input[name='imageUrl[]']" ).valid()
+        }
+
+    } else if(idx == 3) {
+        isValid = true;
+    }
+
+    return isValid;
+}
+
+function showTab(idx){
+    if(idx == 4) {
+        $("#btn_save").show();
+        $("#btn_save_next").show();
+        $("#btn_next").hide();
+        $("#btn_list").hide();
+        $("#btn_prev").show();
+        $('.nav-tabs a[href="#tab_4"]').tab('show');
+    }else if(idx == 3){
+        $("#btn_save").hide();
+        $("#btn_save_next").hide();
+        $("#btn_next").show();
+        $("#btn_list").hide();
+        $("#btn_prev").show();
+        $('.nav-tabs a[href="#tab_3"]').tab('show');
+    }else if(idx == 1 ){
+        $("#btn_save").hide();
+        $("#btn_save_next").hide();
+        $("#btn_next").show();
+        $("#btn_list").show();
+        $("#btn_prev").hide();
+        $('.nav-tabs a[href="#tab_1"]').tab('show');
+    }else{
+        $("#btn_save").hide();
+        $("#btn_save_next").hide();
+        $("#btn_list").hide();
+        $("#btn_next").show();
+        $("#btn_prev").show();
+        $('.nav-tabs a[href="#tab_2"]').tab('show');
+        $('.select-attribute').select2();
+    }
+
+    tabIdx = idx;
+}
+</script>
+<script type="text/javascript">
+  $(document).ready(function () {
+      $('#div_itemCount').show();
+      $('#div_buyPrice').show();
+
+        $(".select2").select2();
+          $("#productlist").select2({
+              width: '100%',
+              multiple:true
+          });
+
+          var selectedProduct = [];
+          $("#productlist option").each(function() {
+              selectedProduct.push($(this).val());
+          });
+
+          console.log(selectedProduct);
+
+          if(selectedProduct.length > 0){
+              $('#productlist').val(selectedProduct).trigger("change");
+          }
+
+        $("#idtmp").select2({
+            ajax: {
+                url: "/admin/products/listsProduct",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 30) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 1,
+            templateResult: function (data) {
+                return data.name;
+            },
+            templateSelection:function (data) {
+                return data.name || data.text;
+            }
+        });
+        var arrProduct = [];
+        $("#idtmp option").each(function()
+        {
+            arrProduct.push($(this).val());
+        });
+        if(arrProduct.length > 0){
+            $('#idtmp').val(arrProduct).trigger("change");
+        }
+
+        $('#fromDate').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat:'MM/dd/YYYY',
+            minDate: "dateToday"
+        });
+        $('#toDate').datepicker({
+            autoclose: true,
+            dateFormat:'MM/dd/YYYY',
+            todayHighlight: true,
+            minDate: "dateToday"
+        });
+        $(".timepicker").timepicker({
+          showInputs: false,
+          showMeridian: false
+        });
+
+        $("#addFile").on('click', function(){
+            var n = $( 'input[name="imageUrl[]"]' ).length;
+            if(n < 5){
+                var uId = getRandomInt(0, 1000);
+                $('#listFile').append(
+                    $('<div class="row">').append(
+                        $('<div class="form-group col-xs-9">').append($('<input/>').attr('type', 'file').attr('name', 'imageUrl[]').attr('multiple', 'multiple').addClass('upload'))
+                    ).append(
+                        $('<div class="form-group col-xs-3">').append($('<button id="imageid_'+uId+'" onclick="deleteImage('+uId+')" class="btn btn-danger btn-delete2 btn-sm" type="button"><i class="fa fa-close"></i></button>'))
+                    )
+
+                );
+            }
+
+        });
+
+        /*$('.upload').bind('change', function() {
+            var files = this.files;
+            var i = 0;
+            var filename = "";
+            for(; i < files.length; i++) {
+                filename += files[i].name + "<br />";
+            }
+            //$( this ).after( filename );
+            //$(this).closest('.listfileview').html(filename);
+        });*/
+
+        $("#addShortDescription").on('click', function(){
+            /*$('#listShortDescription').append(
+                $('<input/>').attr('type', 'text').attr('name', 'listShortDescriptions[]').attr('class', 'form-control')
+            );*/
+            $("#listShortDescription").find('tbody')
+            .append($('<tr>')
+                .append(
+                  $('<td>').append($('<input/>').attr('type', 'text').attr('name', 'listShortDescriptions[]').attr('class', 'form-control').attr('size', '200'))
+                )
+                .append(
+                  $('<td>').append('<button type="button" onclick="removeShorDescription(this)" class="btn btn-danger"><span class="fa fa-close"></span></button>')
+                )
+            );
+        });
+
+      $(".multiple-select").select2({multiple:true});
+
+      for (var i = 1; i<@{idxAttr}; i++){
+          var arrCategory = [];
+          $("#listAttribute"+i+" option").each(function()
+          {
+              if ($(this).attr("ischeck")){
+                  arrCategory.push($(this).val());
+              }
+          });
+          if(arrCategory.length > 0){
+              $('#listAttribute'+i).val(arrCategory).trigger("change");
+          }
+      }
+
+//      var arrCategory = [];
+//      $("#listAttribute1 option").each(function()
+//      {
+//          arrCategory.push($(this).val());
+//      });
+//      if(arrCategory.length > 0){
+//          $('#listAttribute1').val(arrCategory).trigger("change");
+//      }
+
+  });
+
+  function removeShorDescription(param){
+    param.closest('tr').remove();
+  }
+
+  function deleteImage(id){
+    $('#imageid_'+id).closest("div .row").remove();
+  }
+
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    function generateTableAttribute(data){
+        $("#table-attribute").find('tbody').empty();
+        for(i = 0; i < data.length ; i++){
+            var select = '<div class="col-xs-12"><select name="listAttribute[]" class="select-attribute form-control multiple-select">';
+            for(j = 0; j < data[i].items.length ; j++){
+                select += '<option value="'+data[i].items[j].id+'">'+data[i].items[j].text+'</option>';
+            }
+            select += '</select></div>';
+            $("#table-attribute").find('tbody')
+            .append($('<tr>')
+                .append(
+                  $('<td>').text(data[i].text)
+                )
+                .append(
+                  $('<td>').append(select)
+                )
+            );
+        }
+        $(".multiple-select").select2({multiple:true});
+    }
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#category').on("select2:select", function(e) {
+        $.ajax({
+            url: "/admin/masterproducts/category/listsSubCategory?q="+$('#category').val(),
+            type: 'GET',
+            beforeSend: function() {
+
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                $("#subcategory").empty();
+                var items = [];
+                items.push({"id":0,"text":""});
+                $.each (resp.items, function (k) {
+                    items.push(resp.items[k])
+                });
+                $("#subcategory").select2({data: items});
+            },
+            complete: function(xhr) {
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('Something went wrong.');
+                }
+            }
+        });
+    });
+    $('#subcategory').on("select2:select", function(e) {
+        $.ajax({
+            url: "/admin/masterproducts/category/listsSubCategory?q="+$('#subcategory').val(),
+            type: 'GET',
+            beforeSend: function() {
+
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                $("#subsubcategory").empty();
+                var items = [];
+                items.push({"id":0,"text":""});
+                $.each (resp.items, function (k) {
+                    items.push(resp.items[k])
+                });
+                $("#subsubcategory").select2({data: items});
+            },
+            complete: function(xhr) {
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('Something went wrong.');
+                }
+            }
+        });
+    });
+    $('#subsubcategory').on("select2:select", function(e) {
+        $.ajax({
+            url: "/admin/masterproducts/attribute/listsBaseAttributeForSelectByCategory?q="+$('#subsubcategory').val(),
+            type: 'GET',
+            beforeSend: function() {
+
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                generateTableAttribute(resp.items);
+            },
+            complete: function(xhr) {
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('Something went wrong.');
+                }
+            }
+        });
+    });
+
+    $.validator.addMethod("valueNotEquals", function(value, element, arg){
+          return arg != value;
+    }, "Value must not equal arg.");
+
+    $.validator.addMethod(
+        "validatorDimension",
+        function(value, element) {
+            if($('#dimension1').val() != 0 && $('#dimension2').val() != 0 && $('#dimension3').val() != 0)
+                    return true;
+                else return false;
+        },
+        "Dimension is required"
+    );
+    $.validator.addMethod(
+        "validatorStock",
+        function(value, element) {
+            return true;
+        },
+        "Stock is required"
+    );
+    $.validator.addMethod(
+        "validatorBuyPrice",
+        function(value, element) {
+            return true;
+        },
+        "Buy price is required"
+    );
+    $.validator.addMethod(
+        "validatorMinimumBuyPrice",
+        function(value, element, arg) {
+            var v = $(element).autoNumeric('get');
+            return v > arg;
+        }
+    );
+
+    $.validator.addMethod("minimumAmt", function(value, element, arg){
+        var v = $(element).autoNumeric('get');
+        return v > arg;
+    });
+
+    $("#form-save").validate({
+        ignore:[],
+        rules: {
+            /*name: {
+                required : function(value, element, arg){
+                        if($('#newProduct').prop('checked')) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                     }
+            },*/
+            name: "required",
+            /*idtmp: {
+                validatorSelectName : true
+            },*/
+            title: "required",
+            keyword: "required",
+            description: "required",
+            keyword: "required",
+            categoryId :{
+                valueNotEquals : "0"
+            },
+            subCategoryId: {
+                valueNotEquals : "0"
+            },
+            subSubCategoryId: {
+                valueNotEquals : "0"
+            },
+//            brandId: {
+//                valueNotEquals : "0"
+//            },
+            weight: {
+                required: true,
+                number: true,
+                min: 1
+            },
+            warrantyPeriod: {
+                number: true
+            },
+            @if(action.equalsIgnoreCase("add")){
+            //'imageUrl[]': "required",
+
+            }
+            dimension1: {
+                required: true,
+                number: true,
+                min: 1
+            },
+            dimension2: {
+                required: true,
+                number: true,
+                min: 1
+            },
+            dimension3: {
+                required: true,
+                number: true,
+                min: 1
+            },
+            buyPrice: {
+                validatorBuyPrice: true,
+                number: true,
+                validatorMinimumBuyPrice: 0.01
+            },
+            price: {
+                required: true,
+                number: true,
+                minimumAmt: 0.01
+            },
+            itemCount :{
+                validatorStock : true,
+                number: true
+            },
+            listShortDescriptions : "required",
+            productDescription: {
+                 required: function()
+                {
+                 CKEDITOR.instances.productDescription.updateElement();
+                }
+            }
+        },
+        messages: {
+            name: "Product name is required",
+            /*idtmp: {
+                validatorSelectName : "Please select product name"
+            },*/
+            title: "Meta title is required",
+            keyword: "Meta keyword is required",
+            description: "Meta description is required",
+            categoryId: {
+                valueNotEquals : "Please select category"
+            },
+            subCategoryId: {
+                valueNotEquals : "Please select sub category"
+            },
+            subSubCategoryId: {
+                valueNotEquals : "Please select sub sub category"
+            },
+//            brandId: {
+//                valueNotEquals : "Please select brand"
+//            },
+            weight: {
+                required: "Weight is required",
+            },
+            @if(action.equalsIgnoreCase("add")){
+            //'imageUrl[]': "Image is required",
+            }
+            dimension1:  {
+                required: "Dimension is required"
+            },
+            dimension2:  {
+                required: "Dimension is required"
+            },
+            dimension3:  {
+                required: "Dimension is required"
+            },
+            price:  {
+                required: "Price is required",
+                minimumAmt : "Price must greater than 0"
+            },
+            buyPrice:  {
+                validatorBuyPrice: "Buy price is required",
+                validatorMinimumBuyPrice : "Buy price must greater than 0"
+            },
+            itemCount:  {
+                validatorStock: "Stock is required"
+            }
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            $('.input_currency').autoNumeric('get');
+            $('.input_currency').each(function(key, value) {
+                $(value).val($(value).autoNumeric('get'));
+            });
+            form.submit();
+        }
+    });
+
+
+    /*$('#idtmp').on('change', function(){
+        $('#idtmp').valid();
+    });*/
+
+    $('#category').on('change', function(){
+        $('#category').valid();
+    });
+    $('#subcategory').on('change', function(){
+        $('#subcategory').valid();
+    });
+    $('#subsubcategory').on('change', function(){
+        $('#subsubcategory').valid();
+    });
+//    $('#brandId').on('change', function(){
+//        $('#brandId').valid();
+//    });
+//    $('#merchantId').on("select2:select", function(e) {
+//        $('#merchantId').valid();
+//    });
+
+    @if(action.equalsIgnoreCase("edit")){
+        $.ajax({
+            url: "/admin/masterproducts/attribute/listsBaseAttributeForSelectByCategory?q="+$('#subsubcategory').val(),
+            type: 'GET',
+            beforeSend: function() {
+
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                $("#attribute").empty();
+                $("#attribute").select2({data: resp.items});
+            },
+            complete: function(xhr) {
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('Something went wrong.');
+                }
+            }
+        });
+
+        if($('#warrantyType').val() == 0){
+            $('#div_warrantyPeriod').hide();
+        }else{
+            $('#div_warrantyPeriod').show();
+        }
+    }else{
+        $('#div_warrantyPeriod').hide();
+    }
+
+    $('#warrantyType').on('change', function(){
+        if($(this).val() == 0){
+            $('#div_warrantyPeriod').hide();
+        }else{
+            $('#div_warrantyPeriod').show();
+        }
+    })
+
+    $("#sizeId").select2({multiple:true});
+    /*var arrSubCategory = [];
+    $("#subcategoryid option").each(function()
+    {
+        arrSubCategory.push($(this).val());
+    });
+    if(arrSubCategory.length > 0){
+        $('#subcategoryid').val(arrSubCategory).trigger("change");
+    }*/
+});
+
+var jcropApi,jcropApi2,jcropApi3,jcropApi4,jcropApi5;
+var loadFile2 = function(event, previewId, fileId, width, height) {
+    $('#modal-'+previewId).modal('show');
+    setTimeout(function(){
+        if(event.target.files.length > 0){
+            if(previewId == "preview1"){
+                if(jcropApi){
+                    jcropApi.destroy();
+                }
+            }else if(previewId == "preview2"){
+                if(jcropApi2){
+                    jcropApi2.destroy();
+                }
+            }else if(previewId == "preview3"){
+                if(jcropApi3){
+                    jcropApi3.destroy();
+                }
+            }else if(previewId == "preview4"){
+                if(jcropApi4){
+                    jcropApi4.destroy();
+                }
+            }else if(previewId == "preview5"){
+                if(jcropApi5){
+                    jcropApi5.destroy();
+                }
+            }
+
+            var output = document.getElementById(previewId);
+
+            output.src = URL.createObjectURL(event.target.files[0]);
+            var $img = $('#'+previewId);
+            $img.on('load', function(){
+                var imageWidth = $(this).prop('naturalWidth');
+                var imageHeight = $(this).prop('naturalHeight');
+                $('#'+fileId).removeData('imageWidth');
+                $('#'+fileId).removeData('imageHeight');
+
+                $('#'+fileId).data('imageWidth', imageWidth);
+                $('#'+fileId).data('imageHeight', imageHeight);
+
+                $('#'+previewId).Jcrop({
+                    onSelect: function(c){
+                            $('#'+fileId+'X').val(c.x);
+                            $('#'+fileId+'Y').val(c.y);
+                            $('#'+fileId+'W').val(c.w);
+                            $('#'+fileId+'H').val(c.h);
+                        },
+                    onChange: function(c){
+                            $('#'+fileId+'X').val(c.x);
+                            $('#'+fileId+'Y').val(c.y);
+                            $('#'+fileId+'W').val(c.w);
+                            $('#'+fileId+'H').val(c.h);
+                        },
+                    animEasing: 'easeOutQuart',
+                    bgOpacity: .35,
+                    linked: false,
+                    multi: false,
+                    canResize: true,
+                    aspectRatio: width/height
+                },function(){
+                    this.container.addClass('jcrop-dark jcrop-hl-active');
+                    this.newSelection();
+                    this.setSelect([ 0, 0, width, height ]);
+                    this.refresh();
+
+                    if(previewId == "preview1"){
+                        jcropApi = this;
+                    }else if(previewId == "preview2"){
+                        jcropApi2 = this;
+                    }else if(previewId == "preview3"){
+                        jcropApi3 = this;
+                    }else if(previewId == "preview4"){
+                        jcropApi4 = this;
+                    }else if(previewId == "preview5"){
+                        jcropApi5 = this;
+                    }
+                });
+
+            });
+        }
+    }, 1000);
+
+};
+
+var loadFile3 = function(event, previewId, fileId, width, height) {
+    $('#modal-'+previewId).modal('show');
+    var inputField = $('#' + fileId);
+    var previewArea = $('#' + previewId);
+
+    if (inputField[0].files && inputField[0].files[0]) {
+        previewArea.cropper('destroy');
+        previewArea.cropper({resizable: false, aspectRatio: width/height, crop: function(data) {
+            $('#' + fileId + 'X').val(Math.round(data.x));
+            $('#' + fileId + 'Y').val(Math.round(data.y));
+            $('#' + fileId + 'W').val(Math.round(data.width));
+            $('#' + fileId + 'H').val(Math.round(data.height));
+        }});
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            previewArea.cropper('replace', e.target.result);
+        }
+        reader.readAsDataURL(inputField[0].files[0]);
+    }
+
+    var cvs = previewArea.next().find('.cropper-canvas');
+    inputField.data('imageWidth', cvs.width());
+    inputField.data('imageHeight', cvs.height());
+};
+
+$('#title').on('change', function(){
+        $('#keyword').val($(this).val());
+        $('#description').val($(this).val());
+    })
+</script>

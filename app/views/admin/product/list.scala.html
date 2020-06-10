@@ -1,0 +1,624 @@
+@(title: String, action: String, feature:RoleFeature)
+
+@import helper._
+@import views.html.admin.helper._
+@views.html.admin.main(title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Products")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div class="header pull-left">
+                            <h3 class="box-title title-module">@action @title</h3>
+                        </div>
+
+                        <div class="add pull-right">
+                            @if(feature.isEdit()){
+                            @*<a  class="btn btn-info btn-sm importPosition" href="#">*@
+                                @*<i class="fa fa-upload"></i> Import Position*@
+                            @*</a> &nbsp;*@
+                            @*<a  class="btn btn-info btn-sm " target="_blank" href="@controllers.admin.routes.ProductController.downloadPositionFile()">*@
+                                @*<i class="fa fa-download"></i> Download Position*@
+                            @*</a> &nbsp;*@
+                            }
+                            @if(feature.isAdd()){
+                            @*<a class="btn btn-info btn-sm import" href="#">*@
+                                @*<i class="fa fa-upload"></i> Import Product*@
+                            @*</a> &nbsp;*@
+                            @*<a  class="btn btn-info btn-sm " target="_blank" href="@controllers.admin.routes.ProductController.downloadTemplate()">*@
+                                @*<i class="fa fa-download"></i> Download Template*@
+                            @*</a> &nbsp;*@
+                            @*<a  class="btn btn-info btn-sm " target="_blank" href="@controllers.admin.routes.ProductController.downloadTemplateInfo()">*@
+                                @*<i class="fa fa-download"></i> Download Template Information*@
+                            @*</a>*@
+                            }
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-xs-4 col-md-2">
+                                    <select class="form-control" id="searchFilter" name="filter" >
+                                        <option value="-1">All</option>
+                                        <option value="1">Active</option>
+                                        <option value="2">Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="col-xs-4 col-md-2">
+                                    @if(feature.isDelete()){
+                                    <a class="btn btn-danger btn-sm" id="action">
+                                        <i class="fa fa-trash"></i> Delete All
+                                    </a>
+                                    }
+                                </div>
+                            </div>
+                        </form>
+                        <table id="listTable" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th><input name="select_all" value="1" id="select-all" type="checkbox"></th>
+                                <th>No</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Manual Like</th>
+                                <th>Customer Like</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+</div>
+@*<div id="modal-import" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">*@
+    @*<div class="modal-dialog modal-wide">*@
+        @*@form(controllers.admin.routes.ProductController.importProduct(), 'role->"form", 'id->"formImport", 'enctype -> "multipart/form-data") {*@
+        @*<div class="modal-content">*@
+            @*<div class="modal-header">*@
+                @*<button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>*@
+                @*<h4 class="modal-title">Import Product</h4>*@
+            @*</div>*@
+            @*<div class="modal-body form-horizontal">*@
+                @*<div class="form-group">*@
+                    @*<label class="col-sm-3 control-label" for="import">File Upload</label>*@
+
+                    @*<div class="col-sm-9">*@
+                        @*<input type="file" id="import" name="import">*@
+                    @*</div>*@
+                @*</div>*@
+            @*</div>*@
+            @*<div class="modal-footer">*@
+                @*<button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>*@
+                @*<button type="submit" class="btn btn-primary submit-import">Import</button>*@
+            @*</div>*@
+        @*</div>*@
+        @*}*@
+    @*</div>*@
+@*</div>*@
+@mymodaldelete("product")
+<div id="modal-update-stock" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        @form(controllers.admin.routes.ProductController.updateStock(), 'role->"form", 'id->"formUpdateStock") {
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Edit Stock Product</h4>
+            </div>
+            <div class="modal-body form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="import">Stock *</label>
+
+                    <div class="col-sm-9">
+                        <input type="hidden" id="product-stock-id" name="id">
+                        <input type="text" id="stock" name="stock" class="form-control" placeholder="Stock">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                <button type="submit" class="btn btn-primary submit-update-stock">OK</button>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+
+<div id="modal-update-like" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        @form(controllers.admin.routes.ProductController.updateLike(), 'role->"form", 'id->"formUpdateLike") {
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Ettdit Like Product</h4>
+            </div>
+            <div class="modal-body form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="import">Like *</label>
+
+                    <div class="col-sm-9">
+                        <input type="hidden" id="product-like-id" name="id">
+                        <input type="text" id="like" name="like" class="form-control" placeholder="Like">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                <button type="submit" class="btn btn-primary submit-update-like">OK</button>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+
+}
+
+<script src='@routes.Assets.at("javascripts/additional-methods.min.js")' type='text/javascript'></script>
+<script type="text/javascript">
+    var table;
+    $(document).ready(function(){
+        $('#action').hide();
+
+       table = $("#listTable").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "@controllers.admin.routes.ProductController.lists()",
+                "data": function(data) {
+                    data.filter = $("#searchFilter").val();
+                }
+            },
+            language: {
+                searchPlaceholder: "Search by product name..."
+            },
+            columnDefs : [
+                {
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'sortable': false,
+                    'className': 'dt-body-center',
+                    'width': "20px",
+                    'render': function (data, type, full, meta){
+                        return '<input type="checkbox" class="cb-action" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                },
+                { targets: 1, sortable: false, width: "20px"},
+                { targets: 8, sortable: false},
+            ],
+            order: [[ 2, "asc" ]],
+            "fnDrawCallback": function() {
+                $('.cb-status').bootstrapToggle();
+                $('.cb-status').change(function() {
+                    var val = [parseInt($(this).val())];
+                    updateStatus(val, $(this).prop('checked') ? "active" : "inactive", false);
+                })
+            }
+        });
+
+        oTable = $('#listTable').DataTable();
+
+        $('#listTable_length').hide();
+
+        // Handle click on "Select all" control
+       $('#select-all').on('click', function(){
+          // Get all rows with search applied
+          var rows = table.rows({ 'search': 'applied' }).nodes();
+          // Check/uncheck checkboxes for all rows in the table
+          //$('input[type="checkbox"]', rows).prop('checked', this.checked);
+          $('.cb-action', rows).prop('checked', this.checked);
+          if(this.checked){
+            $('#action').show();
+          }else{
+            $('#action').hide();
+          }
+          //
+       });
+
+       // Handle click on checkbox to set state of "Select all" control
+
+       $('#listTable tbody').on('change', '.cb-action', function(){
+          // If checkbox is not checked
+          if(!this.checked){
+             var el = $('#example-select-all').get(0);
+             // If "Select all" control is checked and has 'indeterminate' property
+             if(el && el.checked && ('indeterminate' in el)){
+                // Set visual state of "Select all" control
+                // as 'indeterminate'
+                el.indeterminate = true;
+             }
+          }
+
+          if(getSelectedIds() != ''){
+            $('#action').show();
+          }else{
+            $('#action').hide();
+          }
+       });
+
+       // Handle action change
+       $('#action').on('click', function(){
+            $('#modal-delete-product').modal('show');
+            $("#product_id").val(getSelectedIds());
+            $('.modal-title').html('Delete Product');
+            $('.modal-body').html('Are you sure you want to delete these item?');
+       });
+
+       $('#searchFilter').on('change', function(){
+            table.ajax.reload();
+       });
+
+       // Handle click on button yes
+       $('.submit-delete').on('click', function() {
+            var id = $("#product_id").val();
+            $.ajax({
+                url: "/admin/products/lists/"+id+"/delete",
+                type: 'DELETE',
+                beforeSend: function() {
+                    $('#modal-delete-product').modal('hide');
+                    MyApp.loadingOverlay.show();
+                },
+                error: function(data ) {
+                    resp = JSON.parse(data.responseText);
+                    toastr["error"](resp.message, "Error")
+                },
+                success: function(resp) {
+                    $('#action option[value=""]').prop('selected', true);
+
+                    if(resp.meta.total != 0){
+                        toastr["success"](resp.message, "Succes")
+                        $('#action').hide();
+                        table.ajax.reload();
+                    }else{
+                        toastr["error"](resp.message, "Error")
+                    }
+                },
+                complete: function(xhr) {
+                    MyApp.loadingOverlay.hide();
+                    try {
+                        resp = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        toastr["error"]("Something went wrong.", "Error")
+                    }
+                }
+            });
+       });
+    });
+
+
+    function deleteData(id) {
+        $('#modal-delete-product').modal('show');
+        $("#product_id").val(id);
+        $('.modal-title').html('Delete Product');
+    };
+
+    // Handle update status action
+    function updateStatus(id, status, reload){
+        $.ajax({
+            url: "/admin/products/lists/"+id+"/updateStatus/"+status,
+            type: 'POST',
+            beforeSend: function() {
+                MyApp.loadingOverlay.show();
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                toastr["error"](resp.message, "Error")
+            },
+            success: function(resp) {
+                if(resp.meta.total != 0){
+                    toastr["success"](resp.message, "Succes");
+                    if (reload){
+                        table.ajax.reload();
+                    }
+                }else{
+                    toastr["error"](resp.message, "Error")
+                }
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    toastr["error"]("Something went wrong.", "Error")
+                }
+            }
+        });
+    }
+
+    function getSelectedIds(){
+        var dataId = "";
+        var i = 0;
+        table.$('.cb-action').each(function(){
+            if(this.checked){
+               if(i > 0)
+                    dataId += ","+this.value;
+               else dataId = this.value;
+               i++;
+            }
+        });
+        return dataId;
+    }
+
+    function editData(id) {
+        $.ajax({
+            url: "/admin/products/lists/checkedit/"+id,
+            type: 'GET',
+            beforeSend: function() {
+                MyApp.loadingOverlay.show();
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                toastr["error"](resp.message, "Error")
+            },
+            success: function(resp) {
+                window.location.href = "/admin/products/lists/"+id+"/edit";
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    toastr["error"]("Something went wrong.", "Error")
+                }
+            }
+        });
+    };
+</script>
+
+<script type="text/javascript">
+function updateStock(id, stock) {
+    $.ajax({
+        url: "/admin/products/lists/checkeditstock/"+id,
+        type: 'GET',
+        beforeSend: function() {
+            MyApp.loadingOverlay.show();
+        },
+        error: function(data ) {
+            resp = JSON.parse(data.responseText);
+            toastr["error"](resp.message, "Error")
+        },
+        success: function(resp) {
+            $('#modal-update-stock').modal('show');
+            $("#product-stock-id").val(id);
+            $("#stock").val(stock);
+        },
+        complete: function(xhr) {
+            MyApp.loadingOverlay.hide();
+            try {
+                resp = JSON.parse(xhr.responseText);
+            } catch (e) {
+                toastr["error"]("Something went wrong.", "Error")
+            }
+        }
+    });
+};
+function updateLike(id, like) {
+    $('#modal-update-like').modal('show');
+    $("#product-like-id").val(id);
+    $("#like").val(like);
+};
+$(document).ready(function() {
+    $('#formUpdateStock').ajaxForm({
+        beforeSubmit: function () {
+            return $("#formUpdateStock").valid();
+        },
+        beforeSend: function() {
+            $('#modal-update-stock').modal('hide');
+            MyApp.loadingOverlay.show();
+        },
+        uploadProgress: function(event, position, total, percentComplete) {
+        },
+        error: function(data ) {
+            resp = JSON.parse(data.responseText);
+            toastr["error"](resp.message, "Error")
+        },
+        success: function(resp) {
+            toastr["success"](resp.message, "Success")
+            table.ajax.reload();
+        },
+        complete: function(xhr) {
+            MyApp.loadingOverlay.hide();
+            try {
+                resp = JSON.parse(xhr.responseText);
+            } catch (e) {
+                alert('terjadi kesalahan');
+            }
+        }
+    });
+
+    $("#formUpdateStock").validate({
+        ignore:[],
+        rules: {
+            stock: {
+                required: true,
+                number: true
+            }
+        },
+        messages: {
+            stock: {
+                required : "Stock is required"
+            },
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+
+        }
+    });
+    $('#formUpdateLike').ajaxForm({
+        beforeSubmit: function () {
+            return $("#formUpdateLike").valid();
+        },
+        beforeSend: function() {
+            $('#modal-update-like').modal('hide');
+            MyApp.loadingOverlay.show();
+        },
+        uploadProgress: function(event, position, total, percentComplete) {
+        },
+        error: function(data ) {
+            resp = JSON.parse(data.responseText);
+            toastr["error"](resp.message, "Error")
+        },
+        success: function(resp) {
+            toastr["success"](resp.message, "Success")
+            table.ajax.reload();
+        },
+        complete: function(xhr) {
+            MyApp.loadingOverlay.hide();
+            try {
+                resp = JSON.parse(xhr.responseText);
+            } catch (e) {
+                alert('terjadi kesalahan');
+            }
+        }
+    });
+
+    $("#formUpdateLike").validate({
+        ignore:[],
+        rules: {
+            like: {
+                required: true,
+                number: true
+            }
+        },
+        messages: {
+            like: {
+                required : "Stock is required"
+            },
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+
+        }
+    });
+});
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#formImport').ajaxForm({
+        beforeSubmit: function () {
+            return $("#formImport").valid();
+        },
+        beforeSend: function() {
+            $('#modal-import').modal('hide');
+            MyApp.loadingOverlay.show();
+        },
+        uploadProgress: function(event, position, total, percentComplete) {
+        },
+        error: function(data ) {
+            resp = JSON.parse(data.responseText);
+            toastr["error"](resp.message, "Error");
+        },
+        success: function(resp) {
+            if(resp.meta.total == 1){
+                toastr["success"](resp.message, "Succes");
+            }else{
+                toastr["error"](resp.message, "Error");
+            }
+
+        },
+        complete: function(xhr) {
+            MyApp.loadingOverlay.hide();
+            try {
+                resp = JSON.parse(xhr.responseText);
+            } catch (e) {
+                alert('terjadi kesalahan');
+            }
+        }
+    });
+
+    $("#formImport").validate({
+        ignore:[],
+        rules: {
+            import: {
+                required: true,
+                extension: "xls|xlsx"
+            }
+        },
+        messages: {
+            import: {
+                required : "Please select file",
+                extension: "Only xls extension allowed"
+            },
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+
+        }
+    });
+
+    // Handle action change
+    $('.import').on('click', function(){
+        $('#modal-import').modal('show');
+        $("#formImport").attr("action", "/admin/products/lists/import");
+
+    });
+
+    // Handle action change
+    $('.importPosition').on('click', function(){
+        $('#modal-import').modal('show');
+        $("#formImport").attr("action", "/admin/products/lists/importPosition");
+    });
+
+});
+</script>

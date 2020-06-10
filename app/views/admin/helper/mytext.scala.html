@@ -1,0 +1,12 @@
+@(field: Field, label: String = "CHANGEME", placeholder: String = "", typeinput: String="text", style: String="")
+
+<div class="form-group @style @if(field.hasErrors) {has-error}" id="div_@field.id">
+    @if(typeinput.equals("text") || typeinput.equals("password")) {<label id="lbl_@field.id">@label</label>}
+    <input type="@typeinput"
+           class="form-control"
+           id="@field.id"
+           name="@field.name"
+           value="@field.value.getOrElse("")"
+    placeholder="@placeholder" />
+    <span class="help-block">@{field.error.map { error => error.message }}</span>
+</div>

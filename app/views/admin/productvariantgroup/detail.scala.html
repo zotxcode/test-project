@@ -1,0 +1,94 @@
+@(title: String, action: String, data :ProductVariantGroup)
+
+@import views.html.admin.helper._
+@views.html.admin.main(title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Products")
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div class="header pull-left">
+                            <h3 class="box-title title-module">@action @title</h3>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="form-group">
+                                <label class="col-sm-2">Group Name</label>
+                                <div class="col-sm-10">
+                                    @data.name
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <label class="col-sm-2">Base Attribute</label>
+                                <div class="col-sm-10">
+                                    <ul class="taglist">
+                                        @for(att <- data.baseAttributes) {
+                                        <li>@att.name</li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <table id="listGroup" class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Product SKU</th>
+                                <th>Product Name</th>
+                                <th>Price (IDR)</th>
+                                @for(att <- data.baseAttributes) {
+                                <th>@att.name</th>
+                                }
+                            </tr>
+                            </thead>
+                            <tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <a class="btn btn-default" href="@controllers.admin.routes.ProductVariantGroupController.index()">Back</a>
+                    </div>
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+</div>
+
+@mymodaldelete("group")
+
+}
+
+<script type="text/javascript">
+    var table;
+    $(document).ready(function(){
+       $('#action').hide();
+       table = $("#listGroup").DataTable({
+            "pageLength": 200,
+            "processing": true,
+            "serverSide": true,
+            "ajax": "@controllers.admin.routes.ProductVariantGroupController.listsDetail(data.id)",
+            language: {
+                searchPlaceholder: "Search by name..."
+            }
+        });
+
+        oTable = $('#listGroup').DataTable();
+
+        $('#listGroup_length').hide();
+    });
+</script>

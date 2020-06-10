@@ -1,0 +1,107 @@
+@(title: String, action: String, formData: Form[models.Newsletters], url: play.api.mvc.Call)
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title +" | Enwie Admin Page"){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Preference")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id->"form-save") {
+                    <div class="box-body">
+                        <div class="row">
+                            @mytext(formData("id"), "", "", "hidden")
+                            <div class="col-xs-6">
+                                @mytext(formData("title"), "Title*")
+                                @mytextarea(formData("contents"), "Content *")
+                            </div>
+
+                           
+                        </div>
+
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.NewsletterController.index(), action.equalsIgnoreCase("add"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+</div>
+}
+<script>
+$(function () {
+    CKEDITOR.replace( 'contents',
+        {
+            filebrowserBrowseUrl :'/admin/ckeditor/browser?Connector=/admin/ckeditor/connector',
+            filebrowserImageBrowseUrl : '/admin/ckeditor/browser?Type=Image&Connector=/admin/ckeditor/connector',
+            filebrowserFlashBrowseUrl :'/admin/ckeditor/browser?Type=Flash&Connector=/admin/ckeditor/connector',
+            filebrowserUploadUrl  :'/admin/ckeditor/upload?Type=File',
+            filebrowserImageUploadUrl : '/admin/ckeditor/upload?Type=Image',
+            filebrowserFlashUploadUrl : '/admin/ckeditor/upload?Type=Flash'
+        });
+    
+});
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.input_currency').autoNumeric('init');
+    });
+	
+	$.validator.addMethod("valueNotEquals", function(value, element, arg){
+          return arg != value;
+         }, "Value must not equal arg.");
+		 
+	$("#form-save").validate({
+        ignore: [],
+        rules: {
+            
+            title :{
+                required: true
+            },
+			contents :{
+                required: true
+            }
+        },
+        messages: {
+            title: "Title is required",
+			contents: "Ccontent is required",
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            form.submit();
+        }
+    });
+</script>

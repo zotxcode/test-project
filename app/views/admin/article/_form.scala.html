@@ -1,0 +1,332 @@
+@(title: String, action: String, formData: Form[Article], url: play.api.mvc.Call, listCategory: Map[Integer, String], listTags: List[String])
+
+@import helper._
+@import views.html.admin.helper._
+
+@views.html.admin.main(action + " " + title){
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    @mybreadcumb(title, "Information")
+
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+
+            @myalert()
+
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">@action @title</h3>
+                    </div>
+                    @form(url, 'role->"form", 'id -> "form-save", 'enctype -> "multipart/form-data") {
+                    <div class="box-body">
+                        @mytext(formData("id"), "", "", "hidden")
+                        @mytext(formData("name"), "Name *")
+                        @mytext(formData("title"), "Meta Title * ")
+                        @mytext(formData("keyword"), "Meta Keyword *")
+                        @mytext(formData("description"), "Meta Description *")
+                        @myselectbutton(formData("article_category_id"), "Category *", listCategory, "idBtn", "Add Category")
+
+                        <div class="form-group">
+                            <label>Image *</label>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <button type="button" name="addimage" id="addimage" class="btn btn-primary">Show Image</button>
+                                </div>
+                                <div class="col-md-8 col-sm-10 col-xs-12 margin-show">
+                                    <div id="box-add-image" class="box box-info box-solid">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Add Images</h3>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="col-md-12">
+                                                @mytext(formData("imageName"), "Image Name *")
+                                                @mytext(formData("imageTitle"), "Meta Title *")
+                                                @mytext(formData("imageAlternate"), "Meta Keyword *")
+                                                @mytext(formData("imageDescription"), "Meta Description *")
+                                                @myfile(formData("imageHeaderUrl"), "Image", "", "", "preview")
+                                                <div class="col-md-12">
+                                                    <img id="preview" class="col-md-12" src="@formData("imageLink").value"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tags">Tags</label>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <select id="tags" name="tags_list[]" multiple="multiple" class="form-control" style="width: 100%;">
+                                        @for(tag <- listTags){
+                                        <option value="@tag" selected="selected">@tag</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        @mytextarea(formData("shortDescription"), "Short Desc*")
+                        @mytextarea(formData("content"), "Content *")
+                    </div>
+                    <div class="box-footer">
+                        @mybutton(controllers.admin.routes.ArticleController.index(), action.equalsIgnoreCase("add"))
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+
+
+<div id="modal-add-category" class="modal fade" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="true"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Add Category</h4>
+            </div>
+            @form(controllers.admin.routes.ArticleController.saveCategory(), 'role->"form", 'id->"formArticleCategory") {
+            <div class="modal-body">
+                @mytext(formData("name"), "Category Name")
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                <button type="button" class="btn btn-primary submit-add-category">Save</button>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+
+}
+<script>
+  $(function () {
+    $("#article_category_id").select2();
+    $("#tags").select2({
+        tags:true,
+        tokenSeparators: [',', ' ']
+    });
+    CKEDITOR.replace( 'content',
+        {
+            filebrowserBrowseUrl :'/admin/ckeditor/browser?Connector=/admin/ckeditor/connector',
+            filebrowserImageBrowseUrl : '/admin/ckeditor/browser?Type=Image&Connector=/admin/ckeditor/connector',
+            filebrowserFlashBrowseUrl :'/admin/ckeditor/browser?Type=Flash&Connector=/admin/ckeditor/connector',
+            filebrowserUploadUrl  :'/admin/ckeditor/upload?Type=File',
+            filebrowserImageUploadUrl : '/admin/ckeditor/upload?Type=Image',
+            filebrowserFlashUploadUrl : '/admin/ckeditor/upload?Type=Flash'
+        });
+    CKEDITOR.config.allowedContent = true;
+    $('#idBtn').on('click', function() {
+        $('#formArticleCategory')[0].reset();
+        $('#modal-add-category').modal('show');
+    });
+    $('#box-add-image').hide();
+    $('#addimage').on('click', function() {
+        if($('#box-add-image').is(":visible")){
+            $('#box-add-image').hide();
+            $('#addimage').text('Show Image');
+        }else{
+            $('#box-add-image').show();
+            $('#addimage').text('Hide Image');
+        }
+    });
+
+    $('.submit-add-category').on('click', function() {
+        $('#formArticleCategory').ajaxSubmit({
+            dataType: 'json',
+            beforeSend: function() {
+                $('#modal-add-category').modal('hide');
+                MyApp.loadingOverlay.show();
+            },
+            uploadProgress: function(event, position, total, percentComplete) {
+            },
+            error: function(data ) {
+                resp = JSON.parse(data.responseText);
+                alert(resp.message);
+            },
+            success: function(resp) {
+                alert(resp.message);
+                $("#article_category_id").select2({data: [{id: resp.data.id, text: resp.data.name}]});
+                $("#article_category_id").val(resp.data.id).change();
+            },
+            complete: function(xhr) {
+                MyApp.loadingOverlay.hide();
+                try {
+                    resp = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    alert('terjadi kesalahan');
+                }
+            }
+        });
+    });
+
+  });
+
+var loadFile = function(event, previewId, fileId) {
+    var output = document.getElementById(previewId);
+    output.src = URL.createObjectURL(event.target.files[0]);
+    var $img = $('#'+previewId);
+    $img.on('load', function(){
+        var imageWidth = $(this).prop('naturalWidth');
+        var imageHeight = $(this).prop('naturalHeight');
+        $('#'+fileId).removeData('imageWidth');
+        $('#'+fileId).removeData('imageHeight');
+
+        $('#'+fileId).data('imageWidth', imageWidth);
+        $('#'+fileId).data('imageHeight', imageHeight);
+    });
+};
+
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $.validator.addMethod(
+        "validatorSelect",
+        function(value, element) {
+            if($('#article_category_id').val() != 0)
+                    return true;
+                else return false;
+        },
+        "Please select category"
+    );
+
+    $("#form-save").validate({
+        ignore: [],
+        rules: {
+		   name: {
+				required: true,
+				maxlength: 100,
+				spesialChart: "name"
+			},
+			title: {
+				required: true,
+				maxlength: 100,
+				spesialChart: "title"
+			},
+			keyword: {
+				required: true,
+				maxlength: 100,
+				spesialChart: "keyword"
+			},
+			description: {
+				required: true,
+				maxlength: 200,
+				spesialChart: "description"
+			},
+          imageName: {
+				required: true,
+				maxlength: 200,
+				spesialChart: "imageName"
+			},
+          imageTitle: {
+				required: true,
+				maxlength: 200,
+				spesialChart: "imageTitle"
+			},
+          imageAlternate: {
+				required: true,
+				maxlength: 200,
+				spesialChart: "imageAlternate"
+			},
+          imageDescription: {
+				required: true,
+				maxlength: 200,
+				spesialChart: "imageDescription"
+			},
+          shortDescription: "required",
+          article_category_id: {
+                validatorSelect : true
+          },
+          content: {
+                         required: function()
+                        {
+                         CKEDITOR.instances.content.updateElement();
+                        }
+                    }
+        },
+        messages: {
+            name: {
+                required: "Name is required"
+            },
+            title: {
+                required: "Title is required"
+            },
+            keyword: {
+                required: "Keyword is required"
+            },
+            description: {
+                required: "Description is required"
+            },
+          imageName: {
+                required: "Image Name is required"
+            },
+          imageTitle: {
+                required: "Image Title is required"
+            },
+          imageAlternate: {
+                required: "Image Keyword is required"
+            },
+          imageDescription: {
+                required: "Image Description is required"
+            },
+          shortDescription: "Short description is required",
+          article_category_id: {
+                validatorSelect :"Please select category"
+          },
+          content: {
+                        required:"Content is required"
+                    }
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        success: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            $(element).remove();
+        },
+        errorPlacement: function (error, element) {
+            if(element.is('select')) {
+                element.next().after(error);
+            }
+            else if(element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else error.insertAfter(element);
+        },
+        submitHandler: function(form) {
+            MyApp.loadingOverlay.show();
+            form.submit();
+        }
+    });
+
+    $('#article_category_id').on('change', function(){
+            $('#article_category_id').valid();
+    })
+
+    $('#name').on('change', function(){ $('#imageName').val($(this).val()); });
+    $('#title').on('change', function(){ $('#imageTitle').val($(this).val()); });
+    $('#keyword').on('change', function(){ $('#imageAlternate').val($(this).val()); });
+    $('#description').on('change', function(){ $('#imageDescription').val($(this).val()); });
+});
+$('#title').on('change', function(){
+	$('#keyword').val($(this).val());
+	$('#description').val($(this).val());
+	$('#imageTitle').val($(this).val());
+	$('#imageAlternate').val($(this).val());
+	$('#imageDescription').val($(this).val());
+})
+
+$.validator.addMethod("spesialChart",
+        function(value, element, params) {
+			var pattern=/[^0-9|a-z|^A-Z|^\s]/;
+			if(!document.getElementById(params).value.match(pattern))
+			return true;
+        }, 'There cannot be a special character.');
+</script>
